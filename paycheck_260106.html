@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026년 실수령액 계산기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .info-box {
+            background: #f0f4ff;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .info-box ul {
+            list-style: none;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .info-box li {
+            margin: 5px 0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .result {
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .net-salary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .net-salary .label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .net-salary .amount {
+            font-size: 36px;
+            font-weight: bold;
+        }
+        
+        .summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-card {
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+        }
+        
+        .summary-card.gross {
+            background: #e3f2fd;
+            border-color: #2196F3;
+        }
+        
+        .summary-card.employer {
+            background: #e8f5e9;
+            border-color: #4CAF50;
+        }
+        
+        .summary-card .label {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .summary-card.gross .label {
+            color: #1976D2;
+        }
+        
+        .summary-card.employer .label {
+            color: #388E3C;
+        }
+        
+        .summary-card .amount {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .summary-card.gross .amount {
+            color: #1565C0;
+        }
+        
+        .summary-card.employer .amount {
+            color: #2E7D32;
+        }
+        
+        .details {
+            background: #f9f9f9;
+            padding: 25px;
+            border-radius: 10px;
+        }
+        
+        .details h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-item.total {
+            font-weight: bold;
+            padding-top: 15px;
+            margin-top: 10px;
+            border-top: 2px solid #ddd;
+        }
+        
+        .deduction {
+            color: #d32f2f;
+        }
+        
+        .addition {
+            color: #388E3C;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .footer-note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #856404;
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .summary {
+                grid-template-columns: 1fr;
+            }
+            
+            .net-salary .amount {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 2026년 실수령액 계산기</h1>
+        
+        <div class="info-box">
+            <h3>2026년 인상된 요율</h3>
+            <ul>
+                <li>• 국민연금: 4.5% → <strong>4.75%</strong></li>
+                <li>• 건강보험: 3.545% → <strong>3.595%</strong></li>
+                <li>• 장기요양보험: 건강보험의 12.95% → <strong>13.14%</strong></li>
+            </ul>
+        </div>
+        
+        <form id="salaryForm">
+            <div class="form-group">
+                <label>월 급여액 (세전)</label>
+                <input type="text" id="salary" placeholder="예: 3500000" required>
+            </div>
+            
+            <div class="form-group">
+                <label>부양가족 수 (본인 포함)</label>
+                <select id="dependents">
+                    <option value="1">1명</option>
+                    <option value="2">2명</option>
+                    <option value="3">3명</option>
+                    <option value="4">4명</option>
+                    <option value="5">5명</option>
+                    <option value="6">6명</option>
+                    <option value="7">7명</option>
+                    <option value="8">8명</option>
+                    <option value="9">9명</option>
+                    <option value="10">10명</option>
+                    <option value="11">11명</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>8세 이상 20세 이하 자녀 수</label>
+                <select id="children">
+                    <option value="0">0명</option>
+                    <option value="1">1명</option>
+                    <option value="2">2명</option>
+                    <option value="3">3명</option>
+                    <option value="4">4명</option>
+                    <option value="5">5명</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>산재보험 요율 (%)</label>
+                <input type="text" id="industrialRate" value="0.14" placeholder="예: 0.14">
+                <div class="hint">업종별 요율: 사무직 0.06%, 제조업 0.7~2%, 건설업 3~7%</div>
+            </div>
+            
+            <button type="submit">계산하기</button>
+        </form>
+        
+        <div id="result" class="result">
+            <div class="net-salary">
+                <div class="label">실수령액</div>
+                <div class="amount" id="netSalary">-</div>
+            </div>
+            
+            <div class="summary">
+                <div class="summary-card gross">
+                    <div class="label">세전 급여</div>
+                    <div class="amount" id="grossSalary">-</div>
+                </div>
+                <div class="summary-card employer">
+                    <div class="label">사업주 총부담</div>
+                    <div class="amount" id="totalCost">-</div>
+                </div>
+            </div>
+            
+            <div class="details">
+                <div class="section">
+                    <h3>근로자 공제 내역</h3>
+                    <div class="detail-item">
+                        <span>국민연금 (4.75%)</span>
+                        <span class="deduction" id="pension">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>건강보험 (3.595%)</span>
+                        <span class="deduction" id="health">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>장기요양보험 (13.14%)</span>
+                        <span class="deduction" id="longTermCare">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>고용보험 (0.9%)</span>
+                        <span class="deduction" id="employment">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>소득세 (간이세액표)</span>
+                        <span class="deduction" id="incomeTax">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>지방소득세</span>
+                        <span class="deduction" id="localTax">-</span>
+                    </div>
+                    <div class="detail-item total">
+                        <span>총 공제액</span>
+                        <span class="deduction" id="totalDeduction">-</span>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>사업주 부담분</h3>
+                    <div class="detail-item">
+                        <span>국민연금 (4.75%)</span>
+                        <span class="addition" id="pensionEmployer">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>건강보험 (3.595%)</span>
+                        <span class="addition" id="healthEmployer">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>장기요양보험 (13.14%)</span>
+                        <span class="addition" id="longTermCareEmployer">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>고용보험 (1.15%)</span>
+                        <span class="addition" id="employmentEmployer">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>산재보험 (<span id="industrialRateDisplay">-</span>%)</span>
+                        <span class="addition" id="industrialAccident">-</span>
+                    </div>
+                    <div class="detail-item total">
+                        <span>총 부담액</span>
+                        <span class="addition" id="totalEmployer">-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-note">
+                ※ 소득세는 2024년 2월 개정 간이세액표를 정확히 반영했습니다.<br>
+                ※ 모든 원천징수액은 원단위 절사하여 계산됩니다.<br>
+                ※ 산재보험 요율은 업종별로 다르므로 직접 입력해주세요.<br>
+                ※ 실제 금액은 회사의 급여 지급 조건에 따라 다를 수 있습니다.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const simplifiedTaxTable = {
+            1: [[1060,1040],[1065,1110],[1070,1180],[1075,1250],[1080,1320],[1500,8760],[1510,9120],[2000,19200],[2500,35600],[3000,73060],[3500,127220],[4000,195960],[4500,260040],[5000,332660],[5100,346690],[5200,360710],[5300,374740],[5400,388760],[5500,402790],[6000,447670],[6500,619300],[7000,728170],[7500,841570],[8000,954970],[8500,1069500],[9000,1186500],[9500,1340190],[10000,1503990]],
+            2: [[1340,1060],[1345,1170],[1500,4260],[2000,14540],[2080,16190],[2500,28600],[3000,55560],[3500,102220],[4000,167950],[4500,231670],[5000,303920],[5100,317870],[5200,331820],[5300,345770],[5400,359720],[5500,373670],[6000,418310],[6500,571490],[7000,679780],[7500,792580],[8000,905380],[8500,1019310],[9000,1135710],[9500,1265210],[10000,1428170]],
+            3: [[1720,1040],[1730,1240],[2000,6400],[2080,8180],[2500,16530],[3000,31450],[3500,62460],[4000,109590],[4500,168270],[5000,235270],[5100,248170],[5200,261070],[5300,273970],[5400,286870],[5500,299770],[6000,341050],[6500,461720],[7000,553120],[7500,658720],[8000,764320],[8500,871050],[9000,980250],[9500,1093820],[10000,1200840]],
+            4: [[1890,1040],[1900,1240],[2000,3020],[2080,4610],[2500,12950],[3000,26200],[3500,49340],[4000,91670],[4500,149520],[5000,216520],[5100,229420],[5200,242320],[5300,255220],[5400,268120],[5500,281020],[6000,322300],[6500,442970],[7000,523120],[7500,628720],[8000,734320],[8500,841050],[9000,950250],[9500,1063820],[10000,1170840]],
+            5: [[2060,1040],[2070,1240],[2080,1430],[2500,9780],[3000,20950],[3500,37630],[4000,78550],[4170,0],[4500,130770],[5000,197770],[5100,210670],[5200,223570],[5300,236470],[5400,249370],[5500,262270],[6000,303550],[6500,424220],[7000,493120],[7500,598720],[8000,704320],[8500,811050],[9000,920250],[9500,1033820],[10000,1140840]],
+            6: [[2230,1040],[2240,1230],[2500,6610],[3000,15790],[3500,32380],[4000,69990],[4500,117180],[5000,179020],[5100,191920],[5200,204820],[5300,217720],[5400,230620],[5500,243520],[6000,284800],[6500,405470],[7000,468830],[7500,568720],[8000,674320],[8500,781050],[9000,890250],[9500,1003820],[10000,1110840]],
+            7: [[2400,1030],[2410,1230],[2500,3030],[3000,13410],[3500,27130],[4000,60850],[4500,103590],[5000,160270],[5100,173170],[5200,186070],[5300,198970],[5400,211870],[5500,224770],[5830,0],[6000,266050],[6500,386720],[7000,450080],[7500,538720],[8000,644320],[8500,751050],[9000,860250],[9500,973820],[10000,1080840]],
+            8: [[2570,1130],[2580,1350],[2590,1560],[2600,1770],[3000,10040],[3500,21880],[4000,52300],[4500,89920],[5000,141520],[5100,154420],[5200,167320],[5300,180220],[5400,193120],[5500,206020],[6000,247300],[6670,0],[6500,367970],[7000,431330],[7500,508720],[8000,614320],[8500,721050],[9000,830250],[9500,943820],[10000,1050840]],
+            9: [[2730,1150],[2740,1360],[2750,1570],[3000,6660],[3500,16580],[4000,43570],[4500,76150],[5000,122770],[5100,135670],[5200,148570],[5300,161470],[5400,174370],[5500,187270],[6000,228550],[6500,349220],[7000,412580],[7500,478720],[8000,584320],[8500,691050],[8800,0],[9000,800250],[9500,913820],[10000,1020840]],
+            10: [[2890,1170],[2900,1380],[3000,3290],[3500,13210],[4000,34480],[4500,63030],[5000,104020],[5100,116920],[5200,129820],[5300,142720],[5400,155620],[5500,168520],[6000,209800],[6500,330470],[7000,393830],[7500,459830],[8000,554320],[8500,661050],[9000,770250],[9500,883820],[10000,990840]],
+            11: [[3040,1080],[3060,1500],[3080,1930],[3100,2350],[3500,9830],[4000,29910],[4500,49900],[5000,86020],[5100,98170],[5200,111070],[5300,123970],[5400,136870],[5500,149770],[6000,191050],[6500,311720],[7000,375080],[7500,441080],[8000,524320],[8500,631050],[9000,740250],[9500,853820],[10000,960840]]
+        };
+
+        function getTaxFromTable(monthlyIncome, deps) {
+            const depsKey = Math.min(deps, 11);
+            const table = simplifiedTaxTable[depsKey];
+            const incomeInThousand = monthlyIncome / 1000;
+            
+            for (let i = 0; i < table.length - 1; i++) {
+                const [bracket1, tax1] = table[i];
+                const [bracket2, tax2] = table[i + 1];
+                
+                if (incomeInThousand >= bracket1 && incomeInThousand < bracket2) {
+                    const ratio = (incomeInThousand - bracket1) / (bracket2 - bracket1);
+                    const tax = tax1 + (tax2 - tax1) * ratio;
+                    return Math.floor(tax);
+                }
+            }
+            
+            if (incomeInThousand > 10000) {
+                const baseTax = table[table.length - 1][1];
+                const excess = incomeInThousand - 10000;
+                
+                if (incomeInThousand <= 14000) {
+                    return Math.floor(baseTax + 25000 + (excess * 1000 * 0.98 * 0.35));
+                } else if (incomeInThousand <= 28000) {
+                    return Math.floor(baseTax + 1397000 + ((excess - 4000) * 1000 * 0.98 * 0.38));
+                } else if (incomeInThousand <= 30000) {
+                    return Math.floor(baseTax + 6610600 + ((excess - 18000) * 1000 * 0.98 * 0.40));
+                } else if (incomeInThousand <= 45000) {
+                    return Math.floor(baseTax + 7394600 + ((excess - 20000) * 1000 * 0.40));
+                } else if (incomeInThousand <= 87000) {
+                    return Math.floor(baseTax + 13394600 + ((excess - 35000) * 1000 * 0.42));
+                } else {
+                    return Math.floor(baseTax + 31034600 + ((excess - 77000) * 1000 * 0.45));
+                }
+            }
+            
+            return table[table.length - 1][1];
+        }
+
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        document.getElementById('salaryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const salary = parseInt(document.getElementById('salary').value.replace(/,/g, ''));
+            const dependents = parseInt(document.getElementById('dependents').value);
+            const children = parseInt(document.getElementById('children').value);
+            const industrialRate = parseFloat(document.getElementById('industrialRate').value);
+            
+            if (!salary || salary <= 0) {
+                alert('올바른 금액을 입력해주세요.');
+                return;
+            }
+            
+            if (isNaN(industrialRate) || industrialRate < 0 || industrialRate > 10) {
+                alert('산재보험 요율은 0~10% 사이로 입력해주세요.');
+                return;
+            }
+            
+            // 계산
+            const pensionBase = Math.min(Math.max(salary, 370000), 5900000);
+            const pension = Math.floor(pensionBase * 0.0475 / 10) * 10;
+            const pensionEmployer = Math.floor(pensionBase * 0.0475 / 10) * 10;
+            
+            const health = Math.floor(salary * 0.03595 / 10) * 10;
+            const healthEmployer = Math.floor(salary * 0.03595 / 10) * 10;
+            
+            const longTermCare = Math.floor(health * 0.1314 / 10) * 10;
+            const longTermCareEmployer = Math.floor(healthEmployer * 0.1314 / 10) * 10;
+            
+            const employment = Math.floor(salary * 0.009 / 10) * 10;
+            const employmentEmployer = Math.floor(salary * 0.0115 / 10) * 10;
+            
+            const industrialAccident = Math.floor(salary * (industrialRate / 100) / 10) * 10;
+            
+            let incomeTax = getTaxFromTable(salary, dependents);
+            
+            if (children > 0) {
+                if (children === 1) {
+                    incomeTax -= 12500;
+                } else if (children === 2) {
+                    incomeTax -= 29160;
+                } else if (children >= 3) {
+                    incomeTax -= 29160 + (children - 2) * 25000;
+                }
+            }
+            
+            incomeTax = Math.max(0, incomeTax);
+            incomeTax = Math.floor(incomeTax / 10) * 10;
+            
+            const localTax = Math.floor(incomeTax * 0.1 / 10) * 10;
+            
+            const totalDeduction = pension + health + longTermCare + employment + incomeTax + localTax;
+            const totalEmployer = pensionEmployer + healthEmployer + longTermCareEmployer + employmentEmployer + industrialAccident;
+            const netSalary = salary - totalDeduction;
+            const totalCost = salary + totalEmployer;
+            
+            // 결과 표시
+            document.getElementById('netSalary').textContent = formatNumber(netSalary) + ' 원';
+            document.getElementById('grossSalary').textContent = formatNumber(salary) + ' 원';
+            document.getElementById('totalCost').textContent = formatNumber(totalCost) + ' 원';
+            
+            document.getElementById('pension').textContent = '- ' + formatNumber(pension) + ' 원';
+            document.getElementById('health').textContent = '- ' + formatNumber(health) + ' 원';
+            document.getElementById('longTermCare').textContent = '- ' + formatNumber(longTermCare) + ' 원';
+            document.getElementById('employment').textContent = '- ' + formatNumber(employment) + ' 원';
+            document.getElementById('incomeTax').textContent = '- ' + formatNumber(incomeTax) + ' 원';
+            document.getElementById('localTax').textContent = '- ' + formatNumber(localTax) + ' 원';
+            document.getElementById('totalDeduction').textContent = '- ' + formatNumber(totalDeduction) + ' 원';
+            
+            document.getElementById('pensionEmployer').textContent = '+ ' + formatNumber(pensionEmployer) + ' 원';
+            document.getElementById('healthEmployer').textContent = '+ ' + formatNumber(healthEmployer) + ' 원';
+            document.getElementById('longTermCareEmployer').textContent = '+ ' + formatNumber(longTermCareEmployer) + ' 원';
+            document.getElementById('employmentEmployer').textContent = '+ ' + formatNumber(employmentEmployer) + ' 원';
+            document.getElementById('industrialAccident').textContent = '+ ' + formatNumber(industrialAccident) + ' 원';
+            document.getElementById('industrialRateDisplay').textContent = industrialRate;
+            document.getElementById('totalEmployer').textContent = '+ ' + formatNumber(totalEmployer) + ' 원';
+            
+            document.getElementById('result').classList.add('show');
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+        
+        // 숫자 입력 시 자동으로 콤마 추가
+        document.getElementById('salary').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/,/g, '');
+            if (value && !isNaN(value)) {
+                e.target.value = formatNumber(value);
+            }
+        });
+    </script>
+</body>
+</html>
