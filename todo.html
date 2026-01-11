@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>할일 관리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .circular-progress {
+            transform: rotate(-90deg);
+            filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.3));
+        }
+        
+        .gradient-border {
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(135deg, #667eea 0%, #764ba2 100%) border-box;
+            border: 3px solid transparent;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4 sm:p-8">
+    <div class="max-w-5xl mx-auto">
+        <!-- 헤더 -->
+        <div class="text-center mb-8 animate-fade-in">
+            <div class="inline-block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-transparent bg-clip-text">
+                <h1 class="text-5xl font-bold mb-2">✨ 할일 관리</h1>
+            </div>
+            <p class="text-gray-600 text-sm">당신의 생산성을 극대화하세요</p>
+        </div>
+
+        <div class="glass-effect rounded-3xl shadow-2xl p-8 mb-6 animate-fade-in">
+            <!-- 전체 진척도 -->
+            <div class="mb-10 p-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl text-white shadow-xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-3">전체 진척도</h2>
+                        <p class="text-lg opacity-90" id="totalProgressText">0개의 할일 중 0개 완료</p>
+                    </div>
+                    <div id="totalProgressCircle" class="transform hover:scale-110 transition-transform"></div>
+                </div>
+            </div>
+
+            <!-- 필터 버튼 -->
+            <div class="mb-8">
+                <button id="archiveToggle" class="flex items-center gap-3 px-6 py-3 rounded-xl transition font-medium shadow-lg bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 hover:from-purple-200 hover:to-pink-200 transform hover:scale-105">
+                    <span class="text-xl">📦</span>
+                    <span>과거 완료작업 보기 (<span id="archiveCount">0</span>)</span>
+                </button>
+            </div>
+
+            <!-- 과거 완료작업 -->
+            <div id="archiveSection" class="mb-8 p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl hidden border-2 border-purple-200">
+                <h3 class="text-xl font-bold text-purple-800 mb-4 flex items-center gap-2">
+                    <span>📦</span> 과거 완료작업
+                </h3>
+                <div id="archiveList"></div>
+            </div>
+
+            <!-- 입력 폼 -->
+            <div class="mb-10 space-y-5 p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
+                <input type="text" id="titleInput" placeholder="✍️ 할일을 입력하세요" 
+                    class="w-full px-6 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition text-lg font-medium">
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-3 ml-1">📅 시작일시 (선택)</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="date" id="dateInput" 
+                            class="px-6 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition">
+                        <input type="time" id="timeInput" 
+                            class="px-6 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-3 ml-1">⏰ 완료시한 (선택)</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="date" id="deadlineInput" 
+                            class="px-6 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition">
+                        <input type="time" id="deadlineTimeInput" 
+                            class="px-6 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition">
+                    </div>
+                </div>
+
+                <button id="addBtn" class="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white py-4 rounded-xl hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 transition flex items-center justify-center gap-3 font-bold text-lg shadow-xl transform hover:scale-105">
+                    <span class="text-xl">➕</span> 추가하기
+                </button>
+            </div>
+
+            <!-- 할일 목록 -->
+            <div id="todoList" class="space-y-4"></div>
+        </div>
+
+        <div class="text-center text-gray-600 text-sm space-y-2 animate-fade-in">
+            <p class="font-medium">💡 작업 완료 시 눈 아이콘을 눌러 보관할 수 있어요</p>
+            <p class="font-medium">📅 캘린더 버튼을 누르면 구글 캘린더에 간편하게 저장할 수 있어요</p>
+        </div>
+    </div>
+
+    <script>
+        let todos = [];
+        let expandedTodos = {};
+        let showArchive = false;
+
+        // localStorage에서 데이터 불러오기
+        function loadData() {
+            const saved = localStorage.getItem('todos');
+            if (saved) {
+                todos = JSON.parse(saved);
+                render();
+            }
+        }
+
+        // localStorage에 데이터 저장
+        function saveData() {
+            localStorage.setItem('todos', JSON.stringify(todos));
+        }
+
+        // 할일 추가
+        function addTodo() {
+            const title = document.getElementById('titleInput').value.trim();
+            if (!title) return;
+
+            const todo = {
+                id: Date.now(),
+                title,
+                date: document.getElementById('dateInput').value,
+                time: document.getElementById('timeInput').value,
+                deadline: document.getElementById('deadlineInput').value,
+                deadlineTime: document.getElementById('deadlineTimeInput').value,
+                completed: false,
+                subtasks: [],
+                archived: false,
+                completedAt: null
+            };
+
+            todos.push(todo);
+            saveData();
+            
+            document.getElementById('titleInput').value = '';
+            document.getElementById('dateInput').value = '';
+            document.getElementById('timeInput').value = '';
+            document.getElementById('deadlineInput').value = '';
+            document.getElementById('deadlineTimeInput').value = '';
+            
+            render();
+        }
+
+        // 할일 토글
+        function toggleTodo(id) {
+            todos = todos.map(todo => {
+                if (todo.id === id) {
+                    const newCompleted = !todo.completed;
+                    return {
+                        ...todo,
+                        completed: newCompleted,
+                        completedAt: newCompleted ? new Date().toISOString() : null,
+                        subtasks: todo.subtasks.map(st => ({ ...st, completed: newCompleted }))
+                    };
+                }
+                return todo;
+            });
+            saveData();
+            render();
+        }
+
+        // 세부 목록 추가
+        function addSubtask(todoId, input) {
+            const title = input.value.trim();
+            if (!title) return;
+
+            todos = todos.map(todo => {
+                if (todo.id === todoId) {
+                    return {
+                        ...todo,
+                        subtasks: [...todo.subtasks, { id: Date.now(), title, completed: false }]
+                    };
+                }
+                return todo;
+            });
+            
+            input.value = '';
+            saveData();
+            render();
+        }
+
+        // 세부 목록 토글
+        function toggleSubtask(todoId, subtaskId) {
+            todos = todos.map(todo => {
+                if (todo.id === todoId) {
+                    const updatedSubtasks = todo.subtasks.map(st =>
+                        st.id === subtaskId ? { ...st, completed: !st.completed } : st
+                    );
+                    const allCompleted = updatedSubtasks.length > 0 && updatedSubtasks.every(st => st.completed);
+                    return {
+                        ...todo,
+                        subtasks: updatedSubtasks,
+                        completed: allCompleted,
+                        completedAt: allCompleted ? new Date().toISOString() : todo.completedAt
+                    };
+                }
+                return todo;
+            });
+            saveData();
+            render();
+        }
+
+        // 할일 삭제
+        function deleteTodo(id) {
+            todos = todos.filter(t => t.id !== id);
+            saveData();
+            render();
+        }
+
+        // 세부 목록 삭제
+        function deleteSubtask(todoId, subtaskId) {
+            todos = todos.map(todo => {
+                if (todo.id === todoId) {
+                    return {
+                        ...todo,
+                        subtasks: todo.subtasks.filter(st => st.id !== subtaskId)
+                    };
+                }
+                return todo;
+            });
+            saveData();
+            render();
+        }
+
+        // 보관
+        function archiveTodo(id) {
+            todos = todos.map(t => t.id === id ? { ...t, archived: true } : t);
+            saveData();
+            render();
+        }
+
+        // 복원
+        function unarchiveTodo(id) {
+            todos = todos.map(t => t.id === id ? { ...t, archived: false } : t);
+            saveData();
+            render();
+        }
+
+        // 확장 토글
+        function toggleExpanded(id) {
+            expandedTodos[id] = !expandedTodos[id];
+            render();
+        }
+
+        // 진척도 계산
+        function getProgress(todo) {
+            if (todo.subtasks.length === 0) {
+                return todo.completed ? 100 : 0;
+            }
+            const completed = todo.subtasks.filter(st => st.completed).length;
+            return Math.round((completed / todo.subtasks.length) * 100);
+        }
+
+        // 전체 진척도
+        function getTotalProgress() {
+            const activeTodos = todos.filter(t => !t.archived);
+            if (activeTodos.length === 0) return 0;
+            const totalProgress = activeTodos.reduce((sum, todo) => sum + getProgress(todo), 0);
+            return Math.round(totalProgress / activeTodos.length);
+        }
+
+        // 원형 진척도 생성 (두껍고 컬러풀한 그래프)
+        function createCircularProgress(percentage, size = 60) {
+            const radius = (size - 16) / 2;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (percentage / 100) * circumference;
+            
+            // 진척도에 따른 그라디언트 색상
+            let gradientId = `gradient-${Math.random().toString(36).substr(2, 9)}`;
+            let color1, color2;
+            
+            if (percentage < 30) {
+                color1 = '#ef4444'; color2 = '#f97316'; // 빨강-주황
+            } else if (percentage < 70) {
+                color1 = '#f59e0b'; color2 = '#eab308'; // 주황-노랑
+            } else if (percentage < 100) {
+                color1 = '#22c55e'; color2 = '#10b981'; // 초록
+            } else {
+                color1 = '#8b5cf6'; color2 = '#ec4899'; // 보라-핑크
+            }
+
+            return `
+                <div class="relative" style="width: ${size}px; height: ${size}px;">
+                    <svg width="${size}" height="${size}" class="circular-progress">
+                        <defs>
+                            <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:${color1};stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:${color2};stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="${size/2}" cy="${size/2}" r="${radius}" fill="none" stroke="#e5e7eb" stroke-width="8"/>
+                        <circle cx="${size/2}" cy="${size/2}" r="${radius}" fill="none" stroke="url(#${gradientId})" stroke-width="8" 
+                            stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round" 
+                            style="transition: stroke-dashoffset 0.8s ease-in-out;"/>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-base font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">${percentage}%</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 구글 캘린더 추가
+        function addToCalendar(todo) {
+            if (!todo.date && !todo.deadline) {
+                alert('시작일시 또는 완료시한이 설정되지 않은 할일입니다.');
+                return;
+            }
+
+            const startDateStr = todo.date || todo.deadline;
+            const startTimeStr = todo.time || todo.deadlineTime || '09:00';
+            const startDate = new Date(`${startDateStr}T${startTimeStr}`);
+            
+            let endDate;
+            if (todo.deadline) {
+                const deadlineTimeStr = todo.deadlineTime || '23:59';
+                endDate = new Date(`${todo.deadline}T${deadlineTimeStr}`);
+            } else {
+                endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+            }
+            
+            const formatDateTime = (date) => {
+                return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            };
+            
+            const startStr = formatDateTime(startDate);
+            const endStr = formatDateTime(endDate);
+            
+            let description = '할일관리 앱에서 추가된 일정';
+            if (todo.deadline && todo.date) {
+                const deadlineStr = new Date(todo.deadline + 'T00:00').toLocaleDateString('ko-KR');
+                description += `\\n완료시한: ${deadlineStr}${todo.deadlineTime ? ' ' + todo.deadlineTime : ''}`;
+            }
+            
+            const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(todo.title)}&dates=${startStr}/${endStr}&details=${encodeURIComponent(description)}`;
+            window.open(url, '_blank');
+        }
+
+        // 렌더링
+        function render() {
+            const activeTodos = todos.filter(t => !t.archived);
+            const archivedTodos = todos.filter(t => t.archived).sort((a, b) => 
+                new Date(b.completedAt) - new Date(a.completedAt)
+            );
+
+            // 전체 진척도
+            const totalProgress = getTotalProgress();
+            const completedCount = activeTodos.filter(t => getProgress(t) === 100).length;
+            document.getElementById('totalProgressText').textContent = 
+                `${activeTodos.length}개의 할일 중 ${completedCount}개 완료`;
+            document.getElementById('totalProgressCircle').innerHTML = createCircularProgress(totalProgress, 100);
+
+            // 보관 개수
+            document.getElementById('archiveCount').textContent = archivedTodos.length;
+
+            // 보관 목록
+            if (archivedTodos.length === 0) {
+                document.getElementById('archiveList').innerHTML = 
+                    '<p class="text-center text-gray-400 py-8 text-lg">아직 보관된 작업이 없습니다</p>';
+            } else {
+                document.getElementById('archiveList').innerHTML = archivedTodos.map(todo => `
+                    <div class="bg-white p-4 rounded-xl flex items-center justify-between mb-3 shadow-md hover:shadow-lg transition">
+                        <div class="flex-1">
+                            <p class="font-semibold text-gray-500 line-through">${todo.title}</p>
+                            ${todo.completedAt ? `<p class="text-xs text-gray-400 mt-1">✅ 완료: ${new Date(todo.completedAt).toLocaleString('ko-KR')}</p>` : ''}
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="unarchiveTodo(${todo.id})" class="px-4 py-2 text-sm font-medium bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 rounded-lg hover:from-indigo-200 hover:to-purple-200 transition transform hover:scale-105">
+                                복원
+                            </button>
+                            <button onclick="deleteTodo(${todo.id})" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // 할일 목록
+            if (activeTodos.length === 0) {
+                document.getElementById('todoList').innerHTML = 
+                    '<div class="text-center text-gray-400 py-20"><p class="text-2xl mb-2">📝</p><p class="text-xl font-medium">할일을 추가해보세요!</p></div>';
+            } else {
+                document.getElementById('todoList').innerHTML = activeTodos.map(todo => {
+                    const progress = getProgress(todo);
+                    const isExpanded = expandedTodos[todo.id];
+                    const isOverdue = todo.deadline && 
+                        new Date(todo.deadline + 'T' + (todo.deadlineTime || '23:59')) < new Date() && 
+                        !todo.completed;
+
+                    return `
+                        <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.01] animate-fade-in">
+                            <div class="p-5 hover:bg-gradient-to-br hover:from-gray-50 hover:to-gray-100 transition">
+                                <div class="flex items-start gap-4">
+                                    <button onclick="toggleTodo(${todo.id})" 
+                                        class="mt-1 flex-shrink-0 w-7 h-7 rounded-lg border-3 flex items-center justify-center transition transform hover:scale-110 shadow-md ${
+                                            todo.completed ? 'bg-gradient-to-br from-green-400 to-emerald-500 border-green-500' : 'border-gray-300 hover:border-green-500 bg-white'
+                                        }">
+                                        ${todo.completed ? '<span class="text-white font-bold">✓</span>' : ''}
+                                    </button>
+
+                                    <button onclick="toggleExpanded(${todo.id})" 
+                                        class="mt-1 flex-shrink-0 text-gray-400 hover:text-indigo-600 transition transform hover:scale-125 text-lg">
+                                        ${isExpanded ? '▼' : '▶'}
+                                    </button>
+
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-semibold text-lg ${todo.completed ? 'line-through text-gray-400' : 'text-gray-800'}">
+                                            ${todo.title}
+                                        </p>
+                                        <div class="text-sm text-gray-600 mt-2 space-y-1 font-medium">
+                                            ${(todo.date || todo.time) ? `
+                                                <p class="flex items-center gap-2">
+                                                    <span class="text-lg">📅</span>
+                                                    시작: ${todo.date ? new Date(todo.date + 'T00:00').toLocaleDateString('ko-KR', {month: 'long', day: 'numeric'}) : ''}
+                                                    ${todo.time || ''}
+                                                </p>
+                                            ` : ''}
+                                            ${todo.deadline ? `
+                                                <p class="flex items-center gap-2 ${isOverdue ? 'text-red-600 font-bold' : ''}">
+                                                    <span class="text-lg">⏰</span>
+                                                    완료시한: ${new Date(todo.deadline + 'T00:00').toLocaleDateString('ko-KR', {month: 'long', day: 'numeric'})}
+                                                    ${todo.deadlineTime || ''}
+                                                    ${isOverdue ? ' (기한 초과!)' : ''}
+                                                </p>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+
+                                    <div class="transform hover:scale-110 transition-transform">
+                                        ${createCircularProgress(progress, 60)}
+                                    </div>
+
+                                    <div class="flex gap-2">
+                                        ${progress === 100 ? `
+                                            <button onclick="archiveTodo(${todo.id})" 
+                                                class="p-3 text-purple-600 hover:bg-purple-50 rounded-xl transition transform hover:scale-110 shadow-md" title="보관하기">
+                                                👁️‍🗨️
+                                            </button>
+                                        ` : ''}
+                                        ${(todo.date || todo.deadline) ? `
+                                            <button onclick='addToCalendar(${JSON.stringify(todo).replace(/'/g, "&apos;")})' 
+                                                class="p-3 text-indigo-600 hover:bg-indigo-50 rounded-xl transition transform hover:scale-110 shadow-md" title="캘린더에 추가">
+                                                📅
+                                            </button>
+                                        ` : ''}
+                                        <button onclick="deleteTodo(${todo.id})" 
+                                            class="p-3 text-red-600 hover:bg-red-50 rounded-xl transition transform hover:scale-110 shadow-md" title="삭제">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${isExpanded ? `
+                                <div class="px-5 pb-5 bg-gradient-to-br from-indigo-50 to-purple-50 border-t-2 border-indigo-200">
+                                    <div class="pt-4 space-y-3">
+                                        ${todo.subtasks.map(subtask => `
+                                            <div class="flex items-center gap-3 ml-11 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
+                                                <button onclick="toggleSubtask(${todo.id}, ${subtask.id})" 
+                                                    class="flex-shrink-0 w-6 h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 ${
+                                                        subtask.completed ? 'bg-gradient-to-br from-indigo-400 to-purple-500 border-indigo-500' : 'border-gray-300 hover:border-indigo-500 bg-white'
+                                                    }">
+                                                    ${subtask.completed ? '<span class="text-white text-xs font-bold">✓</span>' : ''}
+                                                </button>
+                                                <p class="flex-1 font-medium ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-700'}">
+                                                    ${subtask.title}
+                                                </p>
+                                                <button onclick="deleteSubtask(${todo.id}, ${subtask.id})" 
+                                                    class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125">
+                                                    🗑️
+                                                </button>
+                                            </div>
+                                        `).join('')}
+                                        <div class="ml-11 mt-4">
+                                            <input type="text" placeholder="✨ 세부 목록 추가..." 
+                                                onkeypress="if(event.key==='Enter') { addSubtask(${todo.id}, this); }"
+                                                class="w-full px-4 py-3 font-medium border-2 border-indigo-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition">
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // 이벤트 리스너
+        document.getElementById('addBtn').addEventListener('click', addTodo);
+        document.getElementById('titleInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTodo();
+        });
+        document.getElementById('archiveToggle').addEventListener('click', () => {
+            showArchive = !showArchive;
+            const section = document.getElementById('archiveSection');
+            const btn = document.getElementById('archiveToggle');
+            
+            if (showArchive) {
+                section.classList.remove('hidden');
+                btn.classList.remove('bg-gradient-to-r', 'from-purple-100', 'to-pink-100', 'text-purple-700');
+                btn.classList.add('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'text-white');
+                btn.innerHTML = '<span class="text-xl">📦</span> <span>과거 완료작업 닫기 (<span id="archiveCount">' + 
+                    todos.filter(t => t.archived).length + '</span>)</span>';
+            } else {
+                section.classList.add('hidden');
+                btn.classList.add('bg-gradient-to-r', 'from-purple-100', 'to-pink-100', 'text-purple-700');
+                btn.classList.remove('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'text-white');
+                btn.innerHTML = '<span class="text-xl">📦</span> <span>과거 완료작업 보기 (<span id="archiveCount">' + 
+                    todos.filter(t => t.archived).length + '</span>)</span>';
+            }
+        });
+
+        // 초기 로드
+        loadData();
+    </script>
+</body>
+</html>
