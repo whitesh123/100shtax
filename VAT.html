@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부가세 간단계산기</title>
+    <style>
+        :root {
+            --sales-bg: #fde2e2;
+            --purchase-bg: #e3f2fd;
+            --input-focus: #fff9c4;
+            --result-orange: #ffa500;
+            --deduction-bg: #f0fff0;
+        }
+
+        body { font-family: 'Malgun Gothic', sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; background-color: #f0f2f5; }
+        .container { width: 100%; max-width: 750px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .header { font-weight: bold; font-size: 1.4rem; margin-bottom: 20px; text-align: center; color: #333; }
+        
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f8f9fa; font-size: 14px; }
+
+        .sales-row { background-color: var(--sales-bg); }
+        .purchase-row { background-color: var(--purchase-bg); }
+        .deduction-row { background-color: var(--deduction-bg); }
+        .orange-result { background-color: var(--result-orange); font-weight: bold; color: white; }
+        .black-cell { background-color: #333; color: white; text-align: center; font-size: 13px; }
+
+        /* 입력창 및 단위 래퍼 */
+        .input-group { display: flex; align-items: center; gap: 5px; }
+        input[type="text"], select { 
+            width: 100%; padding: 8px; border: 1.5px solid #aaa; border-radius: 8px; 
+            background-color: white; text-align: right; font-size: 14px; box-sizing: border-box;
+            transition: 0.2s;
+        }
+        input[type="text"]:focus, select:focus { outline: none; border-color: #007bff; background-color: var(--input-focus); }
+        input[type="checkbox"] { transform: scale(1.3); cursor: pointer; margin-right: 8px; }
+        
+        .unit { font-size: 13px; font-weight: bold; color: #555; white-space: nowrap; }
+        .readonly-val { font-weight: bold; text-align: right; width: 100%; display: block; border: none; background: transparent; }
+        .label-column { width: 45%; font-weight: bold; }
+        .value-column { width: 27.5%; }
+        .prepaid-row { background-color: #ffff00; }
+        .desc-text { font-size: 11px; color: #666; font-weight: normal; display: block; margin-top: 4px; line-height: 1.2; }
+
+        .btn-container { display: flex; gap: 10px; margin-top: 20px; justify-content: center; width: 100%; }
+        .btn { padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
+        .btn-print { background-color: #444; }
+        .btn-pdf { background-color: #e74c3c; }
+        .btn-share { background-color: #3498db; }
+        .btn:hover { opacity: 0.8; }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; max-width: 100%; border: 1px solid #eee; }
+            .btn-container, .black-cell { display: none !important; }
+            input { border: none !important; background: none !important; }
+            .header { font-size: 20pt; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="print-area">
+    <div class="header">과세매출 일반사업자 부가세 간단계산기</div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th class="label-column">항목</th>
+                <th class="value-column">공급가액(수량)</th>
+                <th class="value-column">세액</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="sales-row"><td>일반세금계산서발행</td><td><input type="text" class="money-input" id="s1"></td><td><span class="readonly-val" id="s1-tax">0</span></td></tr>
+            <tr class="sales-row"><td>영세율</td><td><input type="text" class="money-input" id="s2"></td><td class="black-cell">-</td></tr>
+            <tr class="sales-row"><td>신용카드발행</td><td><input type="text" class="money-input" id="s3"></td><td><span class="readonly-val" id="s3-tax">0</span></td></tr>
+            <tr class="sales-row"><td>현금영수증발행</td><td><input type="text" class="money-input" id="s4"></td><td><span class="readonly-val" id="s4-tax">0</span></td></tr>
+            <tr class="sales-row"><td>기타매출</td><td><input type="text" class="money-input" id="s5"></td><td><span class="readonly-val" id="s5-tax">0</span></td></tr>
+            <tr class="sales-row" style="border-top: 2px solid #000;">
+                <td><strong>과세표준 및 세액 (가)</strong></td>
+                <td><span class="readonly-val" id="total-sales-supply">0</span></td>
+                <td><span class="readonly-val" id="total-sales-tax">0</span></td>
+            </tr>
+
+            <tr class="purchase-row"><td>세금계산서 수취</td><td><input type="text" class="money-input" id="p1"></td><td><span class="readonly-val" id="p1-tax">0</span></td></tr>
+            <tr class="purchase-row"><td>신용카드수취</td><td><input type="text" class="money-input" id="p2"></td><td><span class="readonly-val" id="p2-tax">0</span></td></tr>
+            <tr class="purchase-row"><td>현금영수증수취</td><td><input type="text" class="money-input" id="p3"></td><td><span class="readonly-val" id="p3-tax">0</span></td></tr>
+            <tr class="purchase-row">
+                <td>의제매입공제율 
+                    <select id="deemed-rate"><option value="0.0196078">2/102</option><option value="0.0384615">4/104</option><option value="0.0740740">8/108</option><option value="0.0825688">9/109</option></select>
+                </td>
+                <td><input type="text" class="money-input" id="deemed-supply"></td>
+                <td><span class="readonly-val" id="deemed-tax">0</span></td>
+            </tr>
+            <tr class="purchase-row"><td>불공제매입세액</td><td><input type="text" class="money-input" id="non-deductible-supply"></td><td><span class="readonly-val" id="non-deductible-tax">0</span></td></tr>
+            <tr class="purchase-row" style="border-top: 2px solid #000;"><td><strong>매입세액 (나)</strong></td><td class="black-cell">-</td><td><span class="readonly-val" id="total-purchase-tax">0</span></td></tr>
+
+            <tr><td colspan="2" style="background-color: #f9f9f9;">납부세액 (가-나)</td><td id="net-tax" style="text-align: right; font-weight: bold; background-color: #f9f9f9;">0</td></tr>
+            
+            <tr class="deduction-row">
+                <td>
+                    <div style="display: flex; align-items: center;">
+                        <input type="checkbox" id="check-e-tax">
+                        <div>
+                            <strong>전자세금계산서 발행세액공제</strong>
+                            <span class="desc-text">(장당 200원, 연간 100만원 한도)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <input type="text" class="money-input" id="e-tax-count" placeholder="발행매수">
+                        <span class="unit">장</span>
+                    </div>
+                </td>
+                <td><span class="readonly-val" id="e-tax-deduction">0</span></td>
+            </tr>
+            
+            <tr class="deduction-row">
+                <td>
+                    <div style="display: flex; align-items: center;">
+                        <input type="checkbox" id="check-card-tax">
+                        <div>
+                            <strong>신용카드 등 발행세액공제</strong>
+                            <span class="desc-text">(카드+현금 매출액의 3%, 연간 천만원 한도)</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="black-cell">대상금액 자동계산</td>
+                <td><span class="readonly-val" id="card-tax-deduction">0</span></td>
+            </tr>
+
+            <tr class="prepaid-row">
+                <td colspan="2">예정고지세액 (직접입력)</td>
+                <td><input type="text" class="money-input" id="prepaid-tax"></td>
+            </tr>
+            <tr class="orange-result">
+                <td colspan="2">차감납부할세액</td>
+                <td id="final-tax" style="text-align: right; font-size: 1.1rem;">0</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="btn-container">
+    <button class="btn btn-print" onclick="window.print()">인쇄하기</button>
+    <button class="btn btn-pdf" onclick="window.print()">PDF 다운로드</button>
+    <button class="btn btn-share" onclick="shareResult()">결과 공유하기</button>
+</div>
+
+<script>
+    function format(n) { return n.toLocaleString(); }
+    function unformat(s) { return parseFloat(s.replace(/,/g, "")) || 0; }
+
+    const moneyInputs = Array.from(document.querySelectorAll('.money-input'));
+    const checkboxes = [document.getElementById('check-e-tax'), document.getElementById('check-card-tax')];
+
+    moneyInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            let val = e.target.value.replace(/[^0-9]/g, "");
+            e.target.value = val ? format(parseInt(val)) : "";
+            calculate();
+        });
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const next = moneyInputs[index + 1];
+                if (next) next.focus();
+            }
+        });
+    });
+
+    checkboxes.forEach(cb => cb.addEventListener('change', calculate));
+    document.getElementById('deemed-rate').addEventListener('change', calculate);
+
+    function calculate() {
+        const s1 = unformat(document.getElementById('s1').value);
+        const s2 = unformat(document.getElementById('s2').value);
+        const s3 = unformat(document.getElementById('s3').value);
+        const s4 = unformat(document.getElementById('s4').value);
+        const s5 = unformat(document.getElementById('s5').value);
+
+        const s1t = Math.floor(s1 * 0.1);
+        const s3t = Math.floor(s3 * 0.1);
+        const s4t = Math.floor(s4 * 0.1);
+        const s5t = Math.floor(s5 * 0.1);
+
+        document.getElementById('s1-tax').innerText = format(s1t);
+        document.getElementById('s3-tax').innerText = format(s3t);
+        document.getElementById('s4-tax').innerText = format(s4t);
+        document.getElementById('s5-tax').innerText = format(s5t);
+
+        const totalST = s1t + s3t + s4t + s5t;
+        document.getElementById('total-sales-supply').innerText = format(s1+s2+s3+s4+s5);
+        document.getElementById('total-sales-tax').innerText = format(totalST);
+
+        const p1t = Math.floor(unformat(document.getElementById('p1').value) * 0.1);
+        const p2t = Math.floor(unformat(document.getElementById('p2').value) * 0.1);
+        const p3t = Math.floor(unformat(document.getElementById('p3').value) * 0.1);
+        document.getElementById('p1-tax').innerText = format(p1t);
+        document.getElementById('p2-tax').innerText = format(p2t);
+        document.getElementById('p3-tax').innerText = format(p3t);
+
+        const dT = Math.floor(unformat(document.getElementById('deemed-supply').value) * parseFloat(document.getElementById('deemed-rate').value));
+        document.getElementById('deemed-tax').innerText = format(dT);
+
+        const nT = Math.floor(unformat(document.getElementById('non-deductible-supply').value) * 0.1);
+        document.getElementById('non-deductible-tax').innerText = format(nT);
+
+        const totalPT = (p1t + p2t + p3t + dT) - nT;
+        document.getElementById('total-purchase-tax').innerText = format(totalPT);
+
+        const net = totalST - totalPT;
+        document.getElementById('net-tax').innerText = format(net);
+
+        // --- 공제 계산 ---
+        let eTaxDed = 0;
+        if(document.getElementById('check-e-tax').checked) {
+            const count = unformat(document.getElementById('e-tax-count').value);
+            eTaxDed = Math.min(count * 200, 1000000); 
+        }
+        document.getElementById('e-tax-deduction').innerText = format(eTaxDed);
+
+        let cardDed = 0;
+        if(document.getElementById('check-card-tax').checked) {
+            const baseAmount = (s3 + s3t) + (s4 + s4t); 
+            cardDed = Math.min(Math.floor(baseAmount * 0.03), 10000000); 
+        }
+        document.getElementById('card-tax-deduction').innerText = format(cardDed);
+
+        const prep = unformat(document.getElementById('prepaid-tax').value);
+        const finalTax = net - eTaxDed - cardDed - prep;
+        document.getElementById('final-tax').innerText = format(finalTax);
+    }
+
+    async function shareResult() {
+        const result = document.getElementById('final-tax').innerText;
+        const text = `부가세 간단계산기 결과: 납부할 세액은 ${result}원입니다.`;
+        if (navigator.share) {
+            try { await navigator.share({ title: '부가세 계산 결과', text: text, url: window.location.href }); } 
+            catch (err) { console.log("공유 중단"); }
+        } else { alert("공유 기능을 지원하지 않는 브라우저입니다. 결과: " + result + "원"); }
+    }
+</script>
+
+</body>
+</html>
