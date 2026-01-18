@@ -27,7 +27,6 @@
         .orange-result { background-color: var(--result-orange); font-weight: bold; color: white; }
         .black-cell { background-color: #333; color: white; text-align: center; font-size: 13px; }
 
-        /* 입력창 및 단위 래퍼 */
         .input-group { display: flex; align-items: center; gap: 5px; }
         input[type="text"], select { 
             width: 100%; padding: 8px; border: 1.5px solid #aaa; border-radius: 8px; 
@@ -48,7 +47,6 @@
         .btn { padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
         .btn-print { background-color: #444; }
         .btn-pdf { background-color: #e74c3c; }
-        .btn-share { background-color: #3498db; }
         .btn:hover { opacity: 0.8; }
 
         @media print {
@@ -148,7 +146,6 @@
 <div class="btn-container">
     <button class="btn btn-print" onclick="window.print()">인쇄하기</button>
     <button class="btn btn-pdf" onclick="window.print()">PDF 다운로드</button>
-    <button class="btn btn-share" onclick="shareResult()">결과 공유하기</button>
 </div>
 
 <script>
@@ -216,7 +213,6 @@
         const net = totalST - totalPT;
         document.getElementById('net-tax').innerText = format(net);
 
-        // --- 공제 계산 ---
         let eTaxDed = 0;
         if(document.getElementById('check-e-tax').checked) {
             const count = unformat(document.getElementById('e-tax-count').value);
@@ -235,16 +231,6 @@
         const finalTax = net - eTaxDed - cardDed - prep;
         document.getElementById('final-tax').innerText = format(finalTax);
     }
-
-    async function shareResult() {
-        const result = document.getElementById('final-tax').innerText;
-        const text = `부가세 간단계산기 결과: 납부할 세액은 ${result}원입니다.`;
-        if (navigator.share) {
-            try { await navigator.share({ title: '부가세 계산 결과', text: text, url: window.location.href }); } 
-            catch (err) { console.log("공유 중단"); }
-        } else { alert("공유 기능을 지원하지 않는 브라우저입니다. 결과: " + result + "원"); }
-    }
 </script>
-
 </body>
 </html>
