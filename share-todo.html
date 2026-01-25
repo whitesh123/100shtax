@@ -84,6 +84,11 @@
             <div id="statusMessage" class="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border-2 border-green-200 shadow-md hidden">
                 <p class="text-center text-xl font-bold text-green-800">✨ 작업 완료!</p>
             </div>
+
+            <!-- 에러 메시지 -->
+            <div id="errorMessage" class="p-6 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl border-2 border-red-200 shadow-md hidden">
+                <p class="text-center text-lg font-bold text-red-800">❌ 공유된 작업을 찾을 수 없습니다.</p>
+            </div>
         </div>
 
         <div class="text-center text-gray-600 text-sm space-y-2 animate-fade-in">
@@ -94,22 +99,43 @@
 
     <script>
         let sharedTodo = null;
-        const shareId = new URLSearchParams(window.location.search).get('id');
+        let allTodos = [];
 
-        // 데이터 로드
-        function loadSharedData() {
+        // URL 파라미터에서 데이터 추출
+        function getSharedTodo() {
+            const params = new URLSearchParams(window.location.search);
+            const data = params.get('data');
+            
+            if (data) {
+                try {
+                    sharedTodo = JSON.parse(decodeURIComponent(data));
+                    return true;
+                } catch (e) {
+                    console.error('Failed to parse shared data:', e);
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        // 로컬스토리지에서 업데이트된 정보 가져오기
+        function updateFromLocalStorage() {
             const saved = localStorage.getItem('todos');
             if (saved) {
-                const todos = JSON.parse(saved);
-                sharedTodo = todos.find(t => t.shareId === shareId);
+                allTodos = JSON.parse(saved);
+                // shareId로 최신 정보 찾기
                 if (sharedTodo) {
-                    render();
+                    const updated = allTodos.find(t => t.shareId === sharedTodo.shareId);
+                    if (updated) {
+                        sharedTodo = updated;
+                    }
                 }
             }
         }
 
         // 진척도 계산
         function getProgress(todo) {
+            if (!todo || !todo.subtasks) return 0;
             if (todo.subtasks.length === 0) {
                 return todo.completed ? 100 : 0;
             }
@@ -160,18 +186,19 @@
         // 렌더링
         function render() {
             if (!sharedTodo) {
-                document.querySelector('.glass-effect').innerHTML = 
-                    '<div class="text-center text-gray-400 py-20"><p class="text-2xl mb-2">❌</p><p class="text-xl font-medium">공유된 작업을 찾을 수 없습니다.</p></div>';
+                document.getElementById('errorMessage').classList.remove('hidden');
                 return;
             }
 
+            document.getElementById('errorMessage').classList.add('hidden');
+            
             const progress = getProgress(sharedTodo);
 
             // 제목
             document.getElementById('projectTitle').textContent = sharedTodo.title;
 
             // 진척도
-            document.getElementById('progressText').textContent = sharedTodo.completed ? '완료됨!' : `진행 중... ${progress}%`;
+            document.getElementById('progressText').textContent = sharedTodo.completed ? '✨ 완료됨!' : `진행 중... ${progress}%`;
             document.getElementById('progressCircle').innerHTML = createCircularProgress(progress, 100);
 
             // 시작일
@@ -184,6 +211,8 @@
                     weekday: 'short'
                 }) + (sharedTodo.time ? ` ${sharedTodo.time}` : '');
                 document.getElementById('startDateSection').classList.remove('hidden');
+            } else {
+                document.getElementById('startDateSection').classList.add('hidden');
             }
 
             // 완료시한
@@ -197,14 +226,16 @@
                     weekday: 'short'
                 }) + (sharedTodo.deadlineTime ? ` ${sharedTodo.deadlineTime}` : '');
                 
-                document.getElementById('deadline').textContent = deadlineText + (isOverdue ? ' (기한 초과)' : '');
+                document.getElementById('deadline').textContent = deadlineText + (isOverdue ? ' ⚠️ (기한 초과)' : '');
                 const deadlineSection = document.getElementById('deadlineSection');
                 deadlineSection.classList.remove('hidden');
                 
                 if (isOverdue) {
                     deadlineSection.classList.remove('from-red-50', 'to-red-100', 'border-red-200');
-                    deadlineSection.classList.add('from-red-100', 'to-red-200', 'border-red-400', 'bg-red-50');
+                    deadlineSection.classList.add('from-orange-100', 'to-red-200', 'border-orange-400', 'bg-orange-50');
                 }
+            } else {
+                document.getElementById('deadlineSection').classList.add('hidden');
             }
 
             // 세부 작업
@@ -223,10 +254,12 @@
                         <span class="text-2xl">${subtask.completed ? '✅' : '⏳'}</span>
                     </div>
                 `).join('');
+            } else {
+                document.getElementById('subtasksSection').classList.add('hidden');
             }
 
             // 완료 상태
-            if (progress === 100) {
+            if (progress === 100 && sharedTodo.completed) {
                 document.getElementById('statusMessage').classList.remove('hidden');
             } else {
                 document.getElementById('statusMessage').classList.add('hidden');
@@ -235,11 +268,17 @@
 
         // 5초마다 새로고침
         setInterval(() => {
-            loadSharedData();
+            updateFromLocalStorage();
+            render();
         }, 5000);
 
         // 초기 로드
-        loadSharedData();
+        if (getSharedTodo()) {
+            updateFromLocalStorage();
+            render();
+        } else {
+            document.getElementById('errorMessage').classList.remove('hidden');
+        }
     </script>
 </body>
 </html>
