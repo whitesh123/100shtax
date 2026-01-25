@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로젝트 진척도</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .circular-progress {
+            transform: rotate(-90deg);
+            filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.3));
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4 sm:p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- 헤더 -->
+        <div class="text-center mb-8 animate-fade-in">
+            <div class="inline-block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-transparent bg-clip-text">
+                <h1 class="text-4xl font-bold mb-2">📊 프로젝트 진척도</h1>
+            </div>
+            <p class="text-gray-600 text-sm">작업 진행 상황을 실시간으로 확인하세요</p>
+        </div>
+
+        <div class="glass-effect rounded-3xl shadow-2xl p-8 mb-6 animate-fade-in">
+            <!-- 프로젝트 제목 -->
+            <div class="mb-8 p-6 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl border-2 border-indigo-300">
+                <h2 class="text-3xl font-bold text-indigo-900" id="projectTitle">프로젝트 로딩 중...</h2>
+            </div>
+
+            <!-- 전체 진척도 -->
+            <div class="mb-10 p-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl text-white shadow-xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-3">진척도</h3>
+                        <p class="text-lg opacity-90" id="progressText">로딩 중...</p>
+                    </div>
+                    <div id="progressCircle" class="transform hover:scale-110 transition-transform"></div>
+                </div>
+            </div>
+
+            <!-- 상세 정보 -->
+            <div id="projectDetails" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+                <!-- 시작일 -->
+                <div id="startDateSection" class="hidden p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border-2 border-blue-200 shadow-md">
+                    <p class="text-sm font-semibold text-blue-600 mb-2">📅 시작일</p>
+                    <p class="text-lg font-bold text-blue-800" id="startDate"></p>
+                </div>
+
+                <!-- 완료시한 -->
+                <div id="deadlineSection" class="hidden p-6 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl border-2 border-red-200 shadow-md">
+                    <p class="text-sm font-semibold text-red-600 mb-2">⏰ 완료시한</p>
+                    <p class="text-lg font-bold text-red-800" id="deadline"></p>
+                </div>
+            </div>
+
+            <!-- 세부 작업 목록 -->
+            <div id="subtasksSection" class="hidden">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">✅ 세부 작업</h3>
+                <div id="subtasksList" class="space-y-3 mb-8"></div>
+            </div>
+
+            <!-- 상태 메시지 -->
+            <div id="statusMessage" class="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border-2 border-green-200 shadow-md hidden">
+                <p class="text-center text-xl font-bold text-green-800">✨ 작업 완료!</p>
+            </div>
+        </div>
+
+        <div class="text-center text-gray-600 text-sm space-y-2 animate-fade-in">
+            <p class="font-medium">💡 이 페이지는 읽기 전용입니다.</p>
+            <p class="font-medium">🔄 5초마다 자동으로 최신 정보로 업데이트됩니다.</p>
+        </div>
+    </div>
+
+    <script>
+        let sharedTodo = null;
+        const shareId = new URLSearchParams(window.location.search).get('id');
+
+        // 데이터 로드
+        function loadSharedData() {
+            const saved = localStorage.getItem('todos');
+            if (saved) {
+                const todos = JSON.parse(saved);
+                sharedTodo = todos.find(t => t.shareId === shareId);
+                if (sharedTodo) {
+                    render();
+                }
+            }
+        }
+
+        // 진척도 계산
+        function getProgress(todo) {
+            if (todo.subtasks.length === 0) {
+                return todo.completed ? 100 : 0;
+            }
+            const completed = todo.subtasks.filter(st => st.completed).length;
+            return Math.round((completed / todo.subtasks.length) * 100);
+        }
+
+        // 원형 진척도 생성
+        function createCircularProgress(percentage, size = 100) {
+            const radius = (size - 16) / 2;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (percentage / 100) * circumference;
+            
+            let gradientId = `gradient-${Math.random().toString(36).substr(2, 9)}`;
+            let color1, color2;
+            
+            if (percentage < 30) {
+                color1 = '#ef4444'; color2 = '#f97316';
+            } else if (percentage < 70) {
+                color1 = '#f59e0b'; color2 = '#eab308';
+            } else if (percentage < 100) {
+                color1 = '#22c55e'; color2 = '#10b981';
+            } else {
+                color1 = '#8b5cf6'; color2 = '#ec4899';
+            }
+
+            return `
+                <div class="relative" style="width: ${size}px; height: ${size}px;">
+                    <svg width="${size}" height="${size}" class="circular-progress">
+                        <defs>
+                            <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:${color1};stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:${color2};stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="${size/2}" cy="${size/2}" r="${radius}" fill="none" stroke="#e5e7eb" stroke-width="8"/>
+                        <circle cx="${size/2}" cy="${size/2}" r="${radius}" fill="none" stroke="url(#${gradientId})" stroke-width="8" 
+                            stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round" 
+                            style="transition: stroke-dashoffset 0.8s ease-in-out;"/>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">${percentage}%</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 렌더링
+        function render() {
+            if (!sharedTodo) {
+                document.querySelector('.glass-effect').innerHTML = 
+                    '<div class="text-center text-gray-400 py-20"><p class="text-2xl mb-2">❌</p><p class="text-xl font-medium">공유된 작업을 찾을 수 없습니다.</p></div>';
+                return;
+            }
+
+            const progress = getProgress(sharedTodo);
+
+            // 제목
+            document.getElementById('projectTitle').textContent = sharedTodo.title;
+
+            // 진척도
+            document.getElementById('progressText').textContent = sharedTodo.completed ? '완료됨!' : `진행 중... ${progress}%`;
+            document.getElementById('progressCircle').innerHTML = createCircularProgress(progress, 100);
+
+            // 시작일
+            if (sharedTodo.date) {
+                const startDate = new Date(sharedTodo.date + 'T00:00');
+                document.getElementById('startDate').textContent = startDate.toLocaleDateString('ko-KR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    weekday: 'short'
+                }) + (sharedTodo.time ? ` ${sharedTodo.time}` : '');
+                document.getElementById('startDateSection').classList.remove('hidden');
+            }
+
+            // 완료시한
+            if (sharedTodo.deadline) {
+                const isOverdue = new Date(sharedTodo.deadline + 'T' + (sharedTodo.deadlineTime || '23:59')) < new Date() && !sharedTodo.completed;
+                const deadline = new Date(sharedTodo.deadline + 'T00:00');
+                const deadlineText = deadline.toLocaleDateString('ko-KR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    weekday: 'short'
+                }) + (sharedTodo.deadlineTime ? ` ${sharedTodo.deadlineTime}` : '');
+                
+                document.getElementById('deadline').textContent = deadlineText + (isOverdue ? ' (기한 초과)' : '');
+                const deadlineSection = document.getElementById('deadlineSection');
+                deadlineSection.classList.remove('hidden');
+                
+                if (isOverdue) {
+                    deadlineSection.classList.remove('from-red-50', 'to-red-100', 'border-red-200');
+                    deadlineSection.classList.add('from-red-100', 'to-red-200', 'border-red-400', 'bg-red-50');
+                }
+            }
+
+            // 세부 작업
+            if (sharedTodo.subtasks && sharedTodo.subtasks.length > 0) {
+                document.getElementById('subtasksSection').classList.remove('hidden');
+                document.getElementById('subtasksList').innerHTML = sharedTodo.subtasks.map(subtask => `
+                    <div class="flex items-center gap-4 p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition">
+                        <div class="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center ${
+                            subtask.completed ? 'bg-green-500' : 'bg-gray-300'
+                        }">
+                            ${subtask.completed ? '<span class="text-white text-sm font-bold">✓</span>' : ''}
+                        </div>
+                        <p class="flex-1 font-medium text-lg ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-800'}">
+                            ${subtask.title}
+                        </p>
+                        <span class="text-2xl">${subtask.completed ? '✅' : '⏳'}</span>
+                    </div>
+                `).join('');
+            }
+
+            // 완료 상태
+            if (progress === 100) {
+                document.getElementById('statusMessage').classList.remove('hidden');
+            } else {
+                document.getElementById('statusMessage').classList.add('hidden');
+            }
+        }
+
+        // 5초마다 새로고침
+        setInterval(() => {
+            loadSharedData();
+        }, 5000);
+
+        // 초기 로드
+        loadSharedData();
+    </script>
+</body>
+</html>
