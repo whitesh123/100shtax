@@ -101,17 +101,18 @@
         let sharedTodo = null;
         let allTodos = [];
 
-        // URL 파라미터에서 데이터 추출
+        // URL 파라미터에서 데이터 추출 (Base64 디코딩)
         function getSharedTodo() {
             const params = new URLSearchParams(window.location.search);
-            const data = params.get('data');
+            const encoded = params.get('id');
             
-            if (data) {
+            if (encoded) {
                 try {
-                    sharedTodo = JSON.parse(decodeURIComponent(data));
+                    const decoded = decodeURIComponent(escape(atob(encoded)));
+                    sharedTodo = JSON.parse(decoded);
                     return true;
                 } catch (e) {
-                    console.error('Failed to parse shared data:', e);
+                    console.error('Failed to decode shared data:', e);
                     return false;
                 }
             }
@@ -122,13 +123,17 @@
         function updateFromLocalStorage() {
             const saved = localStorage.getItem('todos');
             if (saved) {
-                allTodos = JSON.parse(saved);
-                // shareId로 최신 정보 찾기
-                if (sharedTodo) {
-                    const updated = allTodos.find(t => t.shareId === sharedTodo.shareId);
-                    if (updated) {
-                        sharedTodo = updated;
+                try {
+                    allTodos = JSON.parse(saved);
+                    // shareId로 최신 정보 찾기
+                    if (sharedTodo) {
+                        const updated = allTodos.find(t => t.shareId === sharedTodo.shareId);
+                        if (updated) {
+                            sharedTodo = updated;
+                        }
                     }
+                } catch (e) {
+                    console.error('Failed to parse localStorage:', e);
                 }
             }
         }
