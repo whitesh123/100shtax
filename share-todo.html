@@ -30,11 +30,24 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        .loading-spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #6366f1;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4 sm:p-8">
     <div class="max-w-4xl mx-auto">
-        <!-- 헤더 -->
         <div class="text-center mb-8 animate-fade-in">
             <div class="inline-block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-transparent bg-clip-text">
                 <h1 class="text-4xl font-bold mb-2">📊 프로젝트 진척도</h1>
@@ -43,102 +56,91 @@
         </div>
 
         <div class="glass-effect rounded-3xl shadow-2xl p-8 mb-6 animate-fade-in">
-            <!-- 프로젝트 제목 -->
-            <div class="mb-8 p-6 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl border-2 border-indigo-300">
-                <h2 class="text-3xl font-bold text-indigo-900" id="projectTitle">프로젝트 로딩 중...</h2>
+            <div id="loadingSection" class="text-center py-20">
+                <div class="loading-spinner mx-auto mb-4"></div>
+                <p class="text-gray-600 text-lg">데이터를 불러오는 중...</p>
             </div>
 
-            <!-- 전체 진척도 -->
-            <div class="mb-10 p-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl text-white shadow-xl">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-2xl font-bold mb-3">진척도</h3>
-                        <p class="text-lg opacity-90" id="progressText">로딩 중...</p>
+            <div id="contentSection" class="hidden">
+                <div class="mb-8 p-6 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl border-2 border-indigo-300">
+                    <h2 class="text-3xl font-bold text-indigo-900" id="projectTitle">프로젝트 로딩 중...</h2>
+                </div>
+
+                <div class="mb-10 p-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl text-white shadow-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-3">진척도</h3>
+                            <p class="text-lg opacity-90" id="progressText">로딩 중...</p>
+                        </div>
+                        <div id="progressCircle" class="transform hover:scale-110 transition-transform"></div>
                     </div>
-                    <div id="progressCircle" class="transform hover:scale-110 transition-transform"></div>
+                </div>
+
+                <div id="projectDetails" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+                    <div id="startDateSection" class="hidden p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border-2 border-blue-200 shadow-md">
+                        <p class="text-sm font-semibold text-blue-600 mb-2">📅 시작일</p>
+                        <p class="text-lg font-bold text-blue-800" id="startDate"></p>
+                    </div>
+
+                    <div id="deadlineSection" class="hidden p-6 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl border-2 border-red-200 shadow-md">
+                        <p class="text-sm font-semibold text-red-600 mb-2">⏰ 완료시한</p>
+                        <p class="text-lg font-bold text-red-800" id="deadline"></p>
+                    </div>
+                </div>
+
+                <div id="subtasksSection" class="hidden">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">✅ 세부 작업</h3>
+                    <div id="subtasksList" class="space-y-3 mb-8"></div>
+                </div>
+
+                <div id="statusMessage" class="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border-2 border-green-200 shadow-md hidden">
+                    <p class="text-center text-xl font-bold text-green-800">✨ 작업 완료!</p>
                 </div>
             </div>
 
-            <!-- 상세 정보 -->
-            <div id="projectDetails" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-                <!-- 시작일 -->
-                <div id="startDateSection" class="hidden p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border-2 border-blue-200 shadow-md">
-                    <p class="text-sm font-semibold text-blue-600 mb-2">📅 시작일</p>
-                    <p class="text-lg font-bold text-blue-800" id="startDate"></p>
-                </div>
-
-                <!-- 완료시한 -->
-                <div id="deadlineSection" class="hidden p-6 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl border-2 border-red-200 shadow-md">
-                    <p class="text-sm font-semibold text-red-600 mb-2">⏰ 완료시한</p>
-                    <p class="text-lg font-bold text-red-800" id="deadline"></p>
-                </div>
-            </div>
-
-            <!-- 세부 작업 목록 -->
-            <div id="subtasksSection" class="hidden">
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">✅ 세부 작업</h3>
-                <div id="subtasksList" class="space-y-3 mb-8"></div>
-            </div>
-
-            <!-- 상태 메시지 -->
-            <div id="statusMessage" class="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border-2 border-green-200 shadow-md hidden">
-                <p class="text-center text-xl font-bold text-green-800">✨ 작업 완료!</p>
-            </div>
-
-            <!-- 에러 메시지 -->
             <div id="errorMessage" class="p-6 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl border-2 border-red-200 shadow-md hidden">
                 <p class="text-center text-lg font-bold text-red-800">❌ 공유된 작업을 찾을 수 없습니다.</p>
+                <p class="text-center text-sm text-red-600 mt-2">링크가 올바른지 확인해주세요.</p>
             </div>
         </div>
 
         <div class="text-center text-gray-600 text-sm space-y-2 animate-fade-in">
             <p class="font-medium">💡 이 페이지는 읽기 전용입니다.</p>
             <p class="font-medium">🔄 5초마다 자동으로 최신 정보로 업데이트됩니다.</p>
+            <p class="font-medium">☁️ 구글 시트와 실시간으로 동기화됩니다.</p>
         </div>
     </div>
 
     <script>
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzH7yaKhcRl_RNd74QJzG4MaWyvZSBPRXiHoNjht3lPCYaIjxvJ8arIr9ENNeobw8CB_Q/exec';
+        
         let sharedTodo = null;
-        let allTodos = [];
+        let shareId = null;
 
-        // URL 파라미터에서 데이터 추출 (Base64 디코딩)
-        function getSharedTodo() {
+        function getShareId() {
             const params = new URLSearchParams(window.location.search);
-            const encoded = params.get('id');
-            
-            if (encoded) {
-                try {
-                    const decoded = decodeURIComponent(escape(atob(encoded)));
-                    sharedTodo = JSON.parse(decoded);
-                    return true;
-                } catch (e) {
-                    console.error('Failed to decode shared data:', e);
-                    return false;
-                }
-            }
-            return false;
+            return params.get('id');
         }
 
-        // 로컬스토리지에서 업데이트된 정보 가져오기
-        function updateFromLocalStorage() {
-            const saved = localStorage.getItem('todos');
-            if (saved) {
-                try {
-                    allTodos = JSON.parse(saved);
-                    // shareId로 최신 정보 찾기
-                    if (sharedTodo) {
-                        const updated = allTodos.find(t => t.shareId === sharedTodo.shareId);
-                        if (updated) {
-                            sharedTodo = updated;
-                        }
+        async function loadTodoFromGoogleSheets() {
+            try {
+                const response = await fetch(APPS_SCRIPT_URL);
+                const allTodos = await response.json();
+                
+                if (allTodos && Array.isArray(allTodos)) {
+                    const found = allTodos.find(t => t.shareId === shareId);
+                    if (found) {
+                        sharedTodo = found;
+                        return true;
                     }
-                } catch (e) {
-                    console.error('Failed to parse localStorage:', e);
                 }
+                return false;
+            } catch (error) {
+                console.error('Load error:', error);
+                return false;
             }
         }
 
-        // 진척도 계산
         function getProgress(todo) {
             if (!todo || !todo.subtasks) return 0;
             if (todo.subtasks.length === 0) {
@@ -148,7 +150,6 @@
             return Math.round((completed / todo.subtasks.length) * 100);
         }
 
-        // 원형 진척도 생성
         function createCircularProgress(percentage, size = 100) {
             const radius = (size - 16) / 2;
             const circumference = 2 * Math.PI * radius;
@@ -188,25 +189,23 @@
             `;
         }
 
-        // 렌더링
         function render() {
             if (!sharedTodo) {
+                document.getElementById('loadingSection').classList.add('hidden');
                 document.getElementById('errorMessage').classList.remove('hidden');
                 return;
             }
 
+            document.getElementById('loadingSection').classList.add('hidden');
+            document.getElementById('contentSection').classList.remove('hidden');
             document.getElementById('errorMessage').classList.add('hidden');
             
             const progress = getProgress(sharedTodo);
 
-            // 제목
             document.getElementById('projectTitle').textContent = sharedTodo.title;
-
-            // 진척도
             document.getElementById('progressText').textContent = sharedTodo.completed ? '✨ 완료됨!' : `진행 중... ${progress}%`;
             document.getElementById('progressCircle').innerHTML = createCircularProgress(progress, 100);
 
-            // 시작일
             if (sharedTodo.date) {
                 const startDate = new Date(sharedTodo.date + 'T00:00');
                 document.getElementById('startDate').textContent = startDate.toLocaleDateString('ko-KR', {
@@ -220,7 +219,6 @@
                 document.getElementById('startDateSection').classList.add('hidden');
             }
 
-            // 완료시한
             if (sharedTodo.deadline) {
                 const isOverdue = new Date(sharedTodo.deadline + 'T' + (sharedTodo.deadlineTime || '23:59')) < new Date() && !sharedTodo.completed;
                 const deadline = new Date(sharedTodo.deadline + 'T00:00');
@@ -243,7 +241,6 @@
                 document.getElementById('deadlineSection').classList.add('hidden');
             }
 
-            // 세부 작업
             if (sharedTodo.subtasks && sharedTodo.subtasks.length > 0) {
                 document.getElementById('subtasksSection').classList.remove('hidden');
                 document.getElementById('subtasksList').innerHTML = sharedTodo.subtasks.map(subtask => `
@@ -263,7 +260,6 @@
                 document.getElementById('subtasksSection').classList.add('hidden');
             }
 
-            // 완료 상태
             if (progress === 100 && sharedTodo.completed) {
                 document.getElementById('statusMessage').classList.remove('hidden');
             } else {
@@ -271,17 +267,18 @@
             }
         }
 
-        // 5초마다 새로고침
-        setInterval(() => {
-            updateFromLocalStorage();
+        async function updateData() {
+            await loadTodoFromGoogleSheets();
             render();
-        }, 5000);
+        }
 
-        // 초기 로드
-        if (getSharedTodo()) {
-            updateFromLocalStorage();
-            render();
+        setInterval(updateData, 5000);
+
+        shareId = getShareId();
+        if (shareId) {
+            updateData();
         } else {
+            document.getElementById('loadingSection').classList.add('hidden');
             document.getElementById('errorMessage').classList.remove('hidden');
         }
     </script>

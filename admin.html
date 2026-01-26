@@ -56,11 +56,45 @@
             width: 90%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
+
+        .sync-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 999;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .sync-status.syncing {
+            display: flex;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+        }
+
+        .sync-status.success {
+            display: flex;
+            background: linear-gradient(135deg, #10b981, #22c55e);
+            color: white;
+        }
+
+        .sync-status.error {
+            display: flex;
+            background: linear-gradient(135deg, #ef4444, #f97316);
+            color: white;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4 sm:p-8">
+    <div id="syncStatus" class="sync-status"></div>
+
     <div class="max-w-5xl mx-auto">
-        <!-- 헤더 -->
         <div class="text-center mb-8 animate-fade-in">
             <div class="inline-block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-transparent bg-clip-text">
                 <h1 class="text-5xl font-bold mb-2">✨ 할일 관리</h1>
@@ -69,7 +103,6 @@
         </div>
 
         <div class="glass-effect rounded-3xl shadow-2xl p-8 mb-6 animate-fade-in">
-            <!-- 전체 진척도 -->
             <div class="mb-10 p-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl text-white shadow-xl">
                 <div class="flex items-center justify-between">
                     <div>
@@ -80,7 +113,6 @@
                 </div>
             </div>
 
-            <!-- 필터 버튼 -->
             <div class="mb-8">
                 <button id="archiveToggle" class="flex items-center gap-3 px-6 py-3 rounded-xl transition font-medium shadow-lg bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 hover:from-purple-200 hover:to-pink-200 transform hover:scale-105">
                     <span class="text-xl">📦</span>
@@ -88,7 +120,6 @@
                 </button>
             </div>
 
-            <!-- 과거 완료작업 -->
             <div id="archiveSection" class="mb-8 p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl hidden border-2 border-purple-200">
                 <h3 class="text-xl font-bold text-purple-800 mb-4 flex items-center gap-2">
                     <span>📦</span> 과거 완료작업
@@ -96,9 +127,8 @@
                 <div id="archiveList"></div>
             </div>
 
-            <!-- 입력 폼 -->
             <div class="mb-10 space-y-5 p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
-                <input type="text" id="titleInput" placeholder="✍️ 할일을 입력하세요" 
+                <input type="text" id="titleInput" placeholder="✏️ 할일을 입력하세요" 
                     class="w-full px-6 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition text-lg font-medium">
                 
                 <div>
@@ -126,7 +156,6 @@
                 </button>
             </div>
 
-            <!-- 할일 목록 -->
             <div id="todoList" class="space-y-4"></div>
         </div>
 
@@ -134,10 +163,10 @@
             <p class="font-medium">💡 작업 완료 시 눈 아이콘을 눌러 보관할 수 있어요</p>
             <p class="font-medium">📅 캘린더 버튼을 누르면 구글 캘린더에 간편하게 저장할 수 있어요</p>
             <p class="font-medium">🔗 각 할일의 링크 아이콘으로 고객에게 공유할 수 있어요</p>
+            <p class="font-medium">☁️ 모든 데이터는 구글 시트에 자동 동기화됩니다</p>
         </div>
     </div>
 
-    <!-- 개별 할일 공유 모달 -->
     <div id="shareModal" class="share-modal">
         <div class="share-modal-content">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">할일 공유하기</h2>
@@ -174,25 +203,80 @@
     </div>
 
     <script>
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzH7yaKhcRl_RNd74QJzG4MaWyvZSBPRXiHoNjht3lPCYaIjxvJ8arIr9ENNeobw8CB_Q/exec';
+        
         let todos = [];
         let expandedTodos = {};
         let showArchive = false;
+        let isSyncing = false;
 
-        // localStorage에서 데이터 불러오기
+        function showSyncStatus(type, message) {
+            const status = document.getElementById('syncStatus');
+            status.className = `sync-status ${type}`;
+            status.textContent = message;
+            
+            if (type === 'success' || type === 'error') {
+                setTimeout(() => {
+                    status.classList.remove('success', 'error');
+                    status.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        async function syncToGoogleSheets() {
+            if (isSyncing) return;
+            
+            isSyncing = true;
+            showSyncStatus('syncing', '☁️ 동기화 중...');
+            
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(todos)
+                });
+                
+                showSyncStatus('success', '✅ 동기화 완료!');
+            } catch (error) {
+                console.error('Sync error:', error);
+                showSyncStatus('error', '❌ 동기화 실패');
+            } finally {
+                isSyncing = false;
+            }
+        }
+
+        async function loadFromGoogleSheets() {
+            try {
+                const response = await fetch(APPS_SCRIPT_URL);
+                const data = await response.json();
+                
+                if (data && Array.isArray(data)) {
+                    todos = data;
+                    render();
+                }
+            } catch (error) {
+                console.error('Load error:', error);
+                loadData();
+            }
+        }
+
         function loadData() {
             const saved = localStorage.getItem('todos');
             if (saved) {
                 todos = JSON.parse(saved);
+                syncToGoogleSheets();
                 render();
             }
         }
 
-        // localStorage에 데이터 저장
         function saveData() {
             localStorage.setItem('todos', JSON.stringify(todos));
+            syncToGoogleSheets();
         }
 
-        // 할일 추가
         function addTodo() {
             const title = document.getElementById('titleInput').value.trim();
             if (!title) return;
@@ -223,7 +307,6 @@
             render();
         }
 
-        // 할일 토글
         function toggleTodo(id) {
             todos = todos.map(todo => {
                 if (todo.id === id) {
@@ -241,7 +324,6 @@
             render();
         }
 
-        // 세부 목록 추가
         function addSubtask(todoId, input) {
             const title = input.value.trim();
             if (!title) return;
@@ -261,7 +343,6 @@
             render();
         }
 
-        // 세부 목록 토글
         function toggleSubtask(todoId, subtaskId) {
             todos = todos.map(todo => {
                 if (todo.id === todoId) {
@@ -282,14 +363,12 @@
             render();
         }
 
-        // 할일 삭제
         function deleteTodo(id) {
             todos = todos.filter(t => t.id !== id);
             saveData();
             render();
         }
 
-        // 세부 목록 삭제
         function deleteSubtask(todoId, subtaskId) {
             todos = todos.map(todo => {
                 if (todo.id === todoId) {
@@ -304,37 +383,29 @@
             render();
         }
 
-        // 보관
         function archiveTodo(id) {
             todos = todos.map(t => t.id === id ? { ...t, archived: true } : t);
             saveData();
             render();
         }
 
-        // 복원
         function unarchiveTodo(id) {
             todos = todos.map(t => t.id === id ? { ...t, archived: false } : t);
             saveData();
             render();
         }
 
-        // 확장 토글
         function toggleExpanded(id) {
             expandedTodos[id] = !expandedTodos[id];
             render();
         }
 
-        // 공유 모달 열기 (수정됨)
         function openShareModal(todoId) {
             const todo = todos.find(t => t.id === todoId);
             if (!todo) return;
             
-            // 간단한 공유 URL 생성 (Base64 인코딩)
-            const todoJson = JSON.stringify(todo);
-            const encoded = btoa(unescape(encodeURIComponent(todoJson)));
-            
             const baseURL = window.location.href.split('?')[0].replace(/admin\.html|index\.html|$/, '');
-            const shareURL = baseURL + 'share-todo.html?id=' + encoded;
+            const shareURL = baseURL + 'share-todo.html?id=' + todo.shareId;
             
             document.getElementById('shareTodoTitle').textContent = '📌 ' + todo.title;
             document.getElementById('shareLink').value = shareURL;
@@ -342,7 +413,6 @@
             document.getElementById('shareModal').classList.add('active');
         }
 
-        // 진척도 계산
         function getProgress(todo) {
             if (todo.subtasks.length === 0) {
                 return todo.completed ? 100 : 0;
@@ -351,7 +421,6 @@
             return Math.round((completed / todo.subtasks.length) * 100);
         }
 
-        // 전체 진척도
         function getTotalProgress() {
             const activeTodos = todos.filter(t => !t.archived);
             if (activeTodos.length === 0) return 0;
@@ -359,7 +428,6 @@
             return Math.round(totalProgress / activeTodos.length);
         }
 
-        // 원형 진척도 생성
         function createCircularProgress(percentage, size = 60) {
             const radius = (size - 16) / 2;
             const circumference = 2 * Math.PI * radius;
@@ -399,7 +467,6 @@
             `;
         }
 
-        // 구글 캘린더 추가
         function addToCalendar(todo) {
             if (!todo.date && !todo.deadline) {
                 alert('시작일시 또는 완료시한이 설정되지 않은 할일입니다.');
@@ -435,7 +502,6 @@
             window.open(url, '_blank');
         }
 
-        // 렌더링
         function render() {
             const activeTodos = todos.filter(t => !t.archived);
             const archivedTodos = todos.filter(t => t.archived).sort((a, b) => 
@@ -585,7 +651,6 @@
             }
         }
 
-        // 이벤트 리스너
         document.getElementById('addBtn').addEventListener('click', addTodo);
         document.getElementById('titleInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addTodo();
@@ -611,7 +676,6 @@
             }
         });
 
-        // 공유 모달
         document.getElementById('closeShareModal').addEventListener('click', () => {
             document.getElementById('shareModal').classList.remove('active');
         });
@@ -635,7 +699,7 @@
             }
         });
 
-        loadData();
+        loadFromGoogleSheets();
     </script>
 </body>
 </html>
