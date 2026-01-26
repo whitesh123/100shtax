@@ -161,6 +161,8 @@
 
         <div class="text-center text-gray-600 text-sm space-y-2 animate-fade-in">
             <p class="font-medium">💡 작업 완료 시 눈 아이콘을 눌러 보관할 수 있어요</p>
+            <p class="font-medium">📋 복사 버튼으로 반복 작업을 쉽게 만들 수 있어요 (복사 후 자동으로 이름 수정 가능)</p>
+            <p class="font-medium">✏️ 제목을 더블클릭하거나 수정 버튼으로 이름을 변경할 수 있어요</p>
             <p class="font-medium">📅 캘린더 버튼을 누르면 구글 캘린더에 간편하게 저장할 수 있어요</p>
             <p class="font-medium">🔗 각 할일의 링크 아이콘으로 고객에게 공유할 수 있어요</p>
             <p class="font-medium">☁️ 모든 데이터는 구글 시트에 자동 동기화됩니다</p>
@@ -209,6 +211,7 @@
         let expandedTodos = {};
         let showArchive = false;
         let isSyncing = false;
+        let editingTodoId = null;
 
         function showSyncStatus(type, message) {
             const status = document.getElementById('syncStatus');
@@ -366,6 +369,51 @@
         function deleteTodo(id) {
             todos = todos.filter(t => t.id !== id);
             saveData();
+            render();
+        }
+
+        function duplicateTodo(id) {
+            const original = todos.find(t => t.id === id);
+            if (!original) return;
+
+            const duplicated = {
+                ...original,
+                id: Date.now(),
+                title: original.title + ' (복사본)',
+                completed: false,
+                completedAt: null,
+                archived: false,
+                shareId: 'share_' + Math.random().toString(36).substr(2, 9),
+                subtasks: original.subtasks.map(st => ({
+                    ...st,
+                    id: Date.now() + Math.random(),
+                    completed: false
+                }))
+            };
+
+            todos.push(duplicated);
+            saveData();
+            editingTodoId = duplicated.id;
+            render();
+        }
+
+        function startEditTitle(id) {
+            editingTodoId = id;
+            render();
+        }
+
+        function saveEditTitle(id, input) {
+            const newTitle = input.value.trim();
+            if (newTitle) {
+                todos = todos.map(t => t.id === id ? { ...t, title: newTitle } : t);
+                saveData();
+            }
+            editingTodoId = null;
+            render();
+        }
+
+        function cancelEditTitle() {
+            editingTodoId = null;
             render();
         }
 
@@ -566,9 +614,19 @@
                                     </button>
 
                                     <div class="flex-1 min-w-0">
-                                        <p class="font-semibold text-lg ${todo.completed ? 'line-through text-gray-400' : 'text-gray-800'}">
-                                            ${todo.title}
-                                        </p>
+                                        ${editingTodoId === todo.id ? `
+                                            <input type="text" value="${todo.title}" 
+                                                id="editInput${todo.id}"
+                                                onkeypress="if(event.key==='Enter') { saveEditTitle(${todo.id}, this); }"
+                                                onblur="cancelEditTitle()"
+                                                class="w-full px-3 py-2 text-lg font-semibold border-2 border-indigo-500 rounded-lg focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                                                autofocus>
+                                        ` : `
+                                            <p class="font-semibold text-lg ${todo.completed ? 'line-through text-gray-400' : 'text-gray-800'}" 
+                                                ondblclick="startEditTitle(${todo.id})">
+                                                ${todo.title}
+                                            </p>
+                                        `}
                                         <div class="text-sm text-gray-600 mt-2 space-y-1 font-medium">
                                             ${(todo.date || todo.time) ? `
                                                 <p class="flex items-center gap-2">
@@ -596,6 +654,10 @@
                                         <button onclick="openShareModal(${todo.id})" 
                                             class="p-3 text-indigo-600 hover:bg-indigo-50 rounded-xl transition transform hover:scale-110 shadow-md" title="공유하기">
                                             🔗
+                                        </button>
+                                        <button onclick="duplicateTodo(${todo.id})" 
+                                            class="p-3 text-blue-600 hover:bg-blue-50 rounded-xl transition transform hover:scale-110 shadow-md" title="복사하기">
+                                            📋
                                         </button>
                                         ${progress === 100 ? `
                                             <button onclick="archiveTodo(${todo.id})" 
