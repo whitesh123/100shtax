@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>프로젝트 진척도</title>
+    <title>팀원 작업 관리</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -69,9 +69,9 @@
     <div class="max-w-4xl mx-auto">
         <div class="text-center mb-6 sm:mb-8 animate-fade-in">
             <div class="inline-block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-transparent bg-clip-text">
-                <h1 class="text-3xl sm:text-4xl font-bold mb-2">📊 프로젝트 진척도</h1>
+                <h1 class="text-3xl sm:text-4xl font-bold mb-2">👥 팀 작업 관리</h1>
             </div>
-            <p class="text-gray-600 text-xs sm:text-sm">작업 진행 상황을 실시간으로 확인하세요</p>
+            <p class="text-gray-600 text-xs sm:text-sm">실시간으로 작업 상태를 업데이트하세요</p>
         </div>
 
         <div class="glass-effect rounded-3xl shadow-2xl p-4 sm:p-8 mb-6 animate-fade-in">
@@ -124,7 +124,7 @@
         </div>
 
         <div class="text-center text-gray-600 text-xs sm:text-sm space-y-2 animate-fade-in">
-            <p class="font-medium">💡 이 페이지는 읽기 전용입니다.</p>
+            <p class="font-medium">✏️ 체크박스를 클릭하여 작업 상태를 업데이트할 수 있습니다.</p>
             <p class="font-medium">🔄 5초마다 자동으로 최신 정보로 업데이트됩니다.</p>
             <p class="font-medium">☁️ 구글 시트와 실시간으로 동기화됩니다.</p>
         </div>
@@ -134,9 +134,10 @@
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzH7yaKhcRl_RNd74QJzG4MaWyvZSBPRXiHoNjht3lPCYaIjxvJ8arIr9ENNeobw8CB_Q/exec';
         
         let sharedTodo = null;
-        let shareId = null;
+        let teamShareId = null;
+        let allTodos = [];
 
-        function getShareId() {
+        function getTeamShareId() {
             const params = new URLSearchParams(window.location.search);
             return params.get('id');
         }
@@ -144,10 +145,10 @@
         async function loadTodoFromGoogleSheets() {
             try {
                 const response = await fetch(APPS_SCRIPT_URL);
-                const allTodos = await response.json();
+                allTodos = await response.json();
                 
                 if (allTodos && Array.isArray(allTodos)) {
-                    const found = allTodos.find(t => t.shareId === shareId);
+                    const found = allTodos.find(t => t.teamShareId === teamShareId);
                     if (found) {
                         sharedTodo = found;
                         return true;
@@ -158,6 +159,46 @@
                 console.error('Load error:', error);
                 return false;
             }
+        }
+
+        async function saveToGoogleSheets() {
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(allTodos)
+                });
+                return true;
+            } catch (error) {
+                console.error('Save error:', error);
+                return false;
+            }
+        }
+
+        async function toggleSubtask(subtaskId) {
+            if (!sharedTodo) return;
+            
+            const subtask = sharedTodo.subtasks.find(st => st.id === subtaskId);
+            if (!subtask) return;
+            
+            subtask.completed = !subtask.completed;
+            
+            // 모든 서브태스크 완료 여부 확인
+            if (sharedTodo.subtasks.every(st => st.completed)) {
+                sharedTodo.completed = true;
+            } else {
+                sharedTodo.completed = false;
+            }
+            
+            // allTodos 배열에서도 업데이트
+            const todoIndex = allTodos.findIndex(t => t.teamShareId === teamShareId);
+            if (todoIndex !== -1) {
+                allTodos[todoIndex] = sharedTodo;
+            }
+            
+            await saveToGoogleSheets();
+            render();
         }
 
         function getProgress(todo) {
@@ -264,11 +305,12 @@
                 document.getElementById('subtasksSection').classList.remove('hidden');
                 document.getElementById('subtasksList').innerHTML = sharedTodo.subtasks.map(subtask => `
                     <div class="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition">
-                        <div class="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center ${
-                            subtask.completed ? 'bg-green-500' : 'bg-gray-300'
-                        }">
+                        <button onclick="toggleSubtask(${subtask.id})" 
+                            class="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center transition transform hover:scale-110 ${
+                                subtask.completed ? 'bg-green-500' : 'bg-gray-300 hover:bg-gray-400'
+                            }">
                             ${subtask.completed ? '<span class="text-white text-sm sm:text-base font-bold">✓</span>' : ''}
-                        </div>
+                        </button>
                         <p class="flex-1 font-medium text-sm sm:text-lg break-words ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-800'}">
                             ${subtask.title}
                         </p>
@@ -293,8 +335,8 @@
 
         setInterval(updateData, 5000);
 
-        shareId = getShareId();
-        if (shareId) {
+        teamShareId = getTeamShareId();
+        if (teamShareId) {
             updateData();
         } else {
             document.getElementById('loadingSection').classList.add('hidden');
