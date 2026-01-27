@@ -290,12 +290,30 @@
                 const response = await fetch(APPS_SCRIPT_URL);
                 const data = await response.json();
                 
+                let needsUpdate = false;
                 if (data && Array.isArray(data)) {
-                    todos = data.map(t => ({
-                        ...t,
-                        subtasks: t.subtasks || []
-                    }));
+                    todos = data.map(t => {
+                        // teamShareId가 없는 경우 자동 생성
+                        if (!t.teamShareId) {
+                            t.teamShareId = generateShareId();
+                            needsUpdate = true;
+                        }
+                        // shareId가 없는 경우도 자동 생성
+                        if (!t.shareId) {
+                            t.shareId = generateShareId();
+                            needsUpdate = true;
+                        }
+                        return {
+                            ...t,
+                            subtasks: t.subtasks || []
+                        };
+                    });
                     showSyncStatus('success', '✅ 동기화 완료!');
+                    
+                    // 업데이트가 필요한 경우 자동 저장
+                    if (needsUpdate) {
+                        await saveToGoogleSheets();
+                    }
                 } else {
                     todos = [];
                 }
