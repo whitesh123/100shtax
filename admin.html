@@ -529,7 +529,10 @@
             const todo = todos.find(t => t.id === id);
             if (!todo) return;
             
-            const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
+            // 현재 URL의 디렉토리 경로 가져오기
+            const currentUrl = window.location.href;
+            const lastSlashIndex = currentUrl.lastIndexOf('/');
+            const baseUrl = currentUrl.substring(0, lastSlashIndex + 1);
             const shareUrl = `${baseUrl}share-todo.html?id=${todo.shareId}`;
             
             document.getElementById('shareLink').value = shareUrl;
@@ -540,7 +543,10 @@
             const todo = todos.find(t => t.id === id);
             if (!todo) return;
             
-            const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
+            // 현재 URL의 디렉토리 경로 가져오기
+            const currentUrl = window.location.href;
+            const lastSlashIndex = currentUrl.lastIndexOf('/');
+            const baseUrl = currentUrl.substring(0, lastSlashIndex + 1);
             const shareUrl = `${baseUrl}team-share.html?id=${todo.teamShareId}`;
             
             document.getElementById('teamShareLink').value = shareUrl;
