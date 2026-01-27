@@ -739,18 +739,16 @@
                                     </button>
                                 </div>
 
-                                ${todo.subtasks && todo.subtasks.length > 0 ? `
-                                    <button onclick="toggleExpand(${todo.id})" 
-                                        class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                        ${isExpanded ? '▲ 접기' : '▼ 세부목록 보기'}
-                                    </button>
-                                ` : ''}
+                                <button onclick="toggleExpand(${todo.id})" 
+                                    class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
+                                    ${isExpanded ? '▲ 접기' : todo.subtasks && todo.subtasks.length > 0 ? '▼ 세부목록 보기' : '➕ 세부작업 추가'}
+                                </button>
                             </div>
 
                             ${isExpanded ? `
                                 <div class="px-4 sm:px-5 pb-4 sm:pb-5 bg-gradient-to-br from-indigo-50 to-purple-50 border-t-2 border-indigo-200">
                                     <div class="pt-4 space-y-3">
-                                        ${todo.subtasks.map(subtask => `
+                                        ${todo.subtasks && todo.subtasks.length > 0 ? todo.subtasks.map(subtask => `
                                             <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
                                                 <button onclick="toggleSubtask(${todo.id}, ${subtask.id})" 
                                                     class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 ${
@@ -766,7 +764,7 @@
                                                     🗑️
                                                 </button>
                                             </div>
-                                        `).join('')}
+                                        `).join('') : '<p class="text-center text-gray-400 py-4">아직 세부 작업이 없습니다</p>'}
                                         <div class="mt-4">
                                             <input type="text" placeholder="✨ 세부 목록 추가..." 
                                                 onkeypress="if(event.key==='Enter') { addSubtask(${todo.id}, this); }"
