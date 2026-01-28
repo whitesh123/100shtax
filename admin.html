@@ -135,6 +135,20 @@
                 </div>
             </div>
 
+            <!-- 검색 기능 -->
+            <div class="mb-6 sm:mb-8">
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="🔍 할일 검색..." 
+                        class="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition text-base sm:text-lg font-medium pr-24">
+                    <button id="clearSearch" class="hidden absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 text-gray-500 hover:text-gray-700 transition">
+                        ✕
+                    </button>
+                </div>
+                <div id="searchResults" class="hidden mt-2 text-sm text-gray-600">
+                    <span id="searchCount"></span>
+                </div>
+            </div>
+
             <div class="mb-6 sm:mb-8">
                 <button id="archiveToggle" class="w-full sm:w-auto flex items-center justify-center gap-3 px-4 sm:px-6 py-3 rounded-xl transition font-medium shadow-lg bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 hover:from-purple-200 hover:to-pink-200 transform hover:scale-105">
                     <span class="text-xl">📦</span>
@@ -259,6 +273,7 @@
         let todos = [];
         let editingTodoId = null;
         let showArchive = false;
+        let searchQuery = '';
 
         // 시간 선택 초기화
         function initTimeSelectors() {
@@ -621,6 +636,28 @@
             const activeTodos = todos.filter(t => !t.archived);
             const archivedTodos = todos.filter(t => t.archived);
             
+            // 검색 필터링
+            let filteredTodos = activeTodos;
+            if (searchQuery) {
+                filteredTodos = activeTodos.filter(todo => {
+                    // 제목 검색
+                    const titleMatch = todo.title.toLowerCase().includes(searchQuery.toLowerCase());
+                    // 세부작업 검색
+                    const subtaskMatch = todo.subtasks && todo.subtasks.some(st => 
+                        st.title.toLowerCase().includes(searchQuery.toLowerCase())
+                    );
+                    return titleMatch || subtaskMatch;
+                });
+                
+                // 검색 결과 표시
+                document.getElementById('searchResults').classList.remove('hidden');
+                document.getElementById('searchCount').textContent = 
+                    `${filteredTodos.length}개의 할일을 찾았습니다`;
+            } else {
+                document.getElementById('searchResults').classList.add('hidden');
+                filteredTodos = activeTodos;
+            }
+            
             const totalTodos = activeTodos.length;
             const completedTodos = activeTodos.filter(t => t.completed).length;
             const totalProgress = totalTodos > 0 ? Math.round((completedTodos / totalTodos) * 100) : 0;
@@ -651,16 +688,26 @@
                 }).join('');
             }
             
-            if (activeTodos.length === 0) {
-                document.getElementById('todoList').innerHTML = `
-                    <div class="text-center py-16 text-gray-400">
-                        <p class="text-4xl mb-4">📝</p>
-                        <p class="text-lg font-medium">아직 할일이 없습니다</p>
-                        <p class="text-sm">위에서 새로운 할일을 추가해보세요!</p>
-                    </div>
-                `;
+            if (filteredTodos.length === 0) {
+                if (searchQuery) {
+                    document.getElementById('todoList').innerHTML = `
+                        <div class="text-center py-16 text-gray-400">
+                            <p class="text-4xl mb-4">🔍</p>
+                            <p class="text-lg font-medium">검색 결과가 없습니다</p>
+                            <p class="text-sm">"${searchQuery}"와 일치하는 할일을 찾을 수 없습니다</p>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('todoList').innerHTML = `
+                        <div class="text-center py-16 text-gray-400">
+                            <p class="text-4xl mb-4">📝</p>
+                            <p class="text-lg font-medium">아직 할일이 없습니다</p>
+                            <p class="text-sm">위에서 새로운 할일을 추가해보세요!</p>
+                        </div>
+                    `;
+                }
             } else {
-                document.getElementById('todoList').innerHTML = activeTodos.map(todo => {
+                document.getElementById('todoList').innerHTML = filteredTodos.map(todo => {
                     const progress = getProgress(todo);
                     const isExpanded = todo.expanded;
                     const isOverdue = todo.deadline && new Date(todo.deadline + 'T' + (todo.deadlineTime || '23:59')) < new Date() && !todo.completed;
@@ -788,6 +835,28 @@
         document.getElementById('addBtn').addEventListener('click', addTodo);
         document.getElementById('titleInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addTodo();
+        });
+
+        // 검색 기능
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchQuery = e.target.value.trim();
+            
+            // 검색어가 있으면 X 버튼 표시
+            const clearBtn = document.getElementById('clearSearch');
+            if (searchQuery) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            
+            render();
+        });
+
+        document.getElementById('clearSearch').addEventListener('click', () => {
+            searchQuery = '';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('clearSearch').classList.add('hidden');
+            render();
         });
 
         document.getElementById('archiveToggle').addEventListener('click', () => {
