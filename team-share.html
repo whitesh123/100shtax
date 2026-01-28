@@ -145,8 +145,6 @@
         let sharedTodo = null;
         let teamShareId = null;
         let allTodos = [];
-        let saveTimeout = null;
-        let isSaving = false;
 
         function getTeamShareId() {
             const params = new URLSearchParams(window.location.search);
@@ -155,101 +153,35 @@
 
         async function loadTodoFromGoogleSheets() {
             try {
-                console.log('📥 데이터 로딩 시작...');
-                console.log('URL:', APPS_SCRIPT_URL);
-                
                 const response = await fetch(APPS_SCRIPT_URL);
-                console.log('응답 상태:', response.status);
-                
-                const allTodos = await response.json();
-                console.log('받은 데이터:', allTodos);
-                console.log('찾는 teamShareId:', teamShareId);
+                allTodos = await response.json();
                 
                 if (allTodos && Array.isArray(allTodos)) {
-                    console.log('전체 할일 개수:', allTodos.length);
-                    
                     const found = allTodos.find(t => t.teamShareId === teamShareId);
-                    console.log('찾은 할일:', found);
-                    
                     if (found) {
                         sharedTodo = found;
-                        // allTodos도 전역 변수에 저장
-                        window.allTodos = allTodos;
                         return true;
-                    } else {
-                        console.error('❌ teamShareId가 일치하는 할일을 찾을 수 없습니다');
-                        console.log('사용 가능한 teamShareId들:', allTodos.map(t => t.teamShareId));
                     }
                 }
                 return false;
             } catch (error) {
-                console.error('❌ 로드 에러:', error);
+                console.error('Load error:', error);
                 return false;
             }
         }
 
         async function saveToGoogleSheets() {
             try {
-                isSaving = true;
-                showSavingIndicator();
-                
-                console.log('💾 저장 시작...');
-                console.log('저장할 데이터:', window.allTodos);
-                
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(window.allTodos)
+                    body: JSON.stringify(allTodos)
                 });
-                
-                console.log('✅ 저장 완료');
-                isSaving = false;
-                hideSavingIndicator();
                 return true;
             } catch (error) {
-                console.error('❌ 저장 에러:', error);
-                isSaving = false;
-                hideSavingIndicator();
+                console.error('Save error:', error);
                 return false;
-            }
-        }
-
-        // 디바운스된 저장 함수 - 0.5초 대기 후 저장
-        function debouncedSave() {
-            // 기존 타이머 취소
-            if (saveTimeout) {
-                clearTimeout(saveTimeout);
-            }
-            
-            // 새 타이머 시작
-            saveTimeout = setTimeout(async () => {
-                if (!isSaving) {
-                    await saveToGoogleSheets();
-                }
-            }, 500);
-        }
-
-        function showSavingIndicator() {
-            let indicator = document.getElementById('savingIndicator');
-            if (!indicator) {
-                indicator = document.createElement('div');
-                indicator.id = 'savingIndicator';
-                indicator.className = 'fixed top-4 right-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-lg text-sm font-medium z-50';
-                indicator.innerHTML = '💾 저장 중...';
-                document.body.appendChild(indicator);
-            }
-            indicator.style.display = 'block';
-        }
-
-        function hideSavingIndicator() {
-            const indicator = document.getElementById('savingIndicator');
-            if (indicator) {
-                indicator.innerHTML = '✅ 저장 완료';
-                indicator.className = 'fixed top-4 right-4 px-4 py-2 bg-green-500 text-white rounded-lg shadow-lg text-sm font-medium z-50';
-                setTimeout(() => {
-                    indicator.style.display = 'none';
-                }, 2000);
             }
         }
 
@@ -259,7 +191,6 @@
             const subtask = sharedTodo.subtasks.find(st => st.id === subtaskId);
             if (!subtask) return;
             
-            // 1. 즉시 UI 업데이트 (체감 속도 향상)
             subtask.completed = !subtask.completed;
             
             // 모든 서브태스크 완료 여부 확인
@@ -269,20 +200,14 @@
                 sharedTodo.completed = false;
             }
             
-            // window.allTodos 배열에서도 업데이트
-            if (window.allTodos) {
-                const todoIndex = window.allTodos.findIndex(t => t.teamShareId === teamShareId);
-                if (todoIndex !== -1) {
-                    window.allTodos[todoIndex] = sharedTodo;
-                }
+            // allTodos 배열에서도 업데이트
+            const todoIndex = allTodos.findIndex(t => t.teamShareId === teamShareId);
+            if (todoIndex !== -1) {
+                allTodos[todoIndex] = sharedTodo;
             }
             
-            // 2. UI 즉시 렌더링
+            await saveToGoogleSheets();
             render();
-            
-            // 3. 백그라운드에서 저장 (디바운싱 적용)
-            debouncedSave();
-        }
         }
 
         function getProgress(todo) {
@@ -413,25 +338,16 @@
         }
 
         async function updateData() {
-            console.log('🔄 업데이트 시작...');
-            const success = await loadTodoFromGoogleSheets();
-            console.log('로딩 성공:', success);
+            await loadTodoFromGoogleSheets();
             render();
         }
 
         setInterval(updateData, 5000);
 
-        console.log('🚀 페이지 초기화 시작...');
-        console.log('현재 URL:', window.location.href);
-        
         teamShareId = getTeamShareId();
-        console.log('추출한 teamShareId:', teamShareId);
-        
         if (teamShareId) {
-            console.log('✅ teamShareId 있음, 데이터 로딩 시작...');
             updateData();
         } else {
-            console.error('❌ teamShareId가 URL에 없습니다');
             document.getElementById('loadingSection').classList.add('hidden');
             document.getElementById('errorMessage').classList.remove('hidden');
         }
