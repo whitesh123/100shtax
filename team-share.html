@@ -134,6 +134,7 @@
 
         <div class="text-center text-gray-600 text-xs sm:text-sm space-y-2 animate-fade-in">
             <p class="font-medium">✏️ 체크박스를 클릭하여 작업 상태를 업데이트할 수 있습니다.</p>
+            <p class="font-medium">➕ 세부 작업을 추가하거나 삭제할 수 있습니다.</p>
             <p class="font-medium">🔄 5초마다 자동으로 최신 정보로 업데이트됩니다.</p>
             <p class="font-medium">☁️ 구글 시트와 실시간으로 동기화됩니다.</p>
         </div>
@@ -196,6 +197,64 @@
             // 모든 서브태스크 완료 여부 확인
             if (sharedTodo.subtasks.every(st => st.completed)) {
                 sharedTodo.completed = true;
+            } else {
+                sharedTodo.completed = false;
+            }
+            
+            // allTodos 배열에서도 업데이트
+            const todoIndex = allTodos.findIndex(t => t.teamShareId === teamShareId);
+            if (todoIndex !== -1) {
+                allTodos[todoIndex] = sharedTodo;
+            }
+            
+            await saveToGoogleSheets();
+            render();
+        }
+
+        async function addSubtask(input) {
+            if (!sharedTodo) return;
+            
+            const title = input.value.trim();
+            if (!title) return;
+            
+            // subtasks 배열이 없으면 생성
+            if (!sharedTodo.subtasks) {
+                sharedTodo.subtasks = [];
+            }
+            
+            // 새 세부작업 추가
+            const newSubtask = {
+                id: Date.now(),
+                title: title,
+                completed: false
+            };
+            
+            sharedTodo.subtasks.push(newSubtask);
+            
+            // allTodos 배열에서도 업데이트
+            const todoIndex = allTodos.findIndex(t => t.teamShareId === teamShareId);
+            if (todoIndex !== -1) {
+                allTodos[todoIndex] = sharedTodo;
+            }
+            
+            input.value = '';
+            await saveToGoogleSheets();
+            render();
+        }
+
+        async function deleteSubtask(subtaskId) {
+            if (!sharedTodo) return;
+            
+            if (!confirm('이 세부 작업을 삭제하시겠습니까?')) return;
+            
+            // subtasks 배열에서 제거
+            sharedTodo.subtasks = sharedTodo.subtasks.filter(st => st.id !== subtaskId);
+            
+            // 남은 세부작업이 모두 완료되었는지 확인
+            if (sharedTodo.subtasks.length > 0 && sharedTodo.subtasks.every(st => st.completed)) {
+                sharedTodo.completed = true;
+            } else if (sharedTodo.subtasks.length === 0) {
+                sharedTodo.completed = false;
             } else {
                 sharedTodo.completed = false;
             }
@@ -323,11 +382,28 @@
                         <p class="flex-1 font-medium text-sm sm:text-lg break-words ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-800'}">
                             ${subtask.title}
                         </p>
-                        <span class="text-xl sm:text-2xl flex-shrink-0">${subtask.completed ? '✅' : '⏳'}</span>
+                        <button onclick="deleteSubtask(${subtask.id})" 
+                            class="p-2 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0" title="삭제">
+                            🗑️
+                        </button>
                     </div>
-                `).join('');
+                `).join('') + `
+                    <div class="mt-4">
+                        <input type="text" id="newSubtaskInput" placeholder="✨ 세부 작업 추가..." 
+                            onkeypress="if(event.key==='Enter') { addSubtask(this); }"
+                            class="w-full px-4 py-3 font-medium border-2 border-indigo-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
+                    </div>
+                `;
             } else {
-                document.getElementById('subtasksSection').classList.add('hidden');
+                document.getElementById('subtasksSection').classList.remove('hidden');
+                document.getElementById('subtasksList').innerHTML = `
+                    <p class="text-center text-gray-400 py-4">아직 세부 작업이 없습니다</p>
+                    <div class="mt-4">
+                        <input type="text" id="newSubtaskInput" placeholder="✨ 세부 작업 추가..." 
+                            onkeypress="if(event.key==='Enter') { addSubtask(this); }"
+                            class="w-full px-4 py-3 font-medium border-2 border-indigo-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
+                    </div>
+                `;
             }
 
             if (progress === 100 && sharedTodo.completed) {
