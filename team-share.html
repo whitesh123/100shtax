@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>팀원 작업 관리</title>
+    
+    <!-- PWA 설정 -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="팀작업">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -136,6 +145,8 @@
         let sharedTodo = null;
         let teamShareId = null;
         let allTodos = [];
+        let saveTimeout = null;
+        let isSaving = false;
 
         function getTeamShareId() {
             const params = new URLSearchParams(window.location.search);
@@ -163,16 +174,62 @@
 
         async function saveToGoogleSheets() {
             try {
+                isSaving = true;
+                showSavingIndicator();
+                
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(allTodos)
                 });
+                
+                isSaving = false;
+                hideSavingIndicator();
                 return true;
             } catch (error) {
                 console.error('Save error:', error);
+                isSaving = false;
+                hideSavingIndicator();
                 return false;
+            }
+        }
+
+        // 디바운스된 저장 함수 - 0.5초 대기 후 저장
+        function debouncedSave() {
+            // 기존 타이머 취소
+            if (saveTimeout) {
+                clearTimeout(saveTimeout);
+            }
+            
+            // 새 타이머 시작
+            saveTimeout = setTimeout(async () => {
+                if (!isSaving) {
+                    await saveToGoogleSheets();
+                }
+            }, 500);
+        }
+
+        function showSavingIndicator() {
+            let indicator = document.getElementById('savingIndicator');
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.id = 'savingIndicator';
+                indicator.className = 'fixed top-4 right-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-lg text-sm font-medium z-50';
+                indicator.innerHTML = '💾 저장 중...';
+                document.body.appendChild(indicator);
+            }
+            indicator.style.display = 'block';
+        }
+
+        function hideSavingIndicator() {
+            const indicator = document.getElementById('savingIndicator');
+            if (indicator) {
+                indicator.innerHTML = '✅ 저장 완료';
+                indicator.className = 'fixed top-4 right-4 px-4 py-2 bg-green-500 text-white rounded-lg shadow-lg text-sm font-medium z-50';
+                setTimeout(() => {
+                    indicator.style.display = 'none';
+                }, 2000);
             }
         }
 
@@ -182,6 +239,7 @@
             const subtask = sharedTodo.subtasks.find(st => st.id === subtaskId);
             if (!subtask) return;
             
+            // 1. 즉시 UI 업데이트 (체감 속도 향상)
             subtask.completed = !subtask.completed;
             
             // 모든 서브태스크 완료 여부 확인
@@ -197,8 +255,12 @@
                 allTodos[todoIndex] = sharedTodo;
             }
             
-            await saveToGoogleSheets();
+            // 2. UI 즉시 렌더링
             render();
+            
+            // 3. 백그라운드에서 저장 (디바운싱 적용)
+            debouncedSave();
+        }
         }
 
         function getProgress(todo) {
