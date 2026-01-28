@@ -155,19 +155,35 @@
 
         async function loadTodoFromGoogleSheets() {
             try {
+                console.log('📥 데이터 로딩 시작...');
+                console.log('URL:', APPS_SCRIPT_URL);
+                
                 const response = await fetch(APPS_SCRIPT_URL);
-                allTodos = await response.json();
+                console.log('응답 상태:', response.status);
+                
+                const allTodos = await response.json();
+                console.log('받은 데이터:', allTodos);
+                console.log('찾는 teamShareId:', teamShareId);
                 
                 if (allTodos && Array.isArray(allTodos)) {
+                    console.log('전체 할일 개수:', allTodos.length);
+                    
                     const found = allTodos.find(t => t.teamShareId === teamShareId);
+                    console.log('찾은 할일:', found);
+                    
                     if (found) {
                         sharedTodo = found;
+                        // allTodos도 전역 변수에 저장
+                        window.allTodos = allTodos;
                         return true;
+                    } else {
+                        console.error('❌ teamShareId가 일치하는 할일을 찾을 수 없습니다');
+                        console.log('사용 가능한 teamShareId들:', allTodos.map(t => t.teamShareId));
                     }
                 }
                 return false;
             } catch (error) {
-                console.error('Load error:', error);
+                console.error('❌ 로드 에러:', error);
                 return false;
             }
         }
@@ -177,18 +193,22 @@
                 isSaving = true;
                 showSavingIndicator();
                 
+                console.log('💾 저장 시작...');
+                console.log('저장할 데이터:', window.allTodos);
+                
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(allTodos)
+                    body: JSON.stringify(window.allTodos)
                 });
                 
+                console.log('✅ 저장 완료');
                 isSaving = false;
                 hideSavingIndicator();
                 return true;
             } catch (error) {
-                console.error('Save error:', error);
+                console.error('❌ 저장 에러:', error);
                 isSaving = false;
                 hideSavingIndicator();
                 return false;
@@ -249,10 +269,12 @@
                 sharedTodo.completed = false;
             }
             
-            // allTodos 배열에서도 업데이트
-            const todoIndex = allTodos.findIndex(t => t.teamShareId === teamShareId);
-            if (todoIndex !== -1) {
-                allTodos[todoIndex] = sharedTodo;
+            // window.allTodos 배열에서도 업데이트
+            if (window.allTodos) {
+                const todoIndex = window.allTodos.findIndex(t => t.teamShareId === teamShareId);
+                if (todoIndex !== -1) {
+                    window.allTodos[todoIndex] = sharedTodo;
+                }
             }
             
             // 2. UI 즉시 렌더링
@@ -391,16 +413,25 @@
         }
 
         async function updateData() {
-            await loadTodoFromGoogleSheets();
+            console.log('🔄 업데이트 시작...');
+            const success = await loadTodoFromGoogleSheets();
+            console.log('로딩 성공:', success);
             render();
         }
 
         setInterval(updateData, 5000);
 
+        console.log('🚀 페이지 초기화 시작...');
+        console.log('현재 URL:', window.location.href);
+        
         teamShareId = getTeamShareId();
+        console.log('추출한 teamShareId:', teamShareId);
+        
         if (teamShareId) {
+            console.log('✅ teamShareId 있음, 데이터 로딩 시작...');
             updateData();
         } else {
+            console.error('❌ teamShareId가 URL에 없습니다');
             document.getElementById('loadingSection').classList.add('hidden');
             document.getElementById('errorMessage').classList.remove('hidden');
         }
