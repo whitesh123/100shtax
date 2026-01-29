@@ -1,231 +1,15 @@
 <!DOCTYPE html>
-<!-- saved from url=(0048)https://whitesh123.github.io/100shtax/admin.html -->
-<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>할일 관리</title>
-    <script src="./할일 관리_files/saved_resource"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
         body {
             font-family: 'Inter', sans-serif;
-        }
-
-        /* 로그인 화면 */
-        .login-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-
-        .login-screen.hidden {
-            display: none;
-        }
-
-        .login-box {
-            background: white;
-            border-radius: 20px;
-            padding: 50px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            animation: slideUp 0.5s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .login-box h1 {
-            font-size: 3rem;
-            margin: 0 0 20px 0;
-            animation: bounce 0.6s ease-out;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .login-box p {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 1rem;
-        }
-
-        .login-input-group {
-            margin-bottom: 20px;
-        }
-
-        .login-input-group input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-family: 'Inter', sans-serif;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
-
-        .login-input-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-        }
-
-        .login-button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 12px;
-        }
-
-        .login-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .login-button:active {
-            transform: translateY(0);
-        }
-
-        .login-error {
-            background: #fee;
-            color: #c33;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            display: none;
-            border-left: 4px solid #c33;
-            animation: shake 0.4s ease-in-out;
-        }
-
-        .login-error.show {
-            display: block;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* 사용자 프로필 */
-        .user-profile {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            border-radius: 50px;
-            padding: 10px 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 1000;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .user-profile.hidden {
-            display: none;
-        }
-
-        .user-profile:hover {
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .user-profile-menu {
-            position: absolute;
-            top: 60px;
-            right: 0;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            min-width: 180px;
-            padding: 8px 0;
-            display: none;
-            z-index: 1001;
-        }
-
-        .user-profile-menu.show {
-            display: block;
-        }
-
-        .profile-menu-item {
-            padding: 12px 20px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            font-size: 0.95rem;
-            color: #333;
-            border: none;
-            width: 100%;
-            text-align: left;
-            background: none;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .profile-menu-item:hover {
-            background: #f5f5f5;
-        }
-
-        .profile-menu-item.logout {
-            color: #e74c3c;
-            border-top: 1px solid #eee;
         }
         
         .circular-progress {
@@ -311,14 +95,6 @@
 
         /* 모바일 최적화 */
         @media (max-width: 640px) {
-            .login-box {
-                padding: 30px 20px;
-            }
-
-            .login-box h1 {
-                font-size: 2.5rem;
-            }
-
             .share-modal-content {
                 padding: 20px;
             }
@@ -334,159 +110,127 @@
             .text-2xl {
                 font-size: 1.5rem !important;
             }
+        }
 
-            .user-profile {
-                top: 10px;
-                right: 10px;
-                padding: 8px 12px;
-            }
+        /* 팀원 모드 스타일 */
+        body.team-mode .total-progress-section,
+        body.team-mode .search-section,
+        body.team-mode .archive-section,
+        body.team-mode .add-todo-section,
+        body.team-mode #syncStatus {
+            display: none !important;
+        }
+
+        body.team-mode h1 {
+            font-size: 1.5rem !important;
+        }
+
+        body.team-mode .page-subtitle {
+            display: none !important;
         }
     </style>
-<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }</style></head>
+</head>
 <body class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4 sm:p-8">
-    <!-- 로그인 화면 -->
-    <div id="loginScreen" class="login-screen">
-        <div class="login-box">
-            <h1>🔐</h1>
-            <p>비밀번호를 입력하세요</p>
+    <div id="syncStatus" class="sync-status"></div>
 
-            <div id="loginError" class="login-error"></div>
+    <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-6 sm:mb-8 animate-fade-in">
+            <div class="inline-block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-transparent bg-clip-text">
+                <h1 class="text-3xl sm:text-5xl font-bold mb-2" id="pageTitle">✨ 할일 관리</h1>
+            </div>
+            <p class="text-gray-600 text-xs sm:text-sm page-subtitle">당신의 생산성을 극대화하세요</p>
+        </div>
 
-            <form onsubmit="handleLogin(event)">
-                <div class="login-input-group">
-                    <input type="password" id="passwordInput" placeholder="비밀번호" required autofocus>
+        <div class="glass-effect rounded-3xl shadow-2xl p-4 sm:p-8 mb-6 animate-fade-in">
+            <div class="total-progress-section mb-6 sm:mb-10 p-4 sm:p-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl text-white shadow-xl">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="text-center sm:text-left">
+                        <h2 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">전체 진척도</h2>
+                        <p class="text-sm sm:text-lg opacity-90" id="totalProgressText">0개의 할일 중 0개 완료</p>
+                    </div>
+                    <div id="totalProgressCircle" class="transform hover:scale-110 transition-transform"></div>
                 </div>
+            </div>
 
-                <button type="submit" class="login-button" id="loginBtn">
-                    🚀 로그인
+            <!-- 검색 기능 -->
+            <div class="search-section mb-6 sm:mb-8">
+                <div class="relative">
+                    <input type="text" id="searchInput" placeholder="🔍 할일 검색..." 
+                        class="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition text-base sm:text-lg font-medium pr-24">
+                    <button id="clearSearch" class="hidden absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 text-gray-500 hover:text-gray-700 transition">
+                        ✕
+                    </button>
+                </div>
+                <div id="searchResults" class="hidden mt-2 text-sm text-gray-600">
+                    <span id="searchCount"></span>
+                </div>
+            </div>
+
+            <div class="archive-section mb-6 sm:mb-8">
+                <button id="archiveToggle" class="w-full sm:w-auto flex items-center justify-center gap-3 px-4 sm:px-6 py-3 rounded-xl transition font-medium shadow-lg bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 hover:from-purple-200 hover:to-pink-200 transform hover:scale-105">
+                    <span class="text-xl">📦</span>
+                    <span class="text-sm sm:text-base">과거 완료작업 보기 (<span id="archiveCount">0</span>)</span>
                 </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- 사용자 프로필 -->
-    <div class="user-profile hidden" id="userProfile">
-        <div class="user-avatar">👤</div>
-        <span>로그인됨</span>
-        <div class="user-profile-menu" id="profileMenu">
-            <button class="profile-menu-item logout" onclick="logout()">
-                👋 로그아웃
-            </button>
-        </div>
-    </div>
-
-    <!-- 메인 앱 -->
-    <div id="appContainer" style="display: none;">
-        <div id="syncStatus" class="sync-status">✅ 동기화 완료!</div>
-
-        <div class="max-w-5xl mx-auto">
-            <div class="text-center mb-6 sm:mb-8 animate-fade-in">
-                <div class="inline-block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-transparent bg-clip-text">
-                    <h1 class="text-3xl sm:text-5xl font-bold mb-2">✨ 할일 관리</h1>
-                </div>
-                <p class="text-gray-600 text-xs sm:text-sm">당신의 생산성을 극대화하세요</p>
             </div>
 
-            <div class="glass-effect rounded-3xl shadow-2xl p-4 sm:p-8 mb-6 animate-fade-in">
-                <div class="mb-6 sm:mb-10 p-4 sm:p-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl text-white shadow-xl">
-                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div class="text-center sm:text-left">
-                            <h2 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">전체 진척도</h2>
-                            <p class="text-sm sm:text-lg opacity-90" id="totalProgressText">19개의 할일 중 1개 완료</p>
-                        </div>
-                        <div id="totalProgressCircle" class="transform hover:scale-110 transition-transform">
-                            <div class="relative" style="width: 100px; height: 100px;">
-                                <svg width="100" height="100" class="circular-progress">
-                                    <defs>
-                                        <lineargradient id="gradient-om2gjtotb" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                            <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                                        </lineargradient>
-                                    </defs>
-                                    <circle cx="50" cy="50" r="42" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                                    <circle cx="50" cy="50" r="42" fill="none" stroke="url(#gradient-om2gjtotb)" stroke-width="8" stroke-dasharray="263.89378290154264" stroke-dashoffset="250.69909375646552" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                                </svg>
-                                <div class="absolute inset-0 flex items-center justify-center">
-                                    <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">5%</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 검색 기능 -->
-                <div class="mb-6 sm:mb-8">
-                    <div class="relative">
-                        <input type="text" id="searchInput" placeholder="🔍 할일 검색..." class="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition text-base sm:text-lg font-medium pr-24">
-                        <button id="clearSearch" class="hidden absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 text-gray-500 hover:text-gray-700 transition">
-                            ✕
-                        </button>
-                    </div>
-                    <div id="searchResults" class="hidden mt-2 text-sm text-gray-600">
-                        <span id="searchCount"></span>
-                    </div>
-                </div>
-
-                <div class="mb-6 sm:mb-8">
-                    <button id="archiveToggle" class="w-full sm:w-auto flex items-center justify-center gap-3 px-4 sm:px-6 py-3 rounded-xl transition font-medium shadow-lg bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 hover:from-purple-200 hover:to-pink-200 transform hover:scale-105">
-                        <span class="text-xl">📦</span>
-                        <span class="text-sm sm:text-base">과거 완료작업 보기 (<span id="archiveCount">7</span>)</span>
-                    </button>
-                </div>
-
-                <div id="archiveSection" class="mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl hidden border-2 border-purple-200">
-                    <h3 class="text-lg sm:text-xl font-bold text-purple-800 mb-4 flex items-center gap-2">
-                        <span>📦</span> 과거 완료작업
-                    </h3>
-                    <div id="archiveList"></div>
-                </div>
-
-                <div class="mb-6 sm:mb-10 space-y-4 sm:space-y-5 p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
-                    <input type="text" id="titleInput" placeholder="✏️ 할일을 입력하세요" class="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition text-base sm:text-lg font-medium">
-                    
-                    <div>
-                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3 ml-1">📅 시작일시 (선택)</label>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                            <input type="date" id="dateInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
-                            <select id="timeHourInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
-                                <option value="">시간</option>
-                            </select>
-                            <select id="timeMinuteInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
-                                <option value="">분</option>
-                                <option value="00">00분</option>
-                                <option value="15">15분</option>
-                                <option value="30">30분</option>
-                                <option value="45">45분</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3 ml-1">⏰ 완료시한 (선택)</label>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                            <input type="date" id="deadlineInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition text-sm sm:text-base">
-                            <select id="deadlineHourInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition text-sm sm:text-base">
-                                <option value="">시간</option>
-                            </select>
-                            <select id="deadlineMinuteInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition text-sm sm:text-base">
-                                <option value="">분</option>
-                                <option value="00">00분</option>
-                                <option value="15">15분</option>
-                                <option value="30">30분</option>
-                                <option value="45">45분</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <button id="addBtn" class="w-full px-6 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-xl shadow-lg hover:shadow-xl transition transform hover:scale-105 font-bold text-base sm:text-lg">
-                        ➕ 추가하기
-                    </button>
-                </div>
-
-                <div id="todoList" class="space-y-4">
-                    <!-- 여기에 할일 목록이 렌더링됩니다 -->
-                </div>
+            <div id="archiveSection" class="archive-section mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl hidden border-2 border-purple-200">
+                <h3 class="text-lg sm:text-xl font-bold text-purple-800 mb-4 flex items-center gap-2">
+                    <span>📦</span> 과거 완료작업
+                </h3>
+                <div id="archiveList"></div>
             </div>
+
+            <div class="add-todo-section mb-6 sm:mb-10 space-y-4 sm:space-y-5 p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
+                <input type="text" id="titleInput" placeholder="✏️ 할일을 입력하세요" 
+                    class="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition text-base sm:text-lg font-medium">
+                
+                <div>
+                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3 ml-1">📅 시작일시 (선택)</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                        <input type="date" id="dateInput" 
+                            class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
+                        <select id="timeHourInput" 
+                            class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
+                            <option value="">시간</option>
+                        </select>
+                        <select id="timeMinuteInput" 
+                            class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
+                            <option value="">분</option>
+                            <option value="00">00분</option>
+                            <option value="15">15분</option>
+                            <option value="30">30분</option>
+                            <option value="45">45분</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3 ml-1">⏰ 완료시한 (선택)</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                        <input type="date" id="deadlineInput" 
+                            class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition text-sm sm:text-base">
+                        <select id="deadlineHourInput" 
+                            class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition text-sm sm:text-base">
+                            <option value="">시간</option>
+                        </select>
+                        <select id="deadlineMinuteInput" 
+                            class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition text-sm sm:text-base">
+                            <option value="">분</option>
+                            <option value="00">00분</option>
+                            <option value="15">15분</option>
+                            <option value="30">30분</option>
+                            <option value="45">45분</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button id="addBtn" 
+                    class="w-full px-6 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-xl shadow-lg hover:shadow-xl transition transform hover:scale-105 font-bold text-base sm:text-lg">
+                    ➕ 추가하기
+                </button>
+            </div>
+
+            <div id="todoList" class="space-y-4"></div>
         </div>
     </div>
 
@@ -498,13 +242,16 @@
             </h3>
             <p class="text-xs sm:text-sm text-gray-600 mb-6">고객이 진척도를 확인할 수 있는 링크입니다 (읽기 전용)</p>
             <div class="mb-4">
-                <input type="text" id="shareLink" readonly="" class="w-full px-4 py-3 border-2 border-indigo-200 rounded-lg bg-indigo-50 font-mono text-xs sm:text-sm">
+                <input type="text" id="shareLink" readonly 
+                    class="w-full px-4 py-3 border-2 border-indigo-200 rounded-lg bg-indigo-50 font-mono text-xs sm:text-sm">
             </div>
             <div class="flex flex-col sm:flex-row gap-3">
-                <button id="copyBtn" class="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition transform hover:scale-105">
+                <button id="copyBtn" 
+                    class="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition transform hover:scale-105">
                     📋 링크 복사
                 </button>
-                <button id="closeShareModal" class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition">
+                <button id="closeShareModal" 
+                    class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition">
                     닫기
                 </button>
             </div>
@@ -520,13 +267,16 @@
             </h3>
             <p class="text-xs sm:text-sm text-gray-600 mb-6">팀원이 진척도를 확인하고 체크박스를 수정할 수 있는 링크입니다</p>
             <div class="mb-4">
-                <input type="text" id="teamShareLink" readonly="" class="w-full px-4 py-3 border-2 border-indigo-200 rounded-lg bg-indigo-50 font-mono text-xs sm:text-sm">
+                <input type="text" id="teamShareLink" readonly 
+                    class="w-full px-4 py-3 border-2 border-indigo-200 rounded-lg bg-indigo-50 font-mono text-xs sm:text-sm">
             </div>
             <div class="flex flex-col sm:flex-row gap-3">
-                <button id="copyTeamBtn" class="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg transition transform hover:scale-105">
+                <button id="copyTeamBtn" 
+                    class="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg transition transform hover:scale-105">
                     📋 링크 복사
                 </button>
-                <button id="closeTeamShareModal" class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition">
+                <button id="closeTeamShareModal" 
+                    class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition">
                     닫기
                 </button>
             </div>
@@ -535,97 +285,17 @@
     </div>
 
     <script>
-        const CORRECT_PASSWORD = "18133505"; // 비밀번호 설정
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzH7yaKhcRl_RNd74QJzG4MaWyvZSBPRXiHoNjht3lPCYaIjxvJ8arIr9ENNeobw8CB_Q/exec';
         
         let todos = [];
         let editingTodoId = null;
         let showArchive = false;
         let searchQuery = '';
-        let isLoggedIn = false;
-
-        // 로그인 상태 확인
-        function checkLoginStatus() {
-            const loginStatus = localStorage.getItem('todoAppLoggedIn');
-            isLoggedIn = loginStatus === 'true';
-            
-            if (isLoggedIn) {
-                showApp();
-            } else {
-                showLogin();
-            }
-        }
-
-        // 로그인 처리
-        function handleLogin(e) {
-            e.preventDefault();
-            
-            const passwordInput = document.getElementById('passwordInput');
-            const password = passwordInput.value;
-            const errorDiv = document.getElementById('loginError');
-            const loginBtn = document.getElementById('loginBtn');
-
-            if (password === CORRECT_PASSWORD) {
-                // 로그인 성공
-                localStorage.setItem('todoAppLoggedIn', 'true');
-                isLoggedIn = true;
-                showApp();
-                passwordInput.value = '';
-            } else {
-                // 로그인 실패
-                errorDiv.textContent = '❌ 비밀번호가 틀렸습니다';
-                errorDiv.classList.add('show');
-                passwordInput.value = '';
-                passwordInput.focus();
-
-                setTimeout(() => {
-                    errorDiv.classList.remove('show');
-                }, 3000);
-            }
-        }
-
-        // UI 표시 함수
-        function showLogin() {
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('appContainer').style.display = 'none';
-            document.getElementById('userProfile').classList.add('hidden');
-            document.getElementById('passwordInput').focus();
-        }
-
-        function showApp() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('appContainer').style.display = 'block';
-            document.getElementById('userProfile').classList.remove('hidden');
-            loadFromGoogleSheets();
-        }
-
-        // 로그아웃
-        function logout() {
-            if (confirm('로그아웃하시겠습니까?')) {
-                localStorage.removeItem('todoAppLoggedIn');
-                isLoggedIn = false;
-                document.getElementById('profileMenu').classList.remove('show');
-                showLogin();
-            }
-        }
-
-        // 프로필 메뉴 토글
-        document.getElementById('userProfile').addEventListener('click', function(e) {
-            if (e.target.closest('.user-avatar') || e.target.textContent === '로그인됨') {
-                const menu = document.getElementById('profileMenu');
-                menu.classList.toggle('show');
-            }
-        });
-
-        // 메뉴 외부 클릭 시 닫기
-        document.addEventListener('click', function(e) {
-            const profileMenu = document.getElementById('profileMenu');
-            const userProfile = document.getElementById('userProfile');
-
-            if (userProfile && !userProfile.contains(e.target)) {
-                profileMenu.classList.remove('show');
-            }
-        });
+        
+        // 팀원 모드 감지
+        const urlParams = new URLSearchParams(window.location.search);
+        const isTeamMode = urlParams.get('mode') === 'team';
+        const teamTodoId = urlParams.get('todoId');
 
         // 시간 선택 초기화
         function initTimeSelectors() {
@@ -660,10 +330,12 @@
                 let needsUpdate = false;
                 if (data && Array.isArray(data)) {
                     todos = data.map(t => {
+                        // teamShareId가 없는 경우 자동 생성
                         if (!t.teamShareId) {
                             t.teamShareId = generateShareId();
                             needsUpdate = true;
                         }
+                        // shareId가 없는 경우도 자동 생성
                         if (!t.shareId) {
                             t.shareId = generateShareId();
                             needsUpdate = true;
@@ -675,6 +347,7 @@
                     });
                     showSyncStatus('success', '✅ 동기화 완료!');
                     
+                    // 업데이트가 필요한 경우 자동 저장
                     if (needsUpdate) {
                         await saveToGoogleSheets();
                     }
@@ -893,6 +566,7 @@
             const todo = todos.find(t => t.id === id);
             if (!todo) return;
             
+            // 현재 URL의 디렉토리 경로 가져오기
             const currentUrl = window.location.href;
             const lastSlashIndex = currentUrl.lastIndexOf('/');
             const baseUrl = currentUrl.substring(0, lastSlashIndex + 1);
@@ -906,10 +580,9 @@
             const todo = todos.find(t => t.id === id);
             if (!todo) return;
             
-            const currentUrl = window.location.href;
-            const lastSlashIndex = currentUrl.lastIndexOf('/');
-            const baseUrl = currentUrl.substring(0, lastSlashIndex + 1);
-            const shareUrl = `${baseUrl}team-share.html?id=${todo.teamShareId}`;
+            // 현재 URL의 디렉토리 경로 가져오기
+            const currentUrl = window.location.href.split('?')[0]; // 쿼리 파라미터 제거
+            const shareUrl = `${currentUrl}?mode=team&todoId=${todo.id}`;
             
             document.getElementById('teamShareLink').value = shareUrl;
             document.getElementById('teamShareModal').classList.add('active');
@@ -983,22 +656,37 @@
             const activeTodos = todos.filter(t => !t.archived);
             const archivedTodos = todos.filter(t => t.archived);
             
+            // 팀원 모드: 특정 할일만 필터링
             let filteredTodos = activeTodos;
-            if (searchQuery) {
-                filteredTodos = activeTodos.filter(todo => {
-                    const titleMatch = todo.title.toLowerCase().includes(searchQuery.toLowerCase());
-                    const subtaskMatch = todo.subtasks && todo.subtasks.some(st => 
-                        st.title.toLowerCase().includes(searchQuery.toLowerCase())
-                    );
-                    return titleMatch || subtaskMatch;
-                });
+            if (isTeamMode && teamTodoId) {
+                filteredTodos = activeTodos.filter(todo => todo.id == teamTodoId);
                 
-                document.getElementById('searchResults').classList.remove('hidden');
-                document.getElementById('searchCount').textContent = 
-                    `${filteredTodos.length}개의 할일을 찾았습니다`;
+                // 페이지 제목 변경
+                if (filteredTodos.length > 0) {
+                    document.getElementById('pageTitle').textContent = `👥 ${filteredTodos[0].title}`;
+                }
             } else {
-                document.getElementById('searchResults').classList.add('hidden');
-                filteredTodos = activeTodos;
+                // 검색 필터링 (관리자 모드에만 적용)
+                if (searchQuery) {
+                    filteredTodos = activeTodos.filter(todo => {
+                        // 제목 검색
+                        const titleMatch = todo.title.toLowerCase().includes(searchQuery.toLowerCase());
+                        // 세부작업 검색
+                        const subtaskMatch = todo.subtasks && todo.subtasks.some(st => 
+                            st.title.toLowerCase().includes(searchQuery.toLowerCase())
+                        );
+                        return titleMatch || subtaskMatch;
+                    });
+                    
+                    // 검색 결과 표시
+                    document.getElementById('searchResults').classList.remove('hidden');
+                    document.getElementById('searchCount').textContent = 
+                        `${filteredTodos.length}개의 할일을 찾았습니다`;
+                } else {
+                    document.getElementById('searchResults').classList.add('hidden');
+                    filteredTodos = activeTodos;
+                }
+            }
             }
             
             const totalTodos = activeTodos.length;
@@ -1063,12 +751,14 @@
                         }">
                             <div class="p-4 sm:p-5">
                                 <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(${todo.id})" 
-                                        class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 ${
-                                            todo.completed ? 'bg-gradient-to-br from-indigo-400 to-purple-500 border-indigo-500' : 'border-gray-300 hover:border-indigo-500 bg-white'
-                                        }">
-                                        ${todo.completed ? '<span class="text-white text-base sm:text-lg font-bold">✓</span>' : ''}
-                                    </button>
+                                    ${!isTeamMode ? `
+                                        <button onclick="toggleTodo(${todo.id})" 
+                                            class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 ${
+                                                todo.completed ? 'bg-gradient-to-br from-indigo-400 to-purple-500 border-indigo-500' : 'border-gray-300 hover:border-indigo-500 bg-white'
+                                            }">
+                                            ${todo.completed ? '<span class="text-white text-base sm:text-lg font-bold">✓</span>' : ''}
+                                        </button>
+                                    ` : ''}
 
                                     <div class="flex-1 min-w-0">
                                         ${editingTodoId === todo.id ? `
@@ -1105,43 +795,47 @@
                                 </div>
 
                                 <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(${todo.id})" 
-                                        class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(${todo.id})" 
-                                        class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(${todo.id})" 
-                                        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    ${progress === 100 ? `
-                                        <button onclick="archiveTodo(${todo.id})" 
-                                            class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition transform hover:scale-110" title="보관하기">
-                                            📦
+                                    ${!isTeamMode ? `
+                                        <button onclick="openShareModal(${todo.id})" 
+                                            class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
+                                            🔗 고객공유
+                                        </button>
+                                        <button onclick="openTeamShareModal(${todo.id})" 
+                                            class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
+                                            👥 팀원공유
+                                        </button>
+                                        <button onclick="duplicateTodo(${todo.id})" 
+                                            class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
+                                            📋
+                                        </button>
+                                        ${progress === 100 ? `
+                                            <button onclick="archiveTodo(${todo.id})" 
+                                                class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition transform hover:scale-110" title="보관하기">
+                                                📦
+                                            </button>
+                                        ` : ''}
+                                        ${(todo.date || todo.deadline) ? `
+                                            <button onclick='addToCalendar(${JSON.stringify(todo).replace(/'/g, "&apos;")})' 
+                                                class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition transform hover:scale-110" title="캘린더에 추가">
+                                                📅
+                                            </button>
+                                        ` : ''}
+                                        <button onclick="deleteTodo(${todo.id})" 
+                                            class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
+                                            🗑️
                                         </button>
                                     ` : ''}
-                                    ${(todo.date || todo.deadline) ? `
-                                        <button onclick='addToCalendar(${JSON.stringify(todo).replace(/'/g, "&apos;")})' 
-                                            class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition transform hover:scale-110" title="캘린더에 추가">
-                                            📅
-                                        </button>
-                                    ` : ''}
-                                    <button onclick="deleteTodo(${todo.id})" 
-                                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
                                 </div>
 
-                                <button onclick="toggleExpand(${todo.id})" 
-                                    class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ${isExpanded ? '▲ 접기' : todo.subtasks && todo.subtasks.length > 0 ? '▼ 세부목록 보기' : '➕ 세부작업 추가'}
-                                </button>
+                                ${!isTeamMode ? `
+                                    <button onclick="toggleExpand(${todo.id})" 
+                                        class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
+                                        ${isExpanded ? '▲ 접기' : todo.subtasks && todo.subtasks.length > 0 ? '▼ 세부목록 보기' : '➕ 세부작업 추가'}
+                                    </button>
+                                ` : ''}
                             </div>
 
-                            ${isExpanded ? `
+                            ${(isExpanded || isTeamMode) ? `
                                 <div class="px-4 sm:px-5 pb-4 sm:pb-5 bg-gradient-to-br from-indigo-50 to-purple-50 border-t-2 border-indigo-200">
                                     <div class="pt-4 space-y-3">
                                         ${todo.subtasks && todo.subtasks.length > 0 ? todo.subtasks.map(subtask => `
@@ -1175,15 +869,16 @@
             }
         }
 
-        // 이벤트 리스너
         document.getElementById('addBtn').addEventListener('click', addTodo);
         document.getElementById('titleInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addTodo();
         });
 
+        // 검색 기능
         document.getElementById('searchInput').addEventListener('input', (e) => {
             searchQuery = e.target.value.trim();
             
+            // 검색어가 있으면 X 버튼 표시
             const clearBtn = document.getElementById('clearSearch');
             if (searchQuery) {
                 clearBtn.classList.remove('hidden');
@@ -1221,6 +916,7 @@
             }
         });
 
+        // 고객 공유 모달
         document.getElementById('closeShareModal').addEventListener('click', () => {
             document.getElementById('shareModal').classList.remove('active');
         });
@@ -1244,6 +940,7 @@
             }
         });
 
+        // 팀원 공유 모달
         document.getElementById('closeTeamShareModal').addEventListener('click', () => {
             document.getElementById('teamShareModal').classList.remove('active');
         });
@@ -1267,7 +964,16 @@
             }
         });
 
-        // 초기화
-        checkLoginStatus();
+        // 팀원 모드 초기화
+        if (isTeamMode) {
+            document.body.classList.add('team-mode');
+            // 팀원 모드에서는 5초마다 자동 새로고침
+            setInterval(() => {
+                loadFromGoogleSheets();
+            }, 5000);
+        }
+
+        loadFromGoogleSheets();
     </script>
-</body></html>
+</body>
+</html>
