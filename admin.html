@@ -11,6 +11,222 @@
         body {
             font-family: 'Inter', sans-serif;
         }
+
+        /* 로그인 화면 */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .login-screen.hidden {
+            display: none;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-box h1 {
+            font-size: 3rem;
+            margin: 0 0 20px 0;
+            animation: bounce 0.6s ease-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .login-box p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        .login-input-group {
+            margin-bottom: 20px;
+        }
+
+        .login-input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .login-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .login-error {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            display: none;
+            border-left: 4px solid #c33;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        .login-error.show {
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 사용자 프로필 */
+        .user-profile {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 50px;
+            padding: 10px 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile.hidden {
+            display: none;
+        }
+
+        .user-profile:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-profile-menu {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            min-width: 180px;
+            padding: 8px 0;
+            display: none;
+            z-index: 1001;
+        }
+
+        .user-profile-menu.show {
+            display: block;
+        }
+
+        .profile-menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-size: 0.95rem;
+            color: #333;
+            border: none;
+            width: 100%;
+            text-align: left;
+            background: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .profile-menu-item:hover {
+            background: #f5f5f5;
+        }
+
+        .profile-menu-item.logout {
+            color: #e74c3c;
+            border-top: 1px solid #eee;
+        }
         
         .circular-progress {
             transform: rotate(-90deg);
@@ -95,6 +311,14 @@
 
         /* 모바일 최적화 */
         @media (max-width: 640px) {
+            .login-box {
+                padding: 30px 20px;
+            }
+
+            .login-box h1 {
+                font-size: 2.5rem;
+            }
+
             .share-modal-content {
                 padding: 20px;
             }
@@ -110,1835 +334,159 @@
             .text-2xl {
                 font-size: 1.5rem !important;
             }
+
+            .user-profile {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+            }
         }
     </style>
-<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0px}.right-2{right:0.5rem}.top-1\/2{top:50%}.mx-auto{margin-left:auto;margin-right:auto}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.ml-1{margin-left:0.25rem}.mt-2{margin-top:0.5rem}.mt-4{margin-top:1rem}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-5{height:1.25rem}.h-7{height:1.75rem}.min-h-screen{min-height:100vh}.w-full{width:100%}.w-5{width:1.25rem}.w-7{width:1.75rem}.min-w-0{min-width:0px}.max-w-5xl{max-width:64rem}.flex-1{flex:1 1 0%}.flex-shrink-0{flex-shrink:0}.-translate-y-1\/2{--tw-translate-y:-50%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.break-words{overflow-wrap:break-word}.break-all{word-break:break-all}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.rounded-md{border-radius:0.375rem}.border-2{border-width:2px}.border-t-2{border-top-width:2px}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.border-indigo-200{--tw-border-opacity:1;border-color:rgb(199 210 254 / var(--tw-border-opacity, 1))}.border-purple-200{--tw-border-opacity:1;border-color:rgb(233 213 255 / var(--tw-border-opacity, 1))}.border-green-400{--tw-border-opacity:1;border-color:rgb(74 222 128 / var(--tw-border-opacity, 1))}.border-indigo-500{--tw-border-opacity:1;border-color:rgb(99 102 241 / var(--tw-border-opacity, 1))}.bg-gray-200{--tw-bg-opacity:1;background-color:rgb(229 231 235 / var(--tw-bg-opacity, 1))}.bg-indigo-50{--tw-bg-opacity:1;background-color:rgb(238 242 255 / var(--tw-bg-opacity, 1))}.bg-indigo-100{--tw-bg-opacity:1;background-color:rgb(224 231 255 / var(--tw-bg-opacity, 1))}.bg-purple-100{--tw-bg-opacity:1;background-color:rgb(243 232 255 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-indigo-50{--tw-gradient-from:#eef2ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(238 242 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-gray-50{--tw-gradient-from:#f9fafb var(--tw-gradient-from-position);--tw-gradient-to:rgb(249 250 251 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-indigo-500{--tw-gradient-from:#6366f1 var(--tw-gradient-from-position);--tw-gradient-to:rgb(99 102 241 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-indigo-600{--tw-gradient-from:#4f46e5 var(--tw-gradient-from-position);--tw-gradient-to:rgb(79 70 229 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-purple-100{--tw-gradient-from:#f3e8ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(243 232 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-purple-50{--tw-gradient-from:#faf5ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(250 245 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-purple-600{--tw-gradient-from:#9333ea var(--tw-gradient-from-position);--tw-gradient-to:rgb(147 51 234 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-green-50{--tw-gradient-from:#f0fdf4 var(--tw-gradient-from-position);--tw-gradient-to:rgb(240 253 244 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-indigo-400{--tw-gradient-from:#818cf8 var(--tw-gradient-from-position);--tw-gradient-to:rgb(129 140 248 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.via-purple-50{--tw-gradient-to:rgb(250 245 255 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #faf5ff var(--tw-gradient-via-position), var(--tw-gradient-to)}.via-purple-500{--tw-gradient-to:rgb(168 85 247 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #a855f7 var(--tw-gradient-via-position), var(--tw-gradient-to)}.via-purple-600{--tw-gradient-to:rgb(147 51 234 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #9333ea var(--tw-gradient-via-position), var(--tw-gradient-to)}.to-pink-50{--tw-gradient-to:#fdf2f8 var(--tw-gradient-to-position)}.to-gray-100{--tw-gradient-to:#f3f4f6 var(--tw-gradient-to-position)}.to-pink-100{--tw-gradient-to:#fce7f3 var(--tw-gradient-to-position)}.to-pink-500{--tw-gradient-to:#ec4899 var(--tw-gradient-to-position)}.to-pink-600{--tw-gradient-to:#db2777 var(--tw-gradient-to-position)}.to-purple-600{--tw-gradient-to:#9333ea var(--tw-gradient-to-position)}.to-emerald-50{--tw-gradient-to:#ecfdf5 var(--tw-gradient-to-position)}.to-purple-50{--tw-gradient-to:#faf5ff var(--tw-gradient-to-position)}.to-purple-500{--tw-gradient-to:#a855f7 var(--tw-gradient-to-position)}.bg-clip-text{-webkit-background-clip:text;background-clip:text}.p-4{padding:1rem}.p-1{padding:0.25rem}.p-2{padding:0.5rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.pr-24{padding-right:6rem}.pb-4{padding-bottom:1rem}.pt-4{padding-top:1rem}.text-center{text-align:center}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.text-gray-500{--tw-text-opacity:1;color:rgb(107 114 128 / var(--tw-text-opacity, 1))}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity, 1))}.text-purple-700{--tw-text-opacity:1;color:rgb(126 34 206 / var(--tw-text-opacity, 1))}.text-purple-800{--tw-text-opacity:1;color:rgb(107 33 168 / var(--tw-text-opacity, 1))}.text-transparent{color:transparent}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-gray-400{--tw-text-opacity:1;color:rgb(156 163 175 / var(--tw-text-opacity, 1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.text-indigo-700{--tw-text-opacity:1;color:rgb(67 56 202 / var(--tw-text-opacity, 1))}.text-purple-600{--tw-text-opacity:1;color:rgb(147 51 234 / var(--tw-text-opacity, 1))}.text-red-400{--tw-text-opacity:1;color:rgb(248 113 113 / var(--tw-text-opacity, 1))}.text-red-600{--tw-text-opacity:1;color:rgb(220 38 38 / var(--tw-text-opacity, 1))}.line-through{-webkit-text-decoration-line:line-through;text-decoration-line:line-through}.opacity-90{opacity:0.9}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-transform{transition-property:transform;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:scale-110:hover{--tw-scale-x:1.1;--tw-scale-y:1.1;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:scale-125:hover{--tw-scale-x:1.25;--tw-scale-y:1.25;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:border-indigo-500:hover{--tw-border-opacity:1;border-color:rgb(99 102 241 / var(--tw-border-opacity, 1))}.hover\:bg-gray-300:hover{--tw-bg-opacity:1;background-color:rgb(209 213 219 / var(--tw-bg-opacity, 1))}.hover\:bg-blue-50:hover{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.hover\:bg-green-50:hover{--tw-bg-opacity:1;background-color:rgb(240 253 244 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-200:hover{--tw-bg-opacity:1;background-color:rgb(199 210 254 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-50:hover{--tw-bg-opacity:1;background-color:rgb(238 242 255 / var(--tw-bg-opacity, 1))}.hover\:bg-purple-200:hover{--tw-bg-opacity:1;background-color:rgb(233 213 255 / var(--tw-bg-opacity, 1))}.hover\:bg-purple-50:hover{--tw-bg-opacity:1;background-color:rgb(250 245 255 / var(--tw-bg-opacity, 1))}.hover\:bg-red-50:hover{--tw-bg-opacity:1;background-color:rgb(254 242 242 / var(--tw-bg-opacity, 1))}.hover\:from-purple-200:hover{--tw-gradient-from:#e9d5ff var(--tw-gradient-from-position);--tw-gradient-to:rgb(233 213 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:to-pink-200:hover{--tw-gradient-to:#fbcfe8 var(--tw-gradient-to-position)}.hover\:text-gray-700:hover{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.hover\:text-red-600:hover{--tw-text-opacity:1;color:rgb(220 38 38 / var(--tw-text-opacity, 1))}.hover\:shadow-lg:hover{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.hover\:shadow-xl:hover{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.hover\:shadow-md:hover{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.focus\:border-indigo-500:focus{--tw-border-opacity:1;border-color:rgb(99 102 241 / var(--tw-border-opacity, 1))}.focus\:border-pink-500:focus{--tw-border-opacity:1;border-color:rgb(236 72 153 / var(--tw-border-opacity, 1))}.focus\:border-purple-500:focus{--tw-border-opacity:1;border-color:rgb(168 85 247 / var(--tw-border-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-4:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(4px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-indigo-100:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(224 231 255 / var(--tw-ring-opacity, 1))}.focus\:ring-pink-100:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(252 231 243 / var(--tw-ring-opacity, 1))}.focus\:ring-purple-100:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(243 232 255 / var(--tw-ring-opacity, 1))}@media (min-width: 640px){.sm\:mb-10{margin-bottom:2.5rem}.sm\:mb-3{margin-bottom:0.75rem}.sm\:mb-8{margin-bottom:2rem}.sm\:h-6{height:1.5rem}.sm\:h-8{height:2rem}.sm\:w-auto{width:auto}.sm\:w-6{width:1.5rem}.sm\:w-8{width:2rem}.sm\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.sm\:flex-row{flex-direction:row}.sm\:gap-4{gap:1rem}.sm\:space-y-5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.25rem * var(--tw-space-y-reverse))}.sm\:p-8{padding:2rem}.sm\:p-6{padding:1.5rem}.sm\:p-5{padding:1.25rem}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:py-4{padding-top:1rem;padding-bottom:1rem}.sm\:px-5{padding-left:1.25rem;padding-right:1.25rem}.sm\:pb-5{padding-bottom:1.25rem}.sm\:text-left{text-align:left}.sm\:text-2xl{font-size:1.5rem;line-height:2rem}.sm\:text-5xl{font-size:3rem;line-height:1}.sm\:text-base{font-size:1rem;line-height:1.5rem}.sm\:text-lg{font-size:1.125rem;line-height:1.75rem}.sm\:text-sm{font-size:0.875rem;line-height:1.25rem}.sm\:text-xl{font-size:1.25rem;line-height:1.75rem}.sm\:text-3xl{font-size:1.875rem;line-height:2.25rem}}</style></head>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }</style></head>
 <body class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4 sm:p-8">
-    <div id="syncStatus" class="sync-status">✅ 동기화 완료!</div>
+    <!-- 로그인 화면 -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <h1>🔐</h1>
+            <p>비밀번호를 입력하세요</p>
 
-    <div class="max-w-5xl mx-auto">
-        <div class="text-center mb-6 sm:mb-8 animate-fade-in">
-            <div class="inline-block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-transparent bg-clip-text">
-                <h1 class="text-3xl sm:text-5xl font-bold mb-2">✨ 할일 관리</h1>
-            </div>
-            <p class="text-gray-600 text-xs sm:text-sm">당신의 생산성을 극대화하세요</p>
+            <div id="loginError" class="login-error"></div>
+
+            <form onsubmit="handleLogin(event)">
+                <div class="login-input-group">
+                    <input type="password" id="passwordInput" placeholder="비밀번호" required autofocus>
+                </div>
+
+                <button type="submit" class="login-button" id="loginBtn">
+                    🚀 로그인
+                </button>
+            </form>
         </div>
+    </div>
 
-        <div class="glass-effect rounded-3xl shadow-2xl p-4 sm:p-8 mb-6 animate-fade-in">
-            <div class="mb-6 sm:mb-10 p-4 sm:p-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl text-white shadow-xl">
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div class="text-center sm:text-left">
-                        <h2 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">전체 진척도</h2>
-                        <p class="text-sm sm:text-lg opacity-90" id="totalProgressText">19개의 할일 중 1개 완료</p>
-                    </div>
-                    <div id="totalProgressCircle" class="transform hover:scale-110 transition-transform">
-                <div class="relative" style="width: 100px; height: 100px;">
-                    <svg width="100" height="100" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-om2gjtotb" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="50" cy="50" r="42" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="50" cy="50" r="42" fill="none" stroke="url(#gradient-om2gjtotb)" stroke-width="8" stroke-dasharray="263.89378290154264" stroke-dashoffset="250.69909375646552" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">5%</span>
-                    </div>
+    <!-- 사용자 프로필 -->
+    <div class="user-profile hidden" id="userProfile">
+        <div class="user-avatar">👤</div>
+        <span>로그인됨</span>
+        <div class="user-profile-menu" id="profileMenu">
+            <button class="profile-menu-item logout" onclick="logout()">
+                👋 로그아웃
+            </button>
+        </div>
+    </div>
+
+    <!-- 메인 앱 -->
+    <div id="appContainer" style="display: none;">
+        <div id="syncStatus" class="sync-status">✅ 동기화 완료!</div>
+
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-6 sm:mb-8 animate-fade-in">
+                <div class="inline-block bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-transparent bg-clip-text">
+                    <h1 class="text-3xl sm:text-5xl font-bold mb-2">✨ 할일 관리</h1>
                 </div>
-            </div>
-                </div>
+                <p class="text-gray-600 text-xs sm:text-sm">당신의 생산성을 극대화하세요</p>
             </div>
 
-            <!-- 검색 기능 -->
-            <div class="mb-6 sm:mb-8">
-                <div class="relative">
-                    <input type="text" id="searchInput" placeholder="🔍 할일 검색..." class="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition text-base sm:text-lg font-medium pr-24">
-                    <button id="clearSearch" class="hidden absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 text-gray-500 hover:text-gray-700 transition">
-                        ✕
+            <div class="glass-effect rounded-3xl shadow-2xl p-4 sm:p-8 mb-6 animate-fade-in">
+                <div class="mb-6 sm:mb-10 p-4 sm:p-8 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl text-white shadow-xl">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="text-center sm:text-left">
+                            <h2 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">전체 진척도</h2>
+                            <p class="text-sm sm:text-lg opacity-90" id="totalProgressText">19개의 할일 중 1개 완료</p>
+                        </div>
+                        <div id="totalProgressCircle" class="transform hover:scale-110 transition-transform">
+                            <div class="relative" style="width: 100px; height: 100px;">
+                                <svg width="100" height="100" class="circular-progress">
+                                    <defs>
+                                        <lineargradient id="gradient-om2gjtotb" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
+                                            <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
+                                        </lineargradient>
+                                    </defs>
+                                    <circle cx="50" cy="50" r="42" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
+                                    <circle cx="50" cy="50" r="42" fill="none" stroke="url(#gradient-om2gjtotb)" stroke-width="8" stroke-dasharray="263.89378290154264" stroke-dashoffset="250.69909375646552" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">5%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 검색 기능 -->
+                <div class="mb-6 sm:mb-8">
+                    <div class="relative">
+                        <input type="text" id="searchInput" placeholder="🔍 할일 검색..." class="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition text-base sm:text-lg font-medium pr-24">
+                        <button id="clearSearch" class="hidden absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 text-gray-500 hover:text-gray-700 transition">
+                            ✕
+                        </button>
+                    </div>
+                    <div id="searchResults" class="hidden mt-2 text-sm text-gray-600">
+                        <span id="searchCount"></span>
+                    </div>
+                </div>
+
+                <div class="mb-6 sm:mb-8">
+                    <button id="archiveToggle" class="w-full sm:w-auto flex items-center justify-center gap-3 px-4 sm:px-6 py-3 rounded-xl transition font-medium shadow-lg bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 hover:from-purple-200 hover:to-pink-200 transform hover:scale-105">
+                        <span class="text-xl">📦</span>
+                        <span class="text-sm sm:text-base">과거 완료작업 보기 (<span id="archiveCount">7</span>)</span>
                     </button>
                 </div>
-                <div id="searchResults" class="hidden mt-2 text-sm text-gray-600">
-                    <span id="searchCount"></span>
+
+                <div id="archiveSection" class="mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl hidden border-2 border-purple-200">
+                    <h3 class="text-lg sm:text-xl font-bold text-purple-800 mb-4 flex items-center gap-2">
+                        <span>📦</span> 과거 완료작업
+                    </h3>
+                    <div id="archiveList"></div>
+                </div>
+
+                <div class="mb-6 sm:mb-10 space-y-4 sm:space-y-5 p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
+                    <input type="text" id="titleInput" placeholder="✏️ 할일을 입력하세요" class="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition text-base sm:text-lg font-medium">
+                    
+                    <div>
+                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3 ml-1">📅 시작일시 (선택)</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                            <input type="date" id="dateInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
+                            <select id="timeHourInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
+                                <option value="">시간</option>
+                            </select>
+                            <select id="timeMinuteInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
+                                <option value="">분</option>
+                                <option value="00">00분</option>
+                                <option value="15">15분</option>
+                                <option value="30">30분</option>
+                                <option value="45">45분</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3 ml-1">⏰ 완료시한 (선택)</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                            <input type="date" id="deadlineInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition text-sm sm:text-base">
+                            <select id="deadlineHourInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition text-sm sm:text-base">
+                                <option value="">시간</option>
+                            </select>
+                            <select id="deadlineMinuteInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition text-sm sm:text-base">
+                                <option value="">분</option>
+                                <option value="00">00분</option>
+                                <option value="15">15분</option>
+                                <option value="30">30분</option>
+                                <option value="45">45분</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button id="addBtn" class="w-full px-6 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-xl shadow-lg hover:shadow-xl transition transform hover:scale-105 font-bold text-base sm:text-lg">
+                        ➕ 추가하기
+                    </button>
+                </div>
+
+                <div id="todoList" class="space-y-4">
+                    <!-- 여기에 할일 목록이 렌더링됩니다 -->
                 </div>
             </div>
-
-            <div class="mb-6 sm:mb-8">
-                <button id="archiveToggle" class="w-full sm:w-auto flex items-center justify-center gap-3 px-4 sm:px-6 py-3 rounded-xl transition font-medium shadow-lg bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 hover:from-purple-200 hover:to-pink-200 transform hover:scale-105">
-                    <span class="text-xl">📦</span>
-                    <span class="text-sm sm:text-base">과거 완료작업 보기 (<span id="archiveCount">7</span>)</span>
-                </button>
-            </div>
-
-            <div id="archiveSection" class="mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl hidden border-2 border-purple-200">
-                <h3 class="text-lg sm:text-xl font-bold text-purple-800 mb-4 flex items-center gap-2">
-                    <span>📦</span> 과거 완료작업
-                </h3>
-                <div id="archiveList"></div>
-            </div>
-
-            <div class="mb-6 sm:mb-10 space-y-4 sm:space-y-5 p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
-                <input type="text" id="titleInput" placeholder="✏️ 할일을 입력하세요" class="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition text-base sm:text-lg font-medium">
-                
-                <div>
-                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3 ml-1">📅 시작일시 (선택)</label>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                        <input type="date" id="dateInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
-                        <select id="timeHourInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
-                            <option value="">시간</option>
-                        <option value="00">00시</option><option value="01">01시</option><option value="02">02시</option><option value="03">03시</option><option value="04">04시</option><option value="05">05시</option><option value="06">06시</option><option value="07">07시</option><option value="08">08시</option><option value="09">09시</option><option value="10">10시</option><option value="11">11시</option><option value="12">12시</option><option value="13">13시</option><option value="14">14시</option><option value="15">15시</option><option value="16">16시</option><option value="17">17시</option><option value="18">18시</option><option value="19">19시</option><option value="20">20시</option><option value="21">21시</option><option value="22">22시</option><option value="23">23시</option></select>
-                        <select id="timeMinuteInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
-                            <option value="">분</option>
-                            <option value="00">00분</option>
-                            <option value="15">15분</option>
-                            <option value="30">30분</option>
-                            <option value="45">45분</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3 ml-1">⏰ 완료시한 (선택)</label>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                        <input type="date" id="deadlineInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition text-sm sm:text-base">
-                        <select id="deadlineHourInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition text-sm sm:text-base">
-                            <option value="">시간</option>
-                        <option value="00">00시</option><option value="01">01시</option><option value="02">02시</option><option value="03">03시</option><option value="04">04시</option><option value="05">05시</option><option value="06">06시</option><option value="07">07시</option><option value="08">08시</option><option value="09">09시</option><option value="10">10시</option><option value="11">11시</option><option value="12">12시</option><option value="13">13시</option><option value="14">14시</option><option value="15">15시</option><option value="16">16시</option><option value="17">17시</option><option value="18">18시</option><option value="19">19시</option><option value="20">20시</option><option value="21">21시</option><option value="22">22시</option><option value="23">23시</option></select>
-                        <select id="deadlineMinuteInput" class="px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition text-sm sm:text-base">
-                            <option value="">분</option>
-                            <option value="00">00분</option>
-                            <option value="15">15분</option>
-                            <option value="30">30분</option>
-                            <option value="45">45분</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button id="addBtn" class="w-full px-6 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-xl shadow-lg hover:shadow-xl transition transform hover:scale-105 font-bold text-base sm:text-lg">
-                    ➕ 추가하기
-                </button>
-            </div>
-
-            <div id="todoList" class="space-y-4">
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769410293674)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769410293674)">
-                                                디딤돌교육 세무조정작업
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                                <p class="flex items-center gap-2 flex-wrap">
-                                                    <span class="text-base sm:text-lg">📅</span>
-                                                    <span class="break-all">시작: 1월 26일 20:53</span>
-                                                </p>
-                                            
-                                            
-                                                <p class="flex items-center gap-2 flex-wrap ">
-                                                    <span class="text-base sm:text-lg">⏰</span>
-                                                    <span class="break-all">완료시한: 1월 30일 16:00 </span>
-                                                </p>
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-1gpmzwvrq" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#eab308;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-1gpmzwvrq)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="92.6141514278271" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">33%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769410293674)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769410293674)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769410293674)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                        <button onclick="addToCalendar({&quot;id&quot;:1769410293674,&quot;title&quot;:&quot;디딤돌교육 세무조정작업&quot;,&quot;date&quot;:&quot;2026-01-26&quot;,&quot;time&quot;:&quot;20:53&quot;,&quot;deadline&quot;:&quot;2026-01-30&quot;,&quot;deadlineTime&quot;:&quot;16:00&quot;,&quot;completed&quot;:false,&quot;subtasks&quot;:[{&quot;id&quot;:1769410345616,&quot;title&quot;:&quot;표준재무제표 위하고에 반영&quot;,&quot;completed&quot;:true},{&quot;id&quot;:1769410356806,&quot;title&quot;:&quot;퇴직급여충당금 세무조정&quot;,&quot;completed&quot;:true},{&quot;id&quot;:1769410363645,&quot;title&quot;:&quot;대손충당금 세무조정&quot;,&quot;completed&quot;:true},{&quot;id&quot;:1769410372996,&quot;title&quot;:&quot;업무용승용차 세무조정&quot;,&quot;completed&quot;:false},{&quot;id&quot;:1769410379219,&quot;title&quot;:&quot;재고자산 세무조정&quot;,&quot;completed&quot;:false},{&quot;id&quot;:1769410397164,&quot;title&quot;:&quot;기타 세무조정&quot;,&quot;completed&quot;:false},{&quot;id&quot;:1769410440321,&quot;title&quot;:&quot;이익잉여금처분계산서에 현금배당 반영하기&quot;,&quot;completed&quot;:false},{&quot;id&quot;:1769410543338,&quot;title&quot;:&quot;감면검토&quot;,&quot;completed&quot;:false},{&quot;id&quot;:1769493026123,&quot;title&quot;:&quot;광표 조지기&quot;,&quot;completed&quot;:false}],&quot;archived&quot;:false,&quot;completedAt&quot;:null,&quot;shareId&quot;:&quot;share_zbq9wv3bh&quot;,&quot;teamShareId&quot;:&quot;share_1769555998599_fyh9jrgrx&quot;,&quot;expanded&quot;:false})" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition transform hover:scale-110" title="캘린더에 추가">
-                                            📅
-                                        </button>
-                                    
-                                    <button onclick="deleteTodo(1769410293674)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769410293674)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ▼ 세부목록 보기
-                                </button>
-                            </div>
-
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769470275319)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769470275319)">
-                                                마이크로젠타스 결산작업
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                                <p class="flex items-center gap-2 flex-wrap">
-                                                    <span class="text-base sm:text-lg">📅</span>
-                                                    <span class="break-all">시작: 1월 27일 09:30</span>
-                                                </p>
-                                            
-                                            
-                                                <p class="flex items-center gap-2 flex-wrap ">
-                                                    <span class="text-base sm:text-lg">⏰</span>
-                                                    <span class="break-all">완료시한: 2월 2일 16:30 </span>
-                                                </p>
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-rrmj92mj2" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-rrmj92mj2)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="138.23007675795088" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">0%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769470275319)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769470275319)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769470275319)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                        <button onclick="addToCalendar({&quot;id&quot;:1769470275319,&quot;title&quot;:&quot;마이크로젠타스 결산작업&quot;,&quot;date&quot;:&quot;2026-01-27&quot;,&quot;time&quot;:&quot;09:30&quot;,&quot;deadline&quot;:&quot;2026-02-02&quot;,&quot;deadlineTime&quot;:&quot;16:30&quot;,&quot;completed&quot;:false,&quot;subtasks&quot;:[],&quot;archived&quot;:false,&quot;completedAt&quot;:null,&quot;shareId&quot;:&quot;share_db2yyd89b&quot;,&quot;teamShareId&quot;:&quot;share_1769555998599_fjc2e2iej&quot;})" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition transform hover:scale-110" title="캘린더에 추가">
-                                            📅
-                                        </button>
-                                    
-                                    <button onclick="deleteTodo(1769470275319)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769470275319)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ➕ 세부작업 추가
-                                </button>
-                            </div>
-
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769471168905)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769471168905)">
-                                                장성훈선배님 어머님 상속세신고
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-9wedul7dk" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-9wedul7dk)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="114.73096370909923" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">17%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769471168905)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769471168905)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769471168905)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                    <button onclick="deleteTodo(1769471168905)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769471168905)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ▲ 접기
-                                </button>
-                            </div>
-
-                            
-                                <div class="px-4 sm:px-5 pb-4 sm:pb-5 bg-gradient-to-br from-indigo-50 to-purple-50 border-t-2 border-indigo-200">
-                                    <div class="pt-4 space-y-3">
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769471168905, 1769471178337)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 bg-gradient-to-br from-indigo-400 to-purple-500 border-indigo-500">
-                                                    <span class="text-white text-xs font-bold">✓</span>
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words line-through text-gray-400">
-                                                    감정평가 자료받기
-                                                </p>
-                                                <button onclick="deleteSubtask(1769471168905, 1769471178337)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769471168905, 1769471222975)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    기본서류, 통장내역 받기
-                                                </p>
-                                                <button onclick="deleteSubtask(1769471168905, 1769471222975)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769471168905, 1769471330683)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    통장내역 검토
-                                                </p>
-                                                <button onclick="deleteSubtask(1769471168905, 1769471330683)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769471168905, 1769471345583)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    상속세신고 진행
-                                                </p>
-                                                <button onclick="deleteSubtask(1769471168905, 1769471345583)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769471168905, 1769471354502)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    선배님 컨펌 후 신고
-                                                </p>
-                                                <button onclick="deleteSubtask(1769471168905, 1769471354502)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769471168905, 1769574977144)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    *장례비, 봉안시설 영수증 꼭 챙기기
-                                                </p>
-                                                <button onclick="deleteSubtask(1769471168905, 1769574977144)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                        <div class="mt-4">
-                                            <input type="text" placeholder="✨ 세부 목록 추가..." onkeypress="if(event.key===&#39;Enter&#39;) { addSubtask(1769471168905, this); }" class="w-full px-4 py-3 font-medium border-2 border-indigo-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769471294975)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769471294975)">
-                                                민영자님 상속세 신고
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-dp0gry5td" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-dp0gry5td)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="114.73096370909923" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">17%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769471294975)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769471294975)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769471294975)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                    <button onclick="deleteTodo(1769471294975)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769471294975)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ▼ 세부목록 보기
-                                </button>
-                            </div>
-
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769559819231)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769559819231)">
-                                                전남지체 2월 급여작업
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-dhd1wsukj" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-dhd1wsukj)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="138.23007675795088" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">0%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769559819231)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769559819231)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769559819231)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                    <button onclick="deleteTodo(1769559819231)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769559819231)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ▼ 세부목록 보기
-                                </button>
-                            </div>
-
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769561834126)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769561834126)">
-                                                법인결산작업
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-kdhrpc8kx" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-kdhrpc8kx)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="138.23007675795088" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">0%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769561834126)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769561834126)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769561834126)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                    <button onclick="deleteTodo(1769561834126)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769561834126)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ▲ 접기
-                                </button>
-                            </div>
-
-                            
-                                <div class="px-4 sm:px-5 pb-4 sm:pb-5 bg-gradient-to-br from-indigo-50 to-purple-50 border-t-2 border-indigo-200">
-                                    <div class="pt-4 space-y-3">
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769561834126, 1769561848826)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    마이크로젠타스
-                                                </p>
-                                                <button onclick="deleteSubtask(1769561834126, 1769561848826)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769561834126, 1769561858186)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    이모션웨이브
-                                                </p>
-                                                <button onclick="deleteSubtask(1769561834126, 1769561858186)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                        <div class="mt-4">
-                                            <input type="text" placeholder="✨ 세부 목록 추가..." onkeypress="if(event.key===&#39;Enter&#39;) { addSubtask(1769561834126, this); }" class="w-full px-4 py-3 font-medium border-2 border-indigo-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769563287316)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769563287316)">
-                                                연말정산관리
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-jcsop3rfr" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-jcsop3rfr)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="138.23007675795088" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">0%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769563287316)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769563287316)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769563287316)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                    <button onclick="deleteTodo(1769563287316)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769563287316)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ▲ 접기
-                                </button>
-                            </div>
-
-                            
-                                <div class="px-4 sm:px-5 pb-4 sm:pb-5 bg-gradient-to-br from-indigo-50 to-purple-50 border-t-2 border-indigo-200">
-                                    <div class="pt-4 space-y-3">
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769563287316, 1769563299985)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    거래처리스트만들기
-                                                </p>
-                                                <button onclick="deleteSubtask(1769563287316, 1769563299985)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                        <div class="mt-4">
-                                            <input type="text" placeholder="✨ 세부 목록 추가..." onkeypress="if(event.key===&#39;Enter&#39;) { addSubtask(1769563287316, this); }" class="w-full px-4 py-3 font-medium border-2 border-indigo-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769579872357)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769579872357)">
-                                                이모션웨이브 요청사항
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-nqvcfckcs" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-nqvcfckcs)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="138.23007675795088" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">0%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769579872357)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769579872357)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769579872357)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                    <button onclick="deleteTodo(1769579872357)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769579872357)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ▲ 접기
-                                </button>
-                            </div>
-
-                            
-                                <div class="px-4 sm:px-5 pb-4 sm:pb-5 bg-gradient-to-br from-indigo-50 to-purple-50 border-t-2 border-indigo-200">
-                                    <div class="pt-4 space-y-3">
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769579872357, 1769579893288)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    자본금 관련 상법 검토하기
-                                                </p>
-                                                <button onclick="deleteSubtask(1769579872357, 1769579893288)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769579872357, 1769579914028)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    임의감사준비자료-요청자료 확인해서 준비하기
-                                                </p>
-                                                <button onclick="deleteSubtask(1769579872357, 1769579914028)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                        <div class="mt-4">
-                                            <input type="text" placeholder="✨ 세부 목록 추가..." onkeypress="if(event.key===&#39;Enter&#39;) { addSubtask(1769579872357, this); }" class="w-full px-4 py-3 font-medium border-2 border-indigo-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769585661329)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769585661329)">
-                                                석희준선배님 임대사업자 세금계산서 발행
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                                <p class="flex items-center gap-2 flex-wrap">
-                                                    <span class="text-base sm:text-lg">📅</span>
-                                                    <span class="break-all">시작: 2월 27일 </span>
-                                                </p>
-                                            
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-nmibvoh5z" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-nmibvoh5z)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="138.23007675795088" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">0%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769585661329)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769585661329)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769585661329)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                        <button onclick="addToCalendar({&quot;id&quot;:1769585661329,&quot;title&quot;:&quot;석희준선배님 임대사업자 세금계산서 발행&quot;,&quot;completed&quot;:false,&quot;subtasks&quot;:[],&quot;date&quot;:&quot;2026-02-27&quot;,&quot;time&quot;:null,&quot;deadline&quot;:null,&quot;deadlineTime&quot;:null,&quot;shareId&quot;:&quot;share_1769585661329_4ofbme6ti&quot;,&quot;teamShareId&quot;:&quot;share_1769585661329_jjoqkwe72&quot;,&quot;archived&quot;:false,&quot;expanded&quot;:false})" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition transform hover:scale-110" title="캘린더에 추가">
-                                            📅
-                                        </button>
-                                    
-                                    <button onclick="deleteTodo(1769585661329)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769585661329)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ➕ 세부작업 추가
-                                </button>
-                            </div>
-
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-green-400 bg-gradient-to-br from-green-50 to-emerald-50">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769588334479)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 bg-gradient-to-br from-indigo-400 to-purple-500 border-indigo-500">
-                                        <span class="text-white text-base sm:text-lg font-bold">✓</span>
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words line-through text-gray-400" ondblclick="startEditTitle(1769588334479)">
-                                                옵티머스솔루션스 요청사항
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-xd58jchlu" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-xd58jchlu)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="0" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">100%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769588334479)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769588334479)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769588334479)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                        <button onclick="archiveTodo(1769588334479)" class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition transform hover:scale-110" title="보관하기">
-                                            📦
-                                        </button>
-                                    
-                                    
-                                    <button onclick="deleteTodo(1769588334479)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769588334479)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ➕ 세부작업 추가
-                                </button>
-                            </div>
-
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769588795904)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769588795904)">
-                                                드림마크원 급여작업
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-7u27vwjga" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-7u27vwjga)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="138.23007675795088" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">0%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769588795904)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769588795904)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769588795904)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                    <button onclick="deleteTodo(1769588795904)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769588795904)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ▲ 접기
-                                </button>
-                            </div>
-
-                            
-                                <div class="px-4 sm:px-5 pb-4 sm:pb-5 bg-gradient-to-br from-indigo-50 to-purple-50 border-t-2 border-indigo-200">
-                                    <div class="pt-4 space-y-3">
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769588795904, 1769588824106)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    드림마크원
-                                                </p>
-                                                <button onclick="deleteSubtask(1769588795904, 1769588824106)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769588795904, 1769588830047)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    드림마크원 인천
-                                                </p>
-                                                <button onclick="deleteSubtask(1769588795904, 1769588830047)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                        <div class="mt-4">
-                                            <input type="text" placeholder="✨ 세부 목록 추가..." onkeypress="if(event.key===&#39;Enter&#39;) { addSubtask(1769588795904, this); }" class="w-full px-4 py-3 font-medium border-2 border-indigo-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769589107750)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769589107750)">
-                                                면세사업자 현황신고
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                                <p class="flex items-center gap-2 flex-wrap">
-                                                    <span class="text-base sm:text-lg">📅</span>
-                                                    <span class="break-all">시작: 1월 28일 </span>
-                                                </p>
-                                            
-                                            
-                                                <p class="flex items-center gap-2 flex-wrap ">
-                                                    <span class="text-base sm:text-lg">⏰</span>
-                                                    <span class="break-all">완료시한: 2월 10일  </span>
-                                                </p>
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-muvbfiljz" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-muvbfiljz)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="138.23007675795088" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">0%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769589107750)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769589107750)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769589107750)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                        <button onclick="addToCalendar({&quot;id&quot;:1769589107750,&quot;title&quot;:&quot;면세사업자 현황신고&quot;,&quot;completed&quot;:false,&quot;subtasks&quot;:[{&quot;id&quot;:1769589125489,&quot;title&quot;:&quot;이래학원&quot;,&quot;completed&quot;:false},{&quot;id&quot;:1769589132726,&quot;title&quot;:&quot;레드필라테스&quot;,&quot;completed&quot;:false},{&quot;id&quot;:1769589138957,&quot;title&quot;:&quot;부동산이용기&quot;,&quot;completed&quot;:false}],&quot;date&quot;:&quot;2026-01-28&quot;,&quot;time&quot;:null,&quot;deadline&quot;:&quot;2026-02-10&quot;,&quot;deadlineTime&quot;:null,&quot;shareId&quot;:&quot;share_1769589107750_us41reevh&quot;,&quot;teamShareId&quot;:&quot;share_1769589107750_83msuel7u&quot;,&quot;archived&quot;:false,&quot;expanded&quot;:true})" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition transform hover:scale-110" title="캘린더에 추가">
-                                            📅
-                                        </button>
-                                    
-                                    <button onclick="deleteTodo(1769589107750)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769589107750)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ▲ 접기
-                                </button>
-                            </div>
-
-                            
-                                <div class="px-4 sm:px-5 pb-4 sm:pb-5 bg-gradient-to-br from-indigo-50 to-purple-50 border-t-2 border-indigo-200">
-                                    <div class="pt-4 space-y-3">
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769589107750, 1769589125489)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    이래학원
-                                                </p>
-                                                <button onclick="deleteSubtask(1769589107750, 1769589125489)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769589107750, 1769589132726)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    레드필라테스
-                                                </p>
-                                                <button onclick="deleteSubtask(1769589107750, 1769589132726)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769589107750, 1769589138957)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    부동산이용기
-                                                </p>
-                                                <button onclick="deleteSubtask(1769589107750, 1769589138957)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                        <div class="mt-4">
-                                            <input type="text" placeholder="✨ 세부 목록 추가..." onkeypress="if(event.key===&#39;Enter&#39;) { addSubtask(1769589107750, this); }" class="w-full px-4 py-3 font-medium border-2 border-indigo-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769589851736)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769589851736)">
-                                                박중호 목사님 연락드리기
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-i2i5zp7rf" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-i2i5zp7rf)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="138.23007675795088" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">0%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769589851736)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769589851736)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769589851736)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                    <button onclick="deleteTodo(1769589851736)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769589851736)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ➕ 세부작업 추가
-                                </button>
-                            </div>
-
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769590111686)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769590111686)">
-                                                보드랑체스랑 부가세 신고
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-20x5jxfr8" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-20x5jxfr8)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="138.23007675795088" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">0%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769590111686)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769590111686)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769590111686)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                    <button onclick="deleteTodo(1769590111686)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769590111686)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ▲ 접기
-                                </button>
-                            </div>
-
-                            
-                                <div class="px-4 sm:px-5 pb-4 sm:pb-5 bg-gradient-to-br from-indigo-50 to-purple-50 border-t-2 border-indigo-200">
-                                    <div class="pt-4 space-y-3">
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769590111686, 1769590149039)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    세금계산서 및 매출 매입 확인
-                                                </p>
-                                                <button onclick="deleteSubtask(1769590111686, 1769590149039)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769590111686, 1769590175281)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    부가세신고서 마무리 짓기
-                                                </p>
-                                                <button onclick="deleteSubtask(1769590111686, 1769590175281)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769590111686, 1769590181296)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    이메일 보내기
-                                                </p>
-                                                <button onclick="deleteSubtask(1769590111686, 1769590181296)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                        <div class="mt-4">
-                                            <input type="text" placeholder="✨ 세부 목록 추가..." onkeypress="if(event.key===&#39;Enter&#39;) { addSubtask(1769590111686, this); }" class="w-full px-4 py-3 font-medium border-2 border-indigo-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769590867093)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769590867093)">
-                                                승연이 공단에 재제출
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-agpv7oxmn" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-agpv7oxmn)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="138.23007675795088" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">0%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769590867093)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769590867093)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769590867093)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                    <button onclick="deleteTodo(1769590867093)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769590867093)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ➕ 세부작업 추가
-                                </button>
-                            </div>
-
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769645816488)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769645816488)">
-                                                조이앤바투 한세희 고용보험 확인하기
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-ccxvi604a" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-ccxvi604a)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="138.23007675795088" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">0%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769645816488)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769645816488)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769645816488)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                    <button onclick="deleteTodo(1769645816488)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769645816488)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ➕ 세부작업 추가
-                                </button>
-                            </div>
-
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769656041190)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769656041190)">
-                                                1월분 급여작업
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                                <p class="flex items-center gap-2 flex-wrap">
-                                                    <span class="text-base sm:text-lg">📅</span>
-                                                    <span class="break-all">시작: 1월 29일 </span>
-                                                </p>
-                                            
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-9rr3idu5j" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-9rr3idu5j)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="138.23007675795088" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">0%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769656041190)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769656041190)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769656041190)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                        <button onclick="addToCalendar({&quot;id&quot;:1769656041190,&quot;title&quot;:&quot;1월분 급여작업&quot;,&quot;completed&quot;:false,&quot;subtasks&quot;:[{&quot;id&quot;:1769656062260,&quot;title&quot;:&quot;공간이룸&quot;,&quot;completed&quot;:false},{&quot;id&quot;:1769656067219,&quot;title&quot;:&quot;유아플랜건축사&quot;,&quot;completed&quot;:false},{&quot;id&quot;:1769656071962,&quot;title&quot;:&quot;엠클래스&quot;,&quot;completed&quot;:false},{&quot;id&quot;:1769656076077,&quot;title&quot;:&quot;와이모션&quot;,&quot;completed&quot;:false}],&quot;date&quot;:&quot;2026-01-29&quot;,&quot;time&quot;:null,&quot;deadline&quot;:null,&quot;deadlineTime&quot;:null,&quot;shareId&quot;:&quot;share_1769656041190_nbmjznufk&quot;,&quot;teamShareId&quot;:&quot;share_1769656041190_ynahcyh2a&quot;,&quot;archived&quot;:false,&quot;expanded&quot;:true})" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition transform hover:scale-110" title="캘린더에 추가">
-                                            📅
-                                        </button>
-                                    
-                                    <button onclick="deleteTodo(1769656041190)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769656041190)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ▲ 접기
-                                </button>
-                            </div>
-
-                            
-                                <div class="px-4 sm:px-5 pb-4 sm:pb-5 bg-gradient-to-br from-indigo-50 to-purple-50 border-t-2 border-indigo-200">
-                                    <div class="pt-4 space-y-3">
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769656041190, 1769656062260)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    공간이룸
-                                                </p>
-                                                <button onclick="deleteSubtask(1769656041190, 1769656062260)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769656041190, 1769656067219)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    유아플랜건축사
-                                                </p>
-                                                <button onclick="deleteSubtask(1769656041190, 1769656067219)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769656041190, 1769656071962)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    엠클래스
-                                                </p>
-                                                <button onclick="deleteSubtask(1769656041190, 1769656071962)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769656041190, 1769656076077)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    와이모션
-                                                </p>
-                                                <button onclick="deleteSubtask(1769656041190, 1769656076077)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                        <div class="mt-4">
-                                            <input type="text" placeholder="✨ 세부 목록 추가..." onkeypress="if(event.key===&#39;Enter&#39;) { addSubtask(1769656041190, this); }" class="w-full px-4 py-3 font-medium border-2 border-indigo-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769657054411)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769657054411)">
-                                                드림라인 연말정산
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-n9der7k3r" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-n9der7k3r)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="103.67255756846316" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">25%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769657054411)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769657054411)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769657054411)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                    <button onclick="deleteTodo(1769657054411)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769657054411)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ▲ 접기
-                                </button>
-                            </div>
-
-                            
-                                <div class="px-4 sm:px-5 pb-4 sm:pb-5 bg-gradient-to-br from-indigo-50 to-purple-50 border-t-2 border-indigo-200">
-                                    <div class="pt-4 space-y-3">
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769657054411, 1769657070741)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 bg-gradient-to-br from-indigo-400 to-purple-500 border-indigo-500">
-                                                    <span class="text-white text-xs font-bold">✓</span>
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words line-through text-gray-400">
-                                                    임직원 연말정산자료 수집
-                                                </p>
-                                                <button onclick="deleteSubtask(1769657054411, 1769657070741)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769657054411, 1769657078054)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    세무사 검토
-                                                </p>
-                                                <button onclick="deleteSubtask(1769657054411, 1769657078054)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769657054411, 1769657088027)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    이메일 발송
-                                                </p>
-                                                <button onclick="deleteSubtask(1769657054411, 1769657088027)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                            <div class="flex items-center gap-3 p-2 bg-white rounded-lg shadow-sm hover:shadow-md transition">
-                                                <button onclick="toggleSubtask(1769657054411, 1769657219630)" class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-md border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                                    
-                                                </button>
-                                                <p class="flex-1 font-medium text-sm sm:text-base break-words text-gray-700">
-                                                    지급명세서 제출
-                                                </p>
-                                                <button onclick="deleteSubtask(1769657054411, 1769657219630)" class="p-1 text-red-400 hover:text-red-600 transition transform hover:scale-125 flex-shrink-0">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        
-                                        <div class="mt-4">
-                                            <input type="text" placeholder="✨ 세부 목록 추가..." onkeypress="if(event.key===&#39;Enter&#39;) { addSubtask(1769657054411, this); }" class="w-full px-4 py-3 font-medium border-2 border-indigo-200 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition text-sm sm:text-base">
-                                        </div>
-                                    </div>
-                                </div>
-                            
-                        </div>
-                    
-                        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition overflow-hidden border-2 border-indigo-200">
-                            <div class="p-4 sm:p-5">
-                                <div class="flex items-start gap-3 sm:gap-4">
-                                    <button onclick="toggleTodo(1769657520678)" class="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-xl border-2 flex items-center justify-center transition transform hover:scale-110 border-gray-300 hover:border-indigo-500 bg-white">
-                                        
-                                    </button>
-
-                                    <div class="flex-1 min-w-0">
-                                        
-                                            <p class="font-semibold text-base sm:text-lg break-words text-gray-800" ondblclick="startEditTitle(1769657520678)">
-                                                2026.01 4대보험신고
-                                            </p>
-                                        
-                                        <div class="text-xs sm:text-sm text-gray-600 mt-2 space-y-1 font-medium">
-                                            
-                                                <p class="flex items-center gap-2 flex-wrap">
-                                                    <span class="text-base sm:text-lg">📅</span>
-                                                    <span class="break-all">시작: 1월 29일 </span>
-                                                </p>
-                                            
-                                            
-                                                <p class="flex items-center gap-2 flex-wrap ">
-                                                    <span class="text-base sm:text-lg">⏰</span>
-                                                    <span class="break-all">완료시한: 2월 16일  </span>
-                                                </p>
-                                            
-                                        </div>
-                                    </div>
-
-                                    <div class="transform hover:scale-110 transition-transform flex-shrink-0">
-                                        
-                <div class="relative" style="width: 60px; height: 60px;">
-                    <svg width="60" height="60" class="circular-progress">
-                        <defs>
-                            <lineargradient id="gradient-pqrwrgasf" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1"></stop>
-                                <stop offset="100%" style="stop-color:#f97316;stop-opacity:1"></stop>
-                            </lineargradient>
-                        </defs>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="#e5e7eb" stroke-width="8"></circle>
-                        <circle cx="30" cy="30" r="22" fill="none" stroke="url(#gradient-pqrwrgasf)" stroke-width="8" stroke-dasharray="138.23007675795088" stroke-dashoffset="138.23007675795088" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-in-out;"></circle>
-                    </svg>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-indigo-600 to-purple-600 text-transparent bg-clip-text">0%</span>
-                    </div>
-                </div>
-            
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <button onclick="openShareModal(1769657520678)" class="px-3 py-2 text-xs sm:text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition font-medium" title="고객과 공유">
-                                        🔗 고객공유
-                                    </button>
-                                    <button onclick="openTeamShareModal(1769657520678)" class="px-3 py-2 text-xs sm:text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium" title="팀원과 공유">
-                                        👥 팀원공유
-                                    </button>
-                                    <button onclick="duplicateTodo(1769657520678)" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" title="복사하기">
-                                        📋
-                                    </button>
-                                    
-                                    
-                                        <button onclick="addToCalendar({&quot;id&quot;:1769657520678,&quot;title&quot;:&quot;2026.01 4대보험신고&quot;,&quot;completed&quot;:false,&quot;subtasks&quot;:[],&quot;date&quot;:&quot;2026-01-29&quot;,&quot;time&quot;:null,&quot;deadline&quot;:&quot;2026-02-16&quot;,&quot;deadlineTime&quot;:null,&quot;shareId&quot;:&quot;share_1769657520678_32frnnwkt&quot;,&quot;teamShareId&quot;:&quot;share_1769657520678_axe62mc0v&quot;,&quot;archived&quot;:false})" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition transform hover:scale-110" title="캘린더에 추가">
-                                            📅
-                                        </button>
-                                    
-                                    <button onclick="deleteTodo(1769657520678)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" title="삭제">
-                                        🗑️
-                                    </button>
-                                </div>
-
-                                <button onclick="toggleExpand(1769657520678)" class="w-full mt-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg transition font-medium">
-                                    ➕ 세부작업 추가
-                                </button>
-                            </div>
-
-                            
-                        </div>
-                    </div>
         </div>
     </div>
 
@@ -1987,12 +535,97 @@
     </div>
 
     <script>
+        const CORRECT_PASSWORD = "18133505"; // 비밀번호 설정
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzH7yaKhcRl_RNd74QJzG4MaWyvZSBPRXiHoNjht3lPCYaIjxvJ8arIr9ENNeobw8CB_Q/exec';
         
         let todos = [];
         let editingTodoId = null;
         let showArchive = false;
         let searchQuery = '';
+        let isLoggedIn = false;
+
+        // 로그인 상태 확인
+        function checkLoginStatus() {
+            const loginStatus = localStorage.getItem('todoAppLoggedIn');
+            isLoggedIn = loginStatus === 'true';
+            
+            if (isLoggedIn) {
+                showApp();
+            } else {
+                showLogin();
+            }
+        }
+
+        // 로그인 처리
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const passwordInput = document.getElementById('passwordInput');
+            const password = passwordInput.value;
+            const errorDiv = document.getElementById('loginError');
+            const loginBtn = document.getElementById('loginBtn');
+
+            if (password === CORRECT_PASSWORD) {
+                // 로그인 성공
+                localStorage.setItem('todoAppLoggedIn', 'true');
+                isLoggedIn = true;
+                showApp();
+                passwordInput.value = '';
+            } else {
+                // 로그인 실패
+                errorDiv.textContent = '❌ 비밀번호가 틀렸습니다';
+                errorDiv.classList.add('show');
+                passwordInput.value = '';
+                passwordInput.focus();
+
+                setTimeout(() => {
+                    errorDiv.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // UI 표시 함수
+        function showLogin() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('userProfile').classList.add('hidden');
+            document.getElementById('passwordInput').focus();
+        }
+
+        function showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appContainer').style.display = 'block';
+            document.getElementById('userProfile').classList.remove('hidden');
+            loadFromGoogleSheets();
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃하시겠습니까?')) {
+                localStorage.removeItem('todoAppLoggedIn');
+                isLoggedIn = false;
+                document.getElementById('profileMenu').classList.remove('show');
+                showLogin();
+            }
+        }
+
+        // 프로필 메뉴 토글
+        document.getElementById('userProfile').addEventListener('click', function(e) {
+            if (e.target.closest('.user-avatar') || e.target.textContent === '로그인됨') {
+                const menu = document.getElementById('profileMenu');
+                menu.classList.toggle('show');
+            }
+        });
+
+        // 메뉴 외부 클릭 시 닫기
+        document.addEventListener('click', function(e) {
+            const profileMenu = document.getElementById('profileMenu');
+            const userProfile = document.getElementById('userProfile');
+
+            if (userProfile && !userProfile.contains(e.target)) {
+                profileMenu.classList.remove('show');
+            }
+        });
 
         // 시간 선택 초기화
         function initTimeSelectors() {
@@ -2027,12 +660,10 @@
                 let needsUpdate = false;
                 if (data && Array.isArray(data)) {
                     todos = data.map(t => {
-                        // teamShareId가 없는 경우 자동 생성
                         if (!t.teamShareId) {
                             t.teamShareId = generateShareId();
                             needsUpdate = true;
                         }
-                        // shareId가 없는 경우도 자동 생성
                         if (!t.shareId) {
                             t.shareId = generateShareId();
                             needsUpdate = true;
@@ -2044,7 +675,6 @@
                     });
                     showSyncStatus('success', '✅ 동기화 완료!');
                     
-                    // 업데이트가 필요한 경우 자동 저장
                     if (needsUpdate) {
                         await saveToGoogleSheets();
                     }
@@ -2263,7 +893,6 @@
             const todo = todos.find(t => t.id === id);
             if (!todo) return;
             
-            // 현재 URL의 디렉토리 경로 가져오기
             const currentUrl = window.location.href;
             const lastSlashIndex = currentUrl.lastIndexOf('/');
             const baseUrl = currentUrl.substring(0, lastSlashIndex + 1);
@@ -2277,7 +906,6 @@
             const todo = todos.find(t => t.id === id);
             if (!todo) return;
             
-            // 현재 URL의 디렉토리 경로 가져오기
             const currentUrl = window.location.href;
             const lastSlashIndex = currentUrl.lastIndexOf('/');
             const baseUrl = currentUrl.substring(0, lastSlashIndex + 1);
@@ -2355,20 +983,16 @@
             const activeTodos = todos.filter(t => !t.archived);
             const archivedTodos = todos.filter(t => t.archived);
             
-            // 검색 필터링
             let filteredTodos = activeTodos;
             if (searchQuery) {
                 filteredTodos = activeTodos.filter(todo => {
-                    // 제목 검색
                     const titleMatch = todo.title.toLowerCase().includes(searchQuery.toLowerCase());
-                    // 세부작업 검색
                     const subtaskMatch = todo.subtasks && todo.subtasks.some(st => 
                         st.title.toLowerCase().includes(searchQuery.toLowerCase())
                     );
                     return titleMatch || subtaskMatch;
                 });
                 
-                // 검색 결과 표시
                 document.getElementById('searchResults').classList.remove('hidden');
                 document.getElementById('searchCount').textContent = 
                     `${filteredTodos.length}개의 할일을 찾았습니다`;
@@ -2551,16 +1175,15 @@
             }
         }
 
+        // 이벤트 리스너
         document.getElementById('addBtn').addEventListener('click', addTodo);
         document.getElementById('titleInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addTodo();
         });
 
-        // 검색 기능
         document.getElementById('searchInput').addEventListener('input', (e) => {
             searchQuery = e.target.value.trim();
             
-            // 검색어가 있으면 X 버튼 표시
             const clearBtn = document.getElementById('clearSearch');
             if (searchQuery) {
                 clearBtn.classList.remove('hidden');
@@ -2598,7 +1221,6 @@
             }
         });
 
-        // 고객 공유 모달
         document.getElementById('closeShareModal').addEventListener('click', () => {
             document.getElementById('shareModal').classList.remove('active');
         });
@@ -2622,7 +1244,6 @@
             }
         });
 
-        // 팀원 공유 모달
         document.getElementById('closeTeamShareModal').addEventListener('click', () => {
             document.getElementById('teamShareModal').classList.remove('active');
         });
@@ -2646,8 +1267,7 @@
             }
         });
 
-        loadFromGoogleSheets();
+        // 초기화
+        checkLoginStatus();
     </script>
-
-
 </body></html>
