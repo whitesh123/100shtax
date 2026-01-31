@@ -493,7 +493,7 @@
 
     <script>
         // ==================== 설정 ====================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbz_27BXp_4QVSCLERGEP_AFp_Y8sNT7C0vJ5GoxlZT4N6d-TSDp3nJUxhIwJ_P2PRRM/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwOAjCv8ostVzSbp05PSIqHdVI0JBplc6Y06DGESTDdHniAAQVVzI_eCYqNHCkhvZdQ/exec';
         
         // ==================== 전역 변수 ====================
         let currentUser = null;
@@ -1487,33 +1487,40 @@
         }
 
         async function saveSharedTodo() {
-            try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const owner = urlParams.get('u');
-                const shareId = urlParams.get('team');
-                
-                if (!owner || !shareId) return;
-                
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'text/plain'
-                    },
-                    body: JSON.stringify({
-                        action: 'saveSharedTodo',
-                        u: owner,
-                        shareId: shareId,
-                        todo: JSON.stringify(todos[0])
-                    })
-                });
-                
-                showSyncStatus('success', '✅ 저장 완료!');
-            } catch (error) {
-                console.error('Save error:', error);
-                showSyncStatus('error', '❌ 저장 실패');
-            }
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const owner = urlParams.get('u');
+        const teamId = urlParams.get('team');
+        const viewId = urlParams.get('view');
+        const shareId = teamId || viewId;
+        
+        if (!owner || !shareId) {
+            console.error('필수 파라미터 부족');
+            return;
         }
+        
+        showSyncStatus('syncing', '☁️ 저장 중...');
+        
+        // FormData 사용 (no-cors 모드 호환)
+        const formData = new FormData();
+        formData.append('action', 'saveSharedTodo');
+        formData.append('u', owner);
+        formData.append('shareId', shareId);
+        formData.append('todo', JSON.stringify(todos[0]));
+        
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: formData
+        });
+        
+        showSyncStatus('success', '✅ 저장 완료!');
+        console.log('저장 성공');
+    } catch (error) {
+        console.error('Save error:', error);
+        showSyncStatus('error', '❌ 저장 실패');
+    }
+}
+
 
         // ==================== 페이지 로드 ====================
         window.addEventListener('DOMContentLoaded', () => {
