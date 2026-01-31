@@ -329,7 +329,7 @@
                 </div>
                 <button 
                     onclick="handleLogout()"
-                    class="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium shadow-lg hover:shadow-xl transform hover:scale-105">
+                    class="flex items-center gap-2 px-4 py-2 bg-transparent text-blue-600 rounded-lg hover:bg-blue-50 transition font-medium border border-blue-300 hover:border-blue-500">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
@@ -744,11 +744,15 @@
 
         function showSyncStatus(type, message) {
             const status = document.getElementById('syncStatus');
-            status.className = 'sync-status ' + type;
-            status.textContent = message;
-            setTimeout(() => {
-                status.className = 'sync-status';
-            }, 3000);
+            
+            // 에러만 표시 (success, syncing은 표시 안 함)
+            if (type === 'error') {
+                status.className = 'sync-status ' + type;
+                status.textContent = message;
+                setTimeout(() => {
+                    status.className = 'sync-status';
+                }, 5000); // 에러는 5초간 표시
+            }
         }
 
         async function loadFromGoogleSheets() {
@@ -1270,8 +1274,8 @@
                 }
             }
             
-            // 입력 중이던 값 복원
-            if (focusedId) {
+            // 입력 중이던 값 복원 (단, 검색창은 제외)
+            if (focusedId && focusedId !== 'searchInput') {
                 setTimeout(() => {
                     const element = document.getElementById(focusedId);
                     if (element) {
@@ -1286,7 +1290,7 @@
         }
 
         document.getElementById('searchInput').addEventListener('input', (e) => {
-            searchQuery = e.target.value.trim();
+            searchQuery = e.target.value;  // trim() 제거 - 실시간 검색
             render();
         });
 
@@ -1541,8 +1545,8 @@
                 </div>
             `;
             
-            // 입력 중이던 값 복원
-            if (focusedId) {
+            // 입력 중이던 값 복원 (단, 검색창은 제외)
+            if (focusedId && focusedId !== 'searchInput') {
                 setTimeout(() => {
                     const element = document.getElementById(focusedId);
                     if (element) {
