@@ -576,6 +576,19 @@
             }
             
             window.mainAutoRefresh = setInterval(async () => {
+                // 입력 중이면 새로고침 건너뛰기
+                const activeElement = document.activeElement;
+                const isTyping = activeElement && (
+                    activeElement.tagName === 'INPUT' || 
+                    activeElement.tagName === 'TEXTAREA' ||
+                    activeElement.isContentEditable
+                );
+                
+                if (isTyping) {
+                    console.log('⏸️ 입력 중이라 새로고침 건너뜀');
+                    return;
+                }
+                
                 console.log('🔄 자동 동기화 중...');
                 await loadFromGoogleSheets();
             }, 10000); // 10초마다
@@ -1347,6 +1360,19 @@
                 }
                 
                 window.autoRefreshInterval = setInterval(async () => {
+                    // 입력 중이면 새로고침 건너뛰기
+                    const activeElement = document.activeElement;
+                    const isTyping = activeElement && (
+                        activeElement.tagName === 'INPUT' || 
+                        activeElement.tagName === 'TEXTAREA' ||
+                        activeElement.isContentEditable
+                    );
+                    
+                    if (isTyping) {
+                        console.log('⏸️ 입력 중이라 새로고침 건너뜀');
+                        return;
+                    }
+                    
                     console.log('🔄 자동 동기화 중...');
                     await loadSharedTodo(shareId, isTeamMode);
                 }, 5000); // 5초마다
