@@ -1424,6 +1424,46 @@ window.addEventListener('DOMContentLoaded', () => {
         checkSession();
     }
 });
+// [팀원] 하위 할일 추가
+async function addSubtaskShared(shareId) {
+    const input = document.getElementById('newSubtaskInput');
+    const title = input.value.trim();
+    if (!title) return;
+
+    const todo = todos[0];
+    if (!todo.subtasks) todo.subtasks = [];
+    todo.subtasks.push({ id: Date.now(), title: title, completed: false });
+    
+    input.value = '';
+    renderSharedView(true);
+    await saveSharedTodo();
+}
+
+// [팀원] 하위 할일 삭제
+async function deleteSubtaskShared(shareId, subtaskId) {
+    if (!confirm('이 항목을 삭제할까요?')) return;
+    const todo = todos[0];
+    todo.subtasks = todo.subtasks.filter(st => st.id !== subtaskId);
+    
+    renderSharedView(true);
+    await saveSharedTodo();
+}
+
+// [팀원] 상태 변경 후 서버 저장 (이미 작성된 saveSharedTodo 활용)
+async function toggleTodoShared(shareId) {
+    todos[0].completed = !todos[0].completed;
+    renderSharedView(true);
+    await saveSharedTodo();
+}
+
+async function toggleSubtaskShared(shareId, subtaskId) {
+    const st = todos[0].subtasks.find(s => s.id === subtaskId);
+    if (st) {
+        st.completed = !st.completed;
+        renderSharedView(true);
+        await saveSharedTodo();
+    }
+}
 </script>
 
 </body>
