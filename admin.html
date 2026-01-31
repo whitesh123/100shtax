@@ -568,6 +568,17 @@
             document.getElementById('userName').textContent = userData.name;
             
             loadFromGoogleSheets();
+            
+            // 🔄 자동 새로고침 시작 (10초마다)
+            // 기존 interval 정리
+            if (window.mainAutoRefresh) {
+                clearInterval(window.mainAutoRefresh);
+            }
+            
+            window.mainAutoRefresh = setInterval(async () => {
+                console.log('🔄 자동 동기화 중...');
+                await loadFromGoogleSheets();
+            }, 10000); // 10초마다
         }
 
         async function handleLogin(event) {
@@ -1299,7 +1310,7 @@
             
             const mainTitle = document.querySelector('#mainContent h1');
             if (mainTitle) {
-                mainTitle.textContent = isTeamMode ? '👥 팀원 공유 뷰' : '👁️ 고객 공유 뷰';
+                mainTitle.textContent = isTeamMode ? '👥 팀원 공유 뷰 (실시간 동기화)' : '👁️ 고객 공유 뷰';
             }
             
             const searchInput = document.getElementById('searchInput');
@@ -1327,6 +1338,19 @@
             window.isTeamMode = isTeamMode;
             
             await loadSharedTodo(shareId, isTeamMode);
+            
+            // 🔄 자동 새로고침 시작 (팀원 모드만, 5초마다)
+            if (isTeamMode) {
+                // 기존 interval 정리
+                if (window.autoRefreshInterval) {
+                    clearInterval(window.autoRefreshInterval);
+                }
+                
+                window.autoRefreshInterval = setInterval(async () => {
+                    console.log('🔄 자동 동기화 중...');
+                    await loadSharedTodo(shareId, isTeamMode);
+                }, 5000); // 5초마다
+            }
         }
 
         async function loadSharedTodo(shareId, isTeamMode) {
