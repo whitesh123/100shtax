@@ -741,30 +741,32 @@
             }
         }
 
-        async function saveToGoogleSheets() {
-            if (!sessionToken) return;
-            
-            try {
-                showSyncStatus('syncing', '☁️ 저장 중...');
-                
-                const result = await callAuthAPI('saveTodos', {
-                    sessionToken: sessionToken,
-                    todos: todos
-                });
-                
-                if (result.success) {
-                    showSyncStatus('success', '✅ 저장 완료!');
-                } else {
-                    if (result.message.includes('로그인')) {
-                        setTimeout(() => handleLogout(), 2000);
-                    }
-                    showSyncStatus('error', '❌ 저장 실패');
-                }
-            } catch (error) {
-                console.error('Save error:', error);
-                showSyncStatus('error', '❌ 저장 실패');
-            }
-        }
+  async function saveToGoogleSheets() {
+    if (!sessionToken) return;
+    
+    try {
+        showSyncStatus('syncing', '☁️ 저장 중...');
+        
+        // POST 방식으로 변경
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'text/plain'  // CORS 회피
+            },
+            body: JSON.stringify({
+                action: 'saveTodos',
+                sessionToken: sessionToken,
+                todos: JSON.stringify(todos)  // JSON 문자열로 변환
+            })
+        });
+        
+        showSyncStatus('success', '✅ 저장 완료!');
+    } catch (error) {
+        console.error('Save error:', error);
+        showSyncStatus('error', '❌ 저장 실패');
+    }
+}
 
         function generateShareId() {
             return 'share_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -1068,26 +1070,40 @@
                                     class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-500 transition">
                             </div>
                             
-                            <div class="flex flex-wrap gap-2">
-                                <button onclick="openShareModal(${todo.id})" 
-                                    class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition font-medium text-sm">
-                                    🔗 고객공유
-                                </button>
-                                <button onclick="openTeamShareModal(${todo.id})" 
-                                    class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium text-sm">
-                                    👥 팀원공유
-                                </button>
-                                ${todo.completed ? `
-                                    <button onclick="archiveTodo(${todo.id})" 
-                                        class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium text-sm">
-                                        📦 보관
-                                    </button>
-                                ` : ''}
-                                <button onclick="deleteTodo(${todo.id})" 
-                                    class="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition font-medium text-sm">
-                                    🗑️ 삭제
-                                </button>
-                            </div>
+                           <div class="flex flex-wrap gap-2">
+    <button onclick="openShareModal(${todo.id})" 
+        class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition font-medium text-sm">
+        🔗 고객공유
+    </button>
+    <button onclick="openTeamShareModal(${todo.id})" 
+        class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-medium text-sm">
+        👥 팀원공유
+    </button>
+    <button onclick="duplicateTodo(${todo.id})" 
+        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition transform hover:scale-110" 
+        title="복사하기">
+        📋
+    </button>
+    ${progress === 100 ? `
+        <button onclick="archiveTodo(${todo.id})" 
+            class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition transform hover:scale-110" 
+            title="보관하기">
+            📦
+        </button>
+    ` : ''}
+    ${(todo.date || todo.deadline) ? `
+        <button onclick='addToCalendar(${JSON.stringify(todo).replace(/'/g, "&apos;")})' 
+            class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition transform hover:scale-110" 
+            title="캘린더에 추가">
+            📅
+        </button>
+    ` : ''}
+    <button onclick="deleteTodo(${todo.id})" 
+        class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition transform hover:scale-110" 
+        title="삭제">
+        🗑️
+    </button>
+</div>
                         </div>
                     `;
                 }).join('');
@@ -1137,5 +1153,297 @@
             checkSession();
         });
     </script>
+<!-- 
+이 파일을 admin.html의 </body> 태그 바로 앞에 추가할 스크립트입니다.
+또는 기존 script 태그 안에 아래 함수들을 추가하세요.
+-->
+
+<script>
+// ==================== 추가할 함수들 ====================
+
+// 구글 캘린더에 추가하는 함수
+function addToCalendar(todo) {
+    const startDate = todo.date || todo.deadline;
+    if (!startDate) {
+        alert('날짜 정보가 없습니다.');
+        return;
+    }
+
+    const title = encodeURIComponent(todo.title);
+    const description = encodeURIComponent(
+        (todo.subtasks && todo.subtasks.length > 0 
+            ? '세부작업:\n' + todo.subtasks.map(s => '- ' + s.title).join('\n')
+            : ''
+        )
+    );
+    
+    // 시작일시 설정
+    let startDateTime = startDate.replace(/-/g, '');
+    if (todo.time) {
+        startDateTime += 'T' + todo.time.replace(':', '') + '00';
+    }
+    
+    // 종료일시 설정
+    let endDateTime = (todo.deadline || startDate).replace(/-/g, '');
+    if (todo.deadlineTime) {
+        endDateTime += 'T' + todo.deadlineTime.replace(':', '') + '00';
+    } else if (todo.time) {
+        // 시작 시간이 있으면 +1시간
+        const [hour, min] = todo.time.split(':');
+        const endHour = String(parseInt(hour) + 1).padStart(2, '0');
+        endDateTime += 'T' + endHour + min + '00';
+    }
+
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startDateTime}/${endDateTime}&details=${description}`;
+    
+    window.open(googleCalendarUrl, '_blank');
+}
+
+// 페이지 로드 시 공유 링크 확인
+function checkSharedView() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewId = urlParams.get('view');
+    const teamId = urlParams.get('team');
+    
+    if (viewId || teamId) {
+        // 공유 모드로 진입
+        showSharedView(viewId, teamId);
+        return true;
+    }
+    return false;
+}
+
+// 공유 뷰 표시 (로그인 없이)
+async function showSharedView(viewId, teamId) {
+    const isTeamMode = !!teamId;
+    const shareId = viewId || teamId;
+    
+    // 로그인 페이지 숨기기
+    document.getElementById('loginPage').classList.remove('active');
+    document.getElementById('registerPage').classList.remove('active');
+    
+    // 메인 컨텐츠 표시
+    document.getElementById('mainContent').classList.add('active');
+    
+    // 상단 사용자 정보 숨기기
+    const userSection = document.querySelector('#mainContent .flex.justify-between');
+    if (userSection) {
+        userSection.style.display = 'none';
+    }
+    
+    // 제목 변경
+    const mainTitle = document.querySelector('#mainContent h1');
+    if (mainTitle) {
+        mainTitle.textContent = isTeamMode ? '👥 팀원 공유 뷰' : '👁️ 고객 공유 뷰';
+    }
+    
+    // 할일 추가 폼 숨기기
+    const addForm = document.querySelector('.mb-8.space-y-4.p-6');
+    if (addForm) {
+        addForm.style.display = 'none';
+    }
+    
+    // 공유 데이터 로드 (실제로는 모든 사용자의 데이터를 검색해야 함)
+    // 간단하게 구현: 모든 Todos 시트를 검색
+    await loadSharedTodo(shareId, isTeamMode);
+}
+
+// 공유된 할일 로드
+async function loadSharedTodo(shareId, isTeamMode) {
+    try {
+        showSyncStatus('syncing', '📥 공유 데이터 불러오는 중...');
+        
+        // 모든 사용자의 할일을 검색 (Apps Script에 새 함수 필요)
+        const params = new URLSearchParams();
+        params.append('action', 'loadSharedTodo');
+        params.append('shareId', shareId);
+        params.append('isTeamMode', isTeamMode);
+        
+        const response = await fetch(API_URL + '?' + params.toString(), {
+            method: 'GET',
+            redirect: 'follow'
+        });
+        
+        const text = await response.text();
+        const result = JSON.parse(text);
+        
+        if (result.success && result.data.todo) {
+            todos = [result.data.todo];
+            showSyncStatus('success', '✅ 불러오기 완료!');
+            renderSharedView(isTeamMode);
+        } else {
+            showSyncStatus('error', '❌ 공유 링크를 찾을 수 없습니다.');
+            document.getElementById('todoList').innerHTML = `
+                <div class="text-center py-16 text-gray-400">
+                    <div class="text-6xl mb-4">🔗</div>
+                    <p class="text-xl font-semibold">공유 링크를 찾을 수 없습니다</p>
+                    <p class="text-sm mt-2">링크가 올바른지 확인해주세요</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Load shared error:', error);
+        showSyncStatus('error', '❌ 불러오기 실패');
+    }
+}
+
+// 공유 뷰 렌더링
+function renderSharedView(isTeamMode) {
+    const todoList = document.getElementById('todoList');
+    
+    if (todos.length === 0) {
+        todoList.innerHTML = `
+            <div class="text-center py-16 text-gray-400">
+                <div class="text-6xl mb-4">📝</div>
+                <p class="text-xl font-semibold">공유된 할일이 없습니다</p>
+            </div>
+        `;
+        return;
+    }
+    
+    todoList.innerHTML = todos.map(todo => {
+        const progress = calculateProgress(todo);
+        const isOverdue = todo.deadline && new Date(todo.deadline) < new Date() && !todo.completed;
+        
+        return `
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <div class="flex items-start gap-4 mb-4">
+                    ${isTeamMode ? `
+                        <button onclick="toggleTodoShared('${todo.shareId || todo.teamShareId}')" 
+                            class="flex-shrink-0 w-7 h-7 rounded-lg border-2 flex items-center justify-center transition transform hover:scale-110 ${
+                                todo.completed ? 'bg-gradient-to-br from-indigo-500 to-purple-600 border-indigo-600' : 'border-gray-300 hover:border-indigo-500'
+                            }">
+                            ${todo.completed ? '<span class="text-white font-bold">✓</span>' : ''}
+                        </button>
+                    ` : `
+                        <div class="flex-shrink-0 w-7 h-7 rounded-lg border-2 flex items-center justify-center ${
+                            todo.completed ? 'bg-gradient-to-br from-indigo-500 to-purple-600 border-indigo-600' : 'border-gray-300'
+                        }">
+                            ${todo.completed ? '<span class="text-white font-bold">✓</span>' : ''}
+                        </div>
+                    `}
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold ${todo.completed ? 'line-through text-gray-400' : 'text-gray-800'}">
+                            ${todo.title}
+                        </h3>
+                        ${todo.date || todo.deadline ? `
+                            <div class="flex flex-wrap gap-2 mt-2 text-sm">
+                                ${todo.date ? `<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg">📅 ${todo.date} ${todo.time || ''}</span>` : ''}
+                                ${todo.deadline ? `<span class="px-3 py-1 ${isOverdue ? 'bg-red-100 text-red-700 font-bold' : 'bg-pink-100 text-pink-700'} rounded-lg">⏰ ${todo.deadline} ${todo.deadlineTime || ''} ${isOverdue ? '(기한 초과!)' : ''}</span>` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                ${todo.subtasks && todo.subtasks.length > 0 ? `
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-semibold text-gray-600">진행률</span>
+                            <span class="text-sm font-bold text-indigo-600">${progress}%</span>
+                        </div>
+                        <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        ${todo.subtasks.map(subtask => `
+                            <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
+                                ${isTeamMode ? `
+                                    <button onclick="toggleSubtaskShared('${todo.shareId || todo.teamShareId}', ${subtask.id})" 
+                                        class="w-5 h-5 rounded border-2 flex items-center justify-center ${
+                                            subtask.completed ? 'bg-indigo-500 border-indigo-600' : 'border-gray-300'
+                                        }">
+                                        ${subtask.completed ? '<span class="text-white text-xs">✓</span>' : ''}
+                                    </button>
+                                ` : `
+                                    <div class="w-5 h-5 rounded border-2 flex items-center justify-center ${
+                                        subtask.completed ? 'bg-indigo-500 border-indigo-600' : 'border-gray-300'
+                                    }">
+                                        ${subtask.completed ? '<span class="text-white text-xs">✓</span>' : ''}
+                                    </div>
+                                `}
+                                <span class="flex-1 ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-700'}">${subtask.title}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+                
+                ${isTeamMode ? '' : `
+                    <div class="mt-4 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">
+    ${isTeamMode ? '👥 팀원 편집 모드 - 체크박스만 수정 가능합니다' : '👁️ 읽기 전용 뷰 - 수정할 수 없습니다'}
+</div>
+                `}
+            </div>
+        `;
+    }).join('');
+}
+
+// 공유 뷰에서 할일 토글 (팀원 모드만)
+async function toggleTodoShared(shareId) {
+    const todo = todos[0];
+    if (!todo) return;
+    
+    todo.completed = !todo.completed;
+    if (todo.completed) {
+        todo.completedAt = new Date().toISOString();
+    } else {
+        delete todo.completedAt;
+    }
+    
+    renderSharedView(true);
+    await saveSharedTodo(shareId);
+}
+
+// 공유 뷰에서 세부작업 토글 (팀원 모드만)
+async function toggleSubtaskShared(shareId, subtaskId) {
+    const todo = todos[0];
+    if (!todo || !todo.subtasks) return;
+    
+    const subtask = todo.subtasks.find(s => s.id === subtaskId);
+    if (subtask) {
+        subtask.completed = !subtask.completed;
+        renderSharedView(true);
+        await saveSharedTodo(shareId);
+    }
+}
+
+// 공유된 할일 저장 (팀원 모드만)
+async function saveSharedTodo(shareId) {
+    try {
+        showSyncStatus('syncing', '☁️ 저장 중...');
+        
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'text/plain'
+            },
+            body: JSON.stringify({
+                action: 'saveSharedTodo',
+                shareId: shareId,
+                todo: JSON.stringify(todos[0])
+            })
+        });
+        
+        showSyncStatus('success', '✅ 저장 완료!');
+    } catch (error) {
+        console.error('Save error:', error);
+        showSyncStatus('error', '❌ 저장 실패');
+    }
+}
+
+// ==================== 페이지 로드 시 실행 ====================
+window.addEventListener('DOMContentLoaded', () => {
+    initTimeSelectors();
+    
+    // 공유 링크로 접근했는지 확인
+    if (!checkSharedView()) {
+        // 일반 접근이면 세션 체크
+        checkSession();
+    }
+});
+</script>
+
 </body>
 </html>
