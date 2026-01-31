@@ -1054,33 +1054,88 @@
                 `;
             } else {
                 todoList.innerHTML = displayTodos.map(todo => {
-                    const progress = calculateProgress(todo);
-                    const isOverdue = todo.deadline && new Date(todo.deadline) < new Date() && !todo.completed;
-                    
-                    return `
-                        <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition ${isOverdue ? 'border-2 border-red-300' : ''}">
-                            <div class="flex items-start gap-4 mb-4">
-                                <button onclick="toggleTodo(${todo.id})" 
-                                    class="flex-shrink-0 w-7 h-7 rounded-lg border-2 flex items-center justify-center transition transform hover:scale-110 ${
-                                        todo.completed ? 'bg-gradient-to-br from-indigo-500 to-purple-600 border-indigo-600' : 'border-gray-300 hover:border-indigo-500'
-                                    }">
-                                    ${todo.completed ? '<span class="text-white font-bold">✓</span>' : ''}
-                                </button>
-                                <div class="flex-1">
-                                    <input 
-                                        type="text" 
-                                        value="${todo.title.replace(/"/g, '&quot;')}" 
-                                        onchange="updateTodoTitle(${todo.id}, this.value)"
-                                        class="text-xl font-bold ${todo.completed ? 'line-through text-gray-400' : 'text-gray-800'} bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-indigo-300 rounded px-2 w-full">
-                                    ${todo.date || todo.deadline ? `
-                                        <div class="flex flex-wrap gap-2 mt-2 text-sm">
-                                            ${todo.date ? `<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg">📅 ${todo.date} ${todo.time || ''}</span>` : ''}
-                                            ${todo.deadline ? `<span class="px-3 py-1 ${isOverdue ? 'bg-red-100 text-red-700 font-bold' : 'bg-pink-100 text-pink-700'} rounded-lg">⏰ ${todo.deadline} ${todo.deadlineTime || ''} ${isOverdue ? '(기한 초과!)' : ''}</span>` : ''}
-                                        </div>
-                                    ` : ''}
-                                </div>
+        const progress = calculateProgress(todo);
+        const isOverdue = todo.deadline && new Date(todo.deadline) < new Date() && !todo.completed;
+        
+        // 접힘 상태 관리용 (전역변수에 상태 저장 권장하나, 여기선 기본 '열림'으로 설정)
+        const isExpanded = todo.isExpanded !== false; 
+
+        return `
+            <div class="bg-white rounded-2xl shadow-lg p-5 sm:p-6 hover:shadow-xl transition ${isOverdue ? 'border-2 border-red-300' : ''}">
+                <div class="flex items-start gap-4 mb-4">
+                    <button onclick="toggleTodo(${todo.id})" 
+                        class="flex-shrink-0 w-7 h-7 rounded-lg border-2 flex items-center justify-center transition ${
+                            todo.completed ? 'bg-gradient-to-br from-indigo-500 to-purple-600 border-indigo-600' : 'border-gray-300'
+                        }">
+                        ${todo.completed ? '<span class="text-white font-bold">✓</span>' : ''}
+                    </button>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center">
+                            <input type="text" value="${todo.title.replace(/"/g, '&quot;')}" 
+                                onchange="updateTodoTitle(${todo.id}, this.value)"
+                                class="text-lg font-bold ${todo.completed ? 'line-through text-gray-400' : 'text-gray-800'} bg-transparent border-none focus:outline-none w-full">
+                            <button onclick="toggleExpand(${todo.id})" class="text-gray-400 hover:text-indigo-600 p-1">
+                                ${isExpanded ? '▼' : '▲'}
+                            </button>
+                        </div>
+                        </div>
+                </div>
+                
+                <div id="subtask-container-${todo.id}" class="${isExpanded ? '' : 'hidden'}">
+                    ${todo.subtasks && todo.subtasks.length > 0 ? `
+                        <div class="mb-4">
+                            <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-indigo-500 transition-all" style="width: ${progress}%"></div>
                             </div>
-                            
+                        </div>
+                        <div class="space-y-2 mb-4">
+                            ${todo.subtasks.map(subtask => `
+                                <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg text-sm">
+                                    <button onclick="toggleSubtask(${todo.id}, ${subtask.id})" class="...">✓</button>
+                                    <span class="flex-1">${subtask.title}</span>
+                                    <button onclick="deleteSubtask(${todo.id}, ${subtask.id})" class="text-red-400">🗑️</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="mb-4">
+                        <input type="text" id="subtask-input-${todo.id}" placeholder="➕ 세부 작업 추가..." 
+                            onkeypress="if(event.key==='Enter') addSubtask(${todo.id})"
+                            class="w-full px-4 py-2 border-2 border-gray-100 rounded-lg text-sm focus:border-indigo-300 outline-none">
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-50">
+                    <div class="flex gap-1 sm:gap-2">
+                        <button onclick="openShareModal(${todo.id})" class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-md text-xs font-bold">🔗 고객</button>
+                        <button onclick="openTeamShareModal(${todo.id})" class="px-3 py-1.5 bg-purple-50 text-purple-600 rounded-md text-xs font-bold">👥 팀원</button>
+                    </div>
+                    <div class="flex gap-3 text-lg">
+                        <button onclick="duplicateTodo(${todo.id})" title="복사" class="hover:scale-120 transition">📋</button>
+                        ${(todo.date || todo.deadline) ? `<button onclick='addToCalendar(${JSON.stringify(todo)})' title="캘린더" class="hover:scale-120 transition">📅</button>` : ''}
+                        <button onclick="deleteTodo(${todo.id})" title="삭제" class="hover:scale-120 transition text-red-400">🗑️</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // 푸터 추가
+    todoList.innerHTML += `
+        <footer class="mt-12 mb-8 text-center opacity-50">
+            <p class="text-xs text-gray-500">© 2026 백승호. All rights reserved.</p>
+        </footer>
+    `;
+}
+
+// 접기/펴기 동작 함수
+function toggleExpand(id) {
+    const todo = todos.find(t => t.id === id);
+    if (todo) {
+        todo.isExpanded = todo.isExpanded === false;
+        render();
+    }
+}          
                             ${todo.subtasks && todo.subtasks.length > 0 ? `
                                 <div class="mb-4">
                                     <div class="flex items-center justify-between mb-2">
