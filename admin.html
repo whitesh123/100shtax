@@ -1394,13 +1394,19 @@
                 }
                 
                 window.autoRefreshInterval = setInterval(async () => {
-                    // 입력 중이면 새로고침 건너뛰기
+                    // 입력 중이거나 저장 중이면 새로고침 건너뛰기
                     const activeElement = document.activeElement;
                     const isTyping = activeElement && (
                         activeElement.tagName === 'INPUT' || 
                         activeElement.tagName === 'TEXTAREA' ||
                         activeElement.isContentEditable
                     );
+                    
+                    // 저장 중이면 건너뛰기
+                    if (window.isSaving) {
+                        console.log('⏸️ 저장 중이라 새로고침 건너뜀');
+                        return;
+                    }
                     
                     if (isTyping) {
                         console.log('⏸️ 입력 중이라 새로고침 건너뜀');
@@ -1600,6 +1606,9 @@
 
         async function saveSharedTodo() {
             try {
+                // 저장 중 플래그 설정
+                window.isSaving = true;
+                
                 const urlParams = new URLSearchParams(window.location.search);
                 const owner = urlParams.get('u');
                 const teamId = urlParams.get('team');
@@ -1608,6 +1617,7 @@
                 
                 if (!owner || !shareId) {
                     console.error('필수 파라미터 부족');
+                    window.isSaving = false;
                     return;
                 }
                 
@@ -1627,9 +1637,14 @@
                 
                 showSyncStatus('success', '✅ 저장 완료!');
                 console.log('저장 성공');
+                
+                // 저장 완료 후 플래그 해제
+                window.isSaving = false;
             } catch (error) {
                 console.error('Save error:', error);
                 showSyncStatus('error', '❌ 저장 실패');
+                // 에러 시에도 플래그 해제
+                window.isSaving = false;
             }
         }
 
