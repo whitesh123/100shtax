@@ -345,25 +345,6 @@
             </div>
 
             <div class="glass-effect rounded-3xl shadow-2xl p-6 sm:p-8 mb-8 animate-fade-in">
-                <!-- 검색 기능 -->
-                <div class="mb-6">
-                    <input 
-                        type="text" 
-                        id="searchInput" 
-                        placeholder="🔍 할일 검색..." 
-                        class="w-full px-6 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition text-lg font-medium">
-                </div>
-
-                <!-- 보관함 버튼 -->
-                <div class="mb-6">
-                    <button 
-                        id="archiveToggle"
-                        onclick="toggleArchive()" 
-                        class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 rounded-xl font-semibold hover:from-purple-200 hover:to-pink-200 transition transform hover:scale-105 shadow-lg">
-                        📦 보관함 보기
-                    </button>
-                </div>
-
                 <!-- 보관함 섹션 -->
                 <div id="archiveSection" class="hidden mb-6 p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl border-2 border-purple-200">
                     <h3 class="text-xl font-bold text-purple-800 mb-4 flex items-center gap-2">
@@ -381,51 +362,75 @@
                         onkeypress="if(event.key==='Enter') addTodo()"
                         class="w-full px-6 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition text-lg font-medium">
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
+                    <!-- 시작일, 시간, 검색 -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                        <div class="lg:col-span-3">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">📅 시작일</label>
                             <input 
                                 type="date" 
                                 id="dateInput" 
-                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition">
+                                class="w-full px-3 py-2.5 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition text-sm">
                         </div>
-                        <div class="flex gap-2">
-                            <select id="timeHourInput" 
-                                class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition">
-                                <option value="">시</option>
-                            </select>
-                            <select id="timeMinuteInput" 
-                                class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition">
-                                <option value="">분</option>
-                                <option value="00">00분</option>
-                                <option value="15">15분</option>
-                                <option value="30">30분</option>
-                                <option value="45">45분</option>
-                            </select>
+                        <div class="lg:col-span-2">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">🕐 시간</label>
+                            <div class="flex gap-1">
+                                <select id="timeHourInput" 
+                                    class="w-full px-2 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition text-sm">
+                                    <option value="">시</option>
+                                </select>
+                                <select id="timeMinuteInput" 
+                                    class="w-full px-2 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition text-sm">
+                                    <option value="">분</option>
+                                    <option value="00">00</option>
+                                    <option value="15">15</option>
+                                    <option value="30">30</option>
+                                    <option value="45">45</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-7">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">🔍 검색</label>
+                            <input 
+                                type="text" 
+                                id="searchInput" 
+                                placeholder="할일 검색..." 
+                                class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition text-sm">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
+                    <!-- 마감일, 시간, 보관함 -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                        <div class="lg:col-span-3">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">⏰ 마감일</label>
                             <input 
                                 type="date" 
                                 id="deadlineInput" 
-                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition">
+                                class="w-full px-3 py-2.5 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition text-sm">
                         </div>
-                        <div class="flex gap-2">
-                            <select id="deadlineHourInput" 
-                                class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition">
-                                <option value="">시</option>
-                            </select>
-                            <select id="deadlineMinuteInput" 
-                                class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-100 transition">
-                                <option value="">분</option>
-                                <option value="00">00분</option>
-                                <option value="15">15분</option>
-                                <option value="30">30분</option>
-                                <option value="45">45분</option>
-                            </select>
+                        <div class="lg:col-span-2">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">🕐 시간</label>
+                            <div class="flex gap-1">
+                                <select id="deadlineHourInput" 
+                                    class="w-full px-2 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition text-sm">
+                                    <option value="">시</option>
+                                </select>
+                                <select id="deadlineMinuteInput" 
+                                    class="w-full px-2 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition text-sm">
+                                    <option value="">분</option>
+                                    <option value="00">00</option>
+                                    <option value="15">15</option>
+                                    <option value="30">30</option>
+                                    <option value="45">45</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-7 flex items-end">
+                            <button 
+                                id="archiveToggle"
+                                onclick="toggleArchive()" 
+                                class="w-full px-4 py-2.5 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 rounded-xl font-semibold hover:from-purple-200 hover:to-pink-200 transition transform hover:scale-105 shadow text-sm">
+                                📦 보관함 보기
+                            </button>
                         </div>
                     </div>
 
@@ -1571,6 +1576,9 @@
             const title = input.value.trim();
             if (!title) return;
 
+            // 저장 중 플래그 먼저 설정
+            window.isSaving = true;
+            
             const todo = todos[0];
             if (!todo.subtasks) todo.subtasks = [];
             todo.subtasks.push({ id: Date.now(), title: title, completed: false });
@@ -1582,6 +1590,10 @@
 
         async function deleteSubtaskShared(subtaskId) {
             if (!confirm('이 항목을 삭제할까요?')) return;
+            
+            // 저장 중 플래그 먼저 설정
+            window.isSaving = true;
+            
             const todo = todos[0];
             todo.subtasks = todo.subtasks.filter(st => st.id !== subtaskId);
             
@@ -1590,17 +1602,26 @@
         }
 
         async function toggleTodoShared() {
+            // 저장 중 플래그 먼저 설정
+            window.isSaving = true;
+            
             todos[0].completed = !todos[0].completed;
             renderSharedView(true);
             await saveSharedTodo();
         }
 
         async function toggleSubtaskShared(subtaskId) {
+            // 저장 중 플래그 먼저 설정
+            window.isSaving = true;
+            
             const st = todos[0].subtasks.find(s => s.id === subtaskId);
             if (st) {
                 st.completed = !st.completed;
                 renderSharedView(true);
                 await saveSharedTodo();
+            } else {
+                // 찾지 못하면 플래그 해제
+                window.isSaving = false;
             }
         }
 
