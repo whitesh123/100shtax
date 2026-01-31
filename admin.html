@@ -1501,19 +1501,16 @@
                 
                 showSyncStatus('syncing', '☁️ 저장 중...');
                 
-                // no-cors POST 방식으로 변경
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'text/plain'
-                    },
-                    body: JSON.stringify({
-                        action: 'saveSharedTodo',
-                        u: owner,
-                        shareId: shareId,
-                        todo: JSON.stringify(todos[0])
-                    })
+                // GET 방식으로 변경 (확실한 방법)
+                const params = new URLSearchParams();
+                params.append('action', 'saveSharedTodo');
+                params.append('u', owner);
+                params.append('shareId', shareId);
+                params.append('todo', JSON.stringify(todos[0]));
+                
+                const response = await fetch(API_URL + '?' + params.toString(), {
+                    method: 'GET',
+                    redirect: 'follow'
                 });
                 
                 showSyncStatus('success', '✅ 저장 완료!');
