@@ -900,6 +900,43 @@
             }
         }
 
+        function duplicateTodo(id) {
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                const newTodo = {
+                    ...todo,
+                    id: Date.now(),
+                    title: todo.title + ' (복사본)',
+                    completed: false,
+                    shareId: generateShareId(),
+                    teamShareId: generateShareId(),
+                    subtasks: todo.subtasks ? todo.subtasks.map(st => ({
+                        ...st,
+                        id: Date.now() + Math.random() * 1000,
+                        completed: false
+                    })) : [],
+                    archived: false
+                };
+                delete newTodo.completedAt;
+                delete newTodo.archivedAt;
+                
+                todos.unshift(newTodo);
+                render();
+                saveToGoogleSheets();
+            }
+        }
+
+        function updateTodoTitle(id, newTitle) {
+            const todo = todos.find(t => t.id === id);
+            if (todo && newTitle.trim()) {
+                todo.title = newTitle.trim();
+                saveToGoogleSheets();
+            } else if (todo && !newTitle.trim()) {
+                // 제목이 비어있으면 원래대로 복구
+                render();
+            }
+        }
+
         function toggleArchive() {
             showArchive = !showArchive;
             const section = document.getElementById('archiveSection');
@@ -984,6 +1021,12 @@
         }
 
         function render() {
+            // 공유 모드일 때는 renderSharedView 호출
+            if (window.isSharedView) {
+                renderSharedView(window.isTeamMode);
+                return;
+            }
+            
             const activeTodos = todos.filter(t => !t.archived);
             const archivedTodos = todos.filter(t => t.archived);
             
@@ -1021,9 +1064,11 @@
                                     ${todo.completed ? '<span class="text-white font-bold">✓</span>' : ''}
                                 </button>
                                 <div class="flex-1">
-                                    <h3 class="text-xl font-bold ${todo.completed ? 'line-through text-gray-400' : 'text-gray-800'}">
-                                        ${todo.title}
-                                    </h3>
+                                    <input 
+                                        type="text" 
+                                        value="${todo.title.replace(/"/g, '&quot;')}" 
+                                        onchange="updateTodoTitle(${todo.id}, this.value)"
+                                        class="text-xl font-bold ${todo.completed ? 'line-through text-gray-400' : 'text-gray-800'} bg-transparent border-none focus:outline-none focus:ring-2 focus:ring-indigo-300 rounded px-2 w-full">
                                     ${todo.date || todo.deadline ? `
                                         <div class="flex flex-wrap gap-2 mt-2 text-sm">
                                             ${todo.date ? `<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg">📅 ${todo.date} ${todo.time || ''}</span>` : ''}
@@ -1237,14 +1282,35 @@ async function showSharedView(viewId, teamId) {
         mainTitle.textContent = isTeamMode ? '👥 팀원 공유 뷰' : '👁️ 고객 공유 뷰';
     }
     
+    // 검색 기능 숨기기
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        const searchParent = searchInput.closest('.mb-6');
+        if (searchParent) {
+            searchParent.style.display = 'none';
+        }
+    }
+    
+    // 보관함 버튼 숨기기
+    const archiveToggle = document.getElementById('archiveToggle');
+    if (archiveToggle) {
+        const archiveParent = archiveToggle.closest('.mb-6');
+        if (archiveParent) {
+            archiveParent.style.display = 'none';
+        }
+    }
+    
     // 할일 추가 폼 숨기기
     const addForm = document.querySelector('.mb-8.space-y-4.p-6');
     if (addForm) {
         addForm.style.display = 'none';
     }
     
-    // 공유 데이터 로드 (실제로는 모든 사용자의 데이터를 검색해야 함)
-    // 간단하게 구현: 모든 Todos 시트를 검색
+    // 공유 모드 플래그 설정
+    window.isSharedView = true;
+    window.isTeamMode = isTeamMode;
+    
+    // 공유 데이터 로드
     await loadSharedTodo(shareId, isTeamMode);
 }
 
