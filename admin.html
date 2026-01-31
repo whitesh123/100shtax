@@ -957,27 +957,29 @@
             render();
         }
 
-        function openShareModal(id) {
-            const todo = todos.find(t => t.id === id);
-            if (!todo) return;
-            
-            const baseUrl = window.location.origin + window.location.pathname;
-            const shareUrl = `${baseUrl}?view=${todo.shareId}`;
-            
-            document.getElementById('shareLink').value = shareUrl;
-            document.getElementById('shareModal').classList.add('active');
-        }
+      function openShareModal(id) {
+    const todo = todos.find(t => t.id === id);
+    if (!todo) return;
+    
+    const baseUrl = window.location.origin + window.location.pathname;
+    // u=유저아이디 파라미터 추가
+    const shareUrl = `${baseUrl}?u=${currentUser.username}&view=${todo.shareId}`;
+    
+    document.getElementById('shareLink').value = shareUrl;
+    document.getElementById('shareModal').classList.add('active');
+}
 
-        function openTeamShareModal(id) {
-            const todo = todos.find(t => t.id === id);
-            if (!todo) return;
-            
-            const baseUrl = window.location.origin + window.location.pathname;
-            const shareUrl = `${baseUrl}?team=${todo.teamShareId}`;
-            
-            document.getElementById('teamShareLink').value = shareUrl;
-            document.getElementById('teamShareModal').classList.add('active');
-        }
+       function openTeamShareModal(id) {
+    const todo = todos.find(t => t.id === id);
+    if (!todo) return;
+    
+    const baseUrl = window.location.origin + window.location.pathname;
+    // u=유저아이디 파라미터 추가
+    const shareUrl = `${baseUrl}?u=${currentUser.username}&team=${todo.teamShareId}`;
+    
+    document.getElementById('teamShareLink').value = shareUrl;
+    document.getElementById('teamShareModal').classList.add('active');
+}
 
         function closeShareModal() {
             document.getElementById('shareModal').classList.remove('active');
@@ -1318,42 +1320,39 @@ async function showSharedView(viewId, teamId) {
 // 공유된 할일 로드
 async function loadSharedTodo(shareId, isTeamMode) {
     try {
-        showSyncStatus('syncing', '📥 공유 데이터 불러오는 중...');
+        const urlParams = new URLSearchParams(window.location.search);
+        const owner = urlParams.get('u'); // URL에서 유저명 추출
         
-        // 모든 사용자의 할일을 검색 (Apps Script에 새 함수 필요)
+        showSyncStatus('syncing', '📥 데이터를 찾는 중...');
+        
         const params = new URLSearchParams();
         params.append('action', 'loadSharedTodo');
+        params.append('u', owner); // 유저명 전달
         params.append('shareId', shareId);
         params.append('isTeamMode', isTeamMode);
         
-        const response = await fetch(API_URL + '?' + params.toString(), {
-            method: 'GET',
-            redirect: 'follow'
-        });
-        
-        const text = await response.text();
-        const result = JSON.parse(text);
+        const response = await fetch(API_URL + '?' + params.toString());
+        const result = await response.json();
         
         if (result.success && result.data.todo) {
-            todos = [result.data.todo];
-            showSyncStatus('success', '✅ 불러오기 완료!');
-            renderSharedView(isTeamMode);
+            // 가져온 데이터가 요청한 shareId와 일치하는지 최종 확인
+            const fetchedTodo = result.data.todo;
+            const targetId = isTeamMode ? fetchedTodo.teamShareId : fetchedTodo.shareId;
+            
+            if (targetId === shareId) {
+                todos = [fetchedTodo];
+                showSyncStatus('success', '✅ 확인 완료');
+                renderSharedView(isTeamMode);
+            } else {
+                throw new Error('데이터 ID 불일치');
+            }
         } else {
-            showSyncStatus('error', '❌ 공유 링크를 찾을 수 없습니다.');
-            document.getElementById('todoList').innerHTML = `
-                <div class="text-center py-16 text-gray-400">
-                    <div class="text-6xl mb-4">🔗</div>
-                    <p class="text-xl font-semibold">공유 링크를 찾을 수 없습니다</p>
-                    <p class="text-sm mt-2">링크가 올바른지 확인해주세요</p>
-                </div>
-            `;
+            throw new Error('데이터를 찾을 수 없음');
         }
     } catch (error) {
-        console.error('Load shared error:', error);
         showSyncStatus('error', '❌ 불러오기 실패');
     }
 }
-
 // 공유 뷰 렌더링
 function renderSharedView(isTeamMode) {
     const todoList = document.getElementById('todoList');
