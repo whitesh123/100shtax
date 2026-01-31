@@ -1051,7 +1051,7 @@
                                                 }">
                                                 ${subtask.completed ? '<span class="text-white text-xs">✓</span>' : ''}
                                             </button>
-                                            <span class="flex-1 ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-700'}">${subtask.text}</span>
+                                            <span class="flex-1 ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-700'}">${subtask.title}</span>
                                             <button onclick="deleteSubtask(${todo.id}, ${subtask.id})" 
                                                 class="text-red-500 hover:text-red-700 transition">🗑️</button>
                                         </div>
