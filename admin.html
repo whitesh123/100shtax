@@ -362,74 +362,80 @@
                         onkeypress="if(event.key==='Enter') addTodo()"
                         class="w-full px-6 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition text-lg font-medium">
                     
-                    <!-- 시작일, 시간, 검색 -->
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                        <div class="lg:col-span-3">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">📅 시작일</label>
+                    <!-- 시작일과 시간 -->
+                    <div class="grid grid-cols-12 gap-2">
+                        <div class="col-span-6 sm:col-span-5">
+                            <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1">📅 시작일</label>
                             <input 
                                 type="date" 
                                 id="dateInput" 
-                                class="w-full px-3 py-2.5 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition text-sm">
+                                class="w-full px-2 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition text-xs sm:text-sm">
                         </div>
-                        <div class="lg:col-span-2">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">🕐 시간</label>
-                            <div class="flex gap-1">
-                                <select id="timeHourInput" 
-                                    class="w-full px-2 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition text-sm">
-                                    <option value="">시</option>
-                                </select>
-                                <select id="timeMinuteInput" 
-                                    class="w-full px-2 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition text-sm">
-                                    <option value="">분</option>
-                                    <option value="00">00</option>
-                                    <option value="15">15</option>
-                                    <option value="30">30</option>
-                                    <option value="45">45</option>
-                                </select>
-                            </div>
+                        <div class="col-span-3 sm:col-span-2">
+                            <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1">🕐 시</label>
+                            <select id="timeHourInput" 
+                                class="w-full px-1 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition text-xs sm:text-sm">
+                                <option value="">시</option>
+                            </select>
                         </div>
-                        <div class="lg:col-span-7">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">🔍 검색</label>
+                        <div class="col-span-3 sm:col-span-2">
+                            <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1">분</label>
+                            <select id="timeMinuteInput" 
+                                class="w-full px-1 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition text-xs sm:text-sm">
+                                <option value="">분</option>
+                                <option value="00">00</option>
+                                <option value="15">15</option>
+                                <option value="30">30</option>
+                                <option value="45">45</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 마감일과 시간 -->
+                    <div class="grid grid-cols-12 gap-2">
+                        <div class="col-span-6 sm:col-span-5">
+                            <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1">⏰ 마감일</label>
+                            <input 
+                                type="date" 
+                                id="deadlineInput" 
+                                class="w-full px-2 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition text-xs sm:text-sm">
+                        </div>
+                        <div class="col-span-3 sm:col-span-2">
+                            <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1">🕐 시</label>
+                            <select id="deadlineHourInput" 
+                                class="w-full px-1 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition text-xs sm:text-sm">
+                                <option value="">시</option>
+                            </select>
+                        </div>
+                        <div class="col-span-3 sm:col-span-2">
+                            <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1">분</label>
+                            <select id="deadlineMinuteInput" 
+                                class="w-full px-1 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition text-xs sm:text-sm">
+                                <option value="">분</option>
+                                <option value="00">00</option>
+                                <option value="15">15</option>
+                                <option value="30">30</option>
+                                <option value="45">45</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 검색과 보관함 -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1">🔍 검색</label>
                             <input 
                                 type="text" 
                                 id="searchInput" 
                                 placeholder="할일 검색..." 
-                                class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition text-sm">
+                                class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition text-sm">
                         </div>
-                    </div>
-
-                    <!-- 마감일, 시간, 보관함 -->
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                        <div class="lg:col-span-3">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">⏰ 마감일</label>
-                            <input 
-                                type="date" 
-                                id="deadlineInput" 
-                                class="w-full px-3 py-2.5 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition text-sm">
-                        </div>
-                        <div class="lg:col-span-2">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">🕐 시간</label>
-                            <div class="flex gap-1">
-                                <select id="deadlineHourInput" 
-                                    class="w-full px-2 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition text-sm">
-                                    <option value="">시</option>
-                                </select>
-                                <select id="deadlineMinuteInput" 
-                                    class="w-full px-2 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition text-sm">
-                                    <option value="">분</option>
-                                    <option value="00">00</option>
-                                    <option value="15">15</option>
-                                    <option value="30">30</option>
-                                    <option value="45">45</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="lg:col-span-7 flex items-end">
+                        <div class="flex items-end">
                             <button 
                                 id="archiveToggle"
                                 onclick="toggleArchive()" 
-                                class="w-full px-4 py-2.5 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 rounded-xl font-semibold hover:from-purple-200 hover:to-pink-200 transition transform hover:scale-105 shadow text-sm">
-                                📦 보관함 보기
+                                class="w-full px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 rounded-lg font-semibold hover:from-purple-200 hover:to-pink-200 transition transform hover:scale-105 shadow text-sm">
+                                📦 보관함
                             </button>
                         </div>
                     </div>
