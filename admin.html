@@ -1084,6 +1084,20 @@
                 return;
             }
             
+            // 입력 중인 값들 저장
+            const focusedElement = document.activeElement;
+            let focusedId = null;
+            let focusedValue = null;
+            let selectionStart = null;
+            let selectionEnd = null;
+            
+            if (focusedElement && (focusedElement.tagName === 'INPUT' || focusedElement.tagName === 'TEXTAREA')) {
+                focusedId = focusedElement.id;
+                focusedValue = focusedElement.value;
+                selectionStart = focusedElement.selectionStart;
+                selectionEnd = focusedElement.selectionEnd;
+            }
+            
             const activeTodos = todos.filter(t => !t.archived);
             const archivedTodos = todos.filter(t => t.archived);
             
@@ -1253,6 +1267,20 @@
                     `).join('');
                 }
             }
+            
+            // 입력 중이던 값 복원
+            if (focusedId) {
+                setTimeout(() => {
+                    const element = document.getElementById(focusedId);
+                    if (element) {
+                        element.value = focusedValue;
+                        element.focus();
+                        if (selectionStart !== null) {
+                            element.setSelectionRange(selectionStart, selectionEnd);
+                        }
+                    }
+                }, 0);
+            }
         }
 
         document.getElementById('searchInput').addEventListener('input', (e) => {
@@ -1415,6 +1443,20 @@
         }
 
         function renderSharedView(isTeamMode) {
+            // 입력 중인 값들 저장
+            const focusedElement = document.activeElement;
+            let focusedId = null;
+            let focusedValue = null;
+            let selectionStart = null;
+            let selectionEnd = null;
+            
+            if (focusedElement && (focusedElement.tagName === 'INPUT' || focusedElement.tagName === 'TEXTAREA')) {
+                focusedId = focusedElement.id;
+                focusedValue = focusedElement.value;
+                selectionStart = focusedElement.selectionStart;
+                selectionEnd = focusedElement.selectionEnd;
+            }
+            
             const todoList = document.getElementById('todoList');
             const todo = todos[0];
             if (!todo) return;
@@ -1496,6 +1538,20 @@
                     ` : ''}
                 </div>
             `;
+            
+            // 입력 중이던 값 복원
+            if (focusedId) {
+                setTimeout(() => {
+                    const element = document.getElementById(focusedId);
+                    if (element) {
+                        element.value = focusedValue;
+                        element.focus();
+                        if (selectionStart !== null) {
+                            element.setSelectionRange(selectionStart, selectionEnd);
+                        }
+                    }
+                }, 0);
+            }
         }
 
         async function addSubtaskShared() {
