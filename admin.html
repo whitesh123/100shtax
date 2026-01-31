@@ -220,12 +220,16 @@
             </form>
 
             <div class="mt-6 text-center text-sm text-gray-500">
-                <p>💡 초기 관리자 계정</p>
-                <p class="mt-1">아이디: <code class="bg-gray-100 px-2 py-1 rounded">admin</code></p>
-                <p class="mt-1">비밀번호: <code class="bg-gray-100 px-2 py-1 rounded">admin1234</code></p>
+                <p>💡할일관리 앱의 새로운 기준</p>
+                
             </div>
         </div>
     </div>
+<footer class="mt-12 mb-8 text-center border-t border-gray-100 pt-8">
+    <p class="text-gray-400 text-sm tracking-wide">
+        © 2026 <span class="font-semibold text-gray-600">백승호</span>. All rights reserved.
+    </p>
+</footer>
 
     <!-- ==================== 회원가입 페이지 ==================== -->
     <div id="registerPage">
@@ -1412,6 +1416,11 @@ function renderSharedView(isTeamMode) {
             ` : ''}
         </div>
     `;
+todoList.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+        </div>
+    <p class="text-center text-xs text-gray-400 mt-6">© 2026 백승호. All rights reserved.</p>
+`;
 }
 // ==================== 페이지 로드 시 실행 ====================
 window.addEventListener('DOMContentLoaded', () => {
