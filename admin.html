@@ -662,13 +662,37 @@
             
             if (result.success) {
                 showSyncStatus('success', '✓ 회원가입 성공');
-                successDiv.textContent = result.message + ' 로그인 페이지로 이동합니다.';
+                successDiv.textContent = '🎉 회원가입이 완료되었습니다! 자동 로그인 중...';
                 successDiv.classList.remove('hidden');
                 errorDiv.classList.add('hidden');
                 
-                setTimeout(() => {
-                    showLoginPage();
-                }, 2000);
+                // 1초 후 자동 로그인
+                setTimeout(async () => {
+                    showSyncStatus('syncing', '🔄 자동 로그인 중...');
+                    
+                    const loginResult = await callAuthAPI('login', {
+                        username: username,
+                        password: password
+                    });
+                    
+                    if (loginResult.success) {
+                        sessionToken = loginResult.data.sessionToken;
+                        localStorage.setItem('sessionToken', sessionToken);
+                        
+                        showSyncStatus('success', '✓ 로그인 완료!');
+                        
+                        showMainContent({
+                            username: loginResult.data.username,
+                            name: loginResult.data.name
+                        });
+                    } else {
+                        // 자동 로그인 실패 시 로그인 페이지로
+                        showSyncStatus('error', '자동 로그인 실패. 로그인 페이지로 이동합니다.');
+                        setTimeout(() => {
+                            showLoginPage();
+                        }, 1500);
+                    }
+                }, 1000);
             } else {
                 showSyncStatus('error', '✗ 회원가입 실패');
                 errorDiv.textContent = result.message;
