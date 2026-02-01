@@ -140,8 +140,8 @@
 
         /* 세부작업 토글 애니메이션 */
         .subtask-list-content {
-            max-height: 1000px;
-            overflow: hidden;
+            max-height: 9999px;
+            overflow: visible;
             transition: max-height 0.4s ease-out, opacity 0.4s ease-out;
             opacity: 1;
         }
@@ -149,6 +149,7 @@
         .subtask-list-content.collapsed {
             max-height: 0;
             opacity: 0;
+            overflow: hidden;
         }
 
         .subtask-toggle-btn {
