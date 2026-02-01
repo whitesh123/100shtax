@@ -828,7 +828,7 @@
             return 'share_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         }
 
-        function addTodo() {
+        async function addTodo() {
             const title = document.getElementById('titleInput').value.trim();
             if (!title) {
                 alert('할일을 입력해주세요!');
@@ -869,8 +869,11 @@
             document.getElementById('deadlineHourInput').value = '';
             document.getElementById('deadlineMinuteInput').value = '';
             
+            // 즉시 화면에 표시
             render();
-            saveToGoogleSheets();
+            
+            // 저장은 백그라운드에서
+            await saveToGoogleSheets();
         }
 
         function toggleTodo(id) {
@@ -1285,8 +1288,9 @@
                 }
             }
             
-            // 입력 중이던 값 복원 (단, 검색창은 제외)
-            if (focusedId && focusedId !== 'searchInput') {
+            // 입력 중이던 값 복원 (단, 검색창과 로그인 입력창은 제외)
+            const excludeIds = ['searchInput', 'loginUsername', 'loginPassword', 'registerUsername', 'registerPassword', 'registerName'];
+            if (focusedId && !excludeIds.includes(focusedId)) {
                 setTimeout(() => {
                     const element = document.getElementById(focusedId);
                     if (element) {
@@ -1562,8 +1566,9 @@
                 </div>
             `;
             
-            // 입력 중이던 값 복원 (단, 검색창은 제외)
-            if (focusedId && focusedId !== 'searchInput') {
+            // 입력 중이던 값 복원 (단, 검색창과 로그인 입력창은 제외)
+            const excludeIds = ['searchInput', 'loginUsername', 'loginPassword', 'registerUsername', 'registerPassword', 'registerName'];
+            if (focusedId && !excludeIds.includes(focusedId)) {
                 setTimeout(() => {
                     const element = document.getElementById(focusedId);
                     if (element) {
