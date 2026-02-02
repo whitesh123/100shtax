@@ -964,6 +964,52 @@
             }
         }
 
+        function editSubtask(todoId, subtaskId) {
+            const textElement = document.getElementById(`subtask-text-${todoId}-${subtaskId}`);
+            const inputElement = document.getElementById(`subtask-edit-${todoId}-${subtaskId}`);
+            
+            if (textElement && inputElement) {
+                textElement.classList.add('hidden');
+                inputElement.classList.remove('hidden');
+                inputElement.focus();
+                inputElement.select();
+            }
+        }
+
+        function saveSubtaskEdit(todoId, subtaskId) {
+            const inputElement = document.getElementById(`subtask-edit-${todoId}-${subtaskId}`);
+            const textElement = document.getElementById(`subtask-text-${todoId}-${subtaskId}`);
+            
+            if (!inputElement || !textElement) return;
+            
+            const newTitle = inputElement.value.trim();
+            if (!newTitle) {
+                // 빈 값이면 취소
+                cancelSubtaskEdit(todoId, subtaskId);
+                return;
+            }
+            
+            const todo = todos.find(t => t.id === todoId);
+            if (todo && todo.subtasks) {
+                const subtask = todo.subtasks.find(st => st.id === subtaskId);
+                if (subtask) {
+                    subtask.title = newTitle;
+                    render();
+                    saveToGoogleSheets();
+                }
+            }
+        }
+
+        function cancelSubtaskEdit(todoId, subtaskId) {
+            const textElement = document.getElementById(`subtask-text-${todoId}-${subtaskId}`);
+            const inputElement = document.getElementById(`subtask-edit-${todoId}-${subtaskId}`);
+            
+            if (textElement && inputElement) {
+                inputElement.classList.add('hidden');
+                textElement.classList.remove('hidden');
+            }
+        }
+
         // 세부작업 토글 함수 (기본값: 닫혀있음)
         function toggleSubtaskList(todoId) {
             const listContent = document.getElementById(`subtask-list-${todoId}`);
@@ -1224,7 +1270,14 @@
                                                             }">
                                                             ${subtask.completed ? '<span class="text-white text-xs">✓</span>' : ''}
                                                         </button>
-                                                        <span class="flex-1 ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-700'}">${subtask.title}</span>
+                                                        <span id="subtask-text-${todo.id}-${subtask.id}" 
+                                                            ondblclick="editSubtask(${todo.id}, ${subtask.id})"
+                                                            class="flex-1 ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-700'} cursor-pointer hover:text-indigo-600">${subtask.title}</span>
+                                                        <input type="text" id="subtask-edit-${todo.id}-${subtask.id}" 
+                                                            class="hidden flex-1 px-2 py-1 border border-indigo-500 rounded text-sm focus:outline-none"
+                                                            value="${subtask.title.replace(/"/g, '&quot;')}"
+                                                            onblur="saveSubtaskEdit(${todo.id}, ${subtask.id})"
+                                                            onkeypress="if(event.key==='Enter') saveSubtaskEdit(${todo.id}, ${subtask.id}); if(event.key==='Escape') cancelSubtaskEdit(${todo.id}, ${subtask.id})">
                                                         <button onclick="deleteSubtask(${todo.id}, ${subtask.id})" 
                                                             class="text-red-500 hover:text-red-700 transition">🗑️</button>
                                                     </div>
@@ -1562,7 +1615,13 @@
                                                     class="w-5 h-5 rounded border-2 flex items-center justify-center ${st.completed ? 'bg-indigo-400 border-indigo-500' : 'border-gray-300'}">
                                                     ${st.completed ? '<span class="text-white text-[10px]">✓</span>' : ''}
                                                 </button>
-                                                <span class="flex-1 text-sm ${st.completed ? 'line-through text-gray-400' : 'text-gray-700'}">${st.title}</span>
+                                                <span id="subtask-text-${st.id}" ${isTeamMode ? `ondblclick="editSubtaskShared(${st.id})"` : ''} 
+                                                    class="flex-1 text-sm ${st.completed ? 'line-through text-gray-400' : 'text-gray-700'} ${isTeamMode ? 'cursor-pointer hover:text-indigo-600' : ''}">${st.title}</span>
+                                                <input type="text" id="subtask-edit-${st.id}" 
+                                                    class="hidden flex-1 px-2 py-1 border border-indigo-500 rounded text-sm focus:outline-none"
+                                                    value="${st.title}"
+                                                    onblur="saveSubtaskEditShared(${st.id})"
+                                                    onkeypress="if(event.key==='Enter') saveSubtaskEditShared(${st.id}); if(event.key==='Escape') cancelSubtaskEditShared(${st.id})">
                                                 ${isTeamMode ? `<button onclick="deleteSubtaskShared(${st.id})" class="text-gray-400 hover:text-red-500">✕</button>` : ''}
                                             </div>
                                         `).join('')}
@@ -1702,6 +1761,55 @@
                 showSyncStatus('error', '❌ 저장 실패');
                 // 에러 시에도 플래그 해제
                 window.isSaving = false;
+            }
+        }
+
+        function editSubtaskShared(subtaskId) {
+            const textElement = document.getElementById(`subtask-text-${subtaskId}`);
+            const inputElement = document.getElementById(`subtask-edit-${subtaskId}`);
+            
+            if (textElement && inputElement) {
+                textElement.classList.add('hidden');
+                inputElement.classList.remove('hidden');
+                inputElement.focus();
+                inputElement.select();
+            }
+        }
+
+        async function saveSubtaskEditShared(subtaskId) {
+            const inputElement = document.getElementById(`subtask-edit-${subtaskId}`);
+            const textElement = document.getElementById(`subtask-text-${subtaskId}`);
+            
+            if (!inputElement || !textElement) return;
+            
+            const newTitle = inputElement.value.trim();
+            if (!newTitle) {
+                // 빈 값이면 취소
+                cancelSubtaskEditShared(subtaskId);
+                return;
+            }
+            
+            // 저장 중 플래그 설정
+            window.isSaving = true;
+            
+            const todo = todos[0];
+            const subtask = todo.subtasks.find(st => st.id === subtaskId);
+            if (subtask) {
+                subtask.title = newTitle;
+                renderSharedView(true);
+                await saveSharedTodo();
+            } else {
+                window.isSaving = false;
+            }
+        }
+
+        function cancelSubtaskEditShared(subtaskId) {
+            const textElement = document.getElementById(`subtask-text-${subtaskId}`);
+            const inputElement = document.getElementById(`subtask-edit-${subtaskId}`);
+            
+            if (textElement && inputElement) {
+                inputElement.classList.add('hidden');
+                textElement.classList.remove('hidden');
             }
         }
 
