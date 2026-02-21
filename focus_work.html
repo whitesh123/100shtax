@@ -18,7 +18,7 @@
     --peach: #fab387;
     --pink: #f38ba8;
     --text: #e8e8f0;
-    --muted: #4a4a6a;
+    --muted: #8888aa;
     --card: #16162a;
   }
 
@@ -79,7 +79,7 @@
   }
 
   .task-label {
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.15em;
     color: var(--muted);
     text-transform: uppercase;
@@ -108,7 +108,7 @@
   .timer-section { text-align: center; padding: 12px 0 8px; }
 
   .timer-label {
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     font-family: 'Space Mono', monospace;
@@ -155,7 +155,7 @@
 
   .next-checkin {
     margin-top: 8px;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--muted);
     font-family: 'Space Mono', monospace;
   }
@@ -221,7 +221,7 @@
   }
 
   .interrupt-label {
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.15em;
     color: var(--muted);
     text-transform: uppercase;
@@ -301,7 +301,7 @@
   }
 
   .log-title {
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.2em;
     color: var(--muted);
     text-transform: uppercase;
@@ -311,7 +311,7 @@
   .log-actions { display: flex; gap: 12px; }
 
   .log-btn {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--muted);
     cursor: pointer;
     background: none;
@@ -348,7 +348,7 @@
   .log-time {
     color: var(--muted);
     font-family: 'Space Mono', monospace;
-    font-size: 10px;
+    font-size: 12px;
     flex-shrink: 0;
     padding-top: 2px;
     min-width: 38px;
@@ -403,7 +403,7 @@
   .popup-icon { font-size: 36px; margin-bottom: 12px; display: block; animation: pulse 1.5s ease infinite; }
   .popup-icon.static { animation: none; }
 
-  .popup-elapsed { font-size: 11px; color: var(--green); font-family: 'Space Mono', monospace; letter-spacing: 0.15em; margin-bottom: 8px; }
+  .popup-elapsed { font-size: 13px; color: var(--green); font-family: 'Space Mono', monospace; letter-spacing: 0.15em; margin-bottom: 8px; }
 
   .popup-question { font-size: 16px; line-height: 1.6; margin-bottom: 16px; color: var(--text); }
   .popup-question strong { color: var(--accent); }
@@ -484,7 +484,7 @@
   .review-item.checked .review-check { background: var(--yellow); border-color: var(--yellow); color: #0d0d14; }
   .review-item-text { font-size: 13px; color: var(--text); line-height: 1.4; }
 
-  .review-progress { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; margin-bottom: 12px; }
+  .review-progress { font-size: 13px; color: var(--muted); font-family: 'Space Mono', monospace; margin-bottom: 12px; }
   .review-progress span { color: var(--yellow); }
 
   @keyframes fadeIn { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
@@ -516,7 +516,7 @@
         <div class="progress-bar" id="progressBar"></div>
       </div>
       <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border); display:flex; justify-content:center; align-items:center; gap:8px;">
-        <span style="font-size:10px; letter-spacing:0.15em; color:var(--muted); font-family:'Space Mono',monospace; text-transform:uppercase;">전체 집중</span>
+        <span style="font-size:12px; letter-spacing:0.15em; color:var(--muted); font-family:'Space Mono',monospace; text-transform:uppercase;">전체 집중</span>
         <span id="totalFocusDisplay" style="font-family:'Space Mono',monospace; font-size:18px; font-weight:700; color:var(--accent);">00:00:00</span>
       </div>
     </div>
@@ -532,7 +532,7 @@
   <div class="interrupt-section" id="interruptSection">
     <div class="interrupt-label">업무 중단</div>
     <div class="interrupt-grid">
-      <button class="btn-interrupt btn-errand" id="btnErrand" onclick="startInterrupt('errand')" disabled>📋<br>잡무처리</button>
+      <button class="btn-interrupt btn-errand" id="btnErrand" onclick="startInterrupt('errand')" disabled>📋<br>돌발업무</button>
       <button class="btn-interrupt btn-meal" id="btnMeal" onclick="startInterrupt('meal')" disabled>🍱<br>식사</button>
       <button class="btn-interrupt btn-meeting" id="btnMeeting" onclick="startInterrupt('meeting')" disabled>🤝<br>미팅</button>
       <button class="btn-interrupt btn-rest" id="btnRest" onclick="startInterrupt('rest')" disabled>☕<br>휴식</button>
@@ -580,10 +580,10 @@
 <div class="overlay" id="errandOverlay">
   <div class="popup errand-popup">
     <span class="popup-icon static">📋</span>
-    <p class="popup-question">어떤 잡무인가요?</p>
-    <input type="text" class="popup-input" id="errandInput" placeholder="예: 거래처 서류 처리, 세금계산서 발행..." maxlength="60" />
+    <p class="popup-question">어떤 돌발업무인가요?</p>
+    <input type="text" class="popup-input" id="errandInput" placeholder="예: 거래처 전화, 세금계산서 발행..." maxlength="60" />
     <div class="popup-buttons">
-      <button class="popup-btn errand-start" onclick="confirmErrand()">📋 잡무 시작</button>
+      <button class="popup-btn errand-start" onclick="confirmErrand()">📋 돌발업무 시작</button>
       <button class="popup-btn neutral" onclick="cancelErrand()">취소</button>
     </div>
   </div>
@@ -680,7 +680,7 @@
     idle:    { label: '대기',     badge: '대기',     timerClass: 'idle',  badgeClass: 'idle' },
     focus:   { label: '집중 중',  badge: '🟢 집중',  timerClass: 'main',  badgeClass: 'focus' },
     paused:  { label: '일시정지', badge: '⏸ 정지',  timerClass: 'idle',  badgeClass: 'paused' },
-    errand:  { label: '잡무 중',  badge: '📋 잡무',  timerClass: 'sub',   badgeClass: 'errand' },
+    errand:  { label: '돌발업무 중',  badge: '📋 돌발업무',  timerClass: 'sub',   badgeClass: 'errand' },
     meal:    { label: '식사 중',  badge: '🍱 식사',  timerClass: 'sub',   badgeClass: 'meal' },
     meeting: { label: '미팅 중',  badge: '🤝 미팅',  timerClass: 'sub',   badgeClass: 'meeting' },
     rest:    { label: '휴식 중',  badge: '☕ 휴식',  timerClass: 'sub',   badgeClass: 'rest' },
@@ -781,7 +781,7 @@
     reviewBtn.disabled = mode === 'idle';
     if (['errand','meal','meeting','rest'].includes(mode)) {
         if (mode === 'errand') {
-        reviewBtn.textContent = '🔍 잡무 검토';
+        reviewBtn.textContent = '🔍 돌발업무 검토';
       } else {
         reviewBtn.textContent = '↩ 복귀';
       }
@@ -882,7 +882,7 @@
     clearInterval(ticker);
     ticker = setInterval(tick, 1000);
 
-    const labels = { errand: `📋 잡무 시작${name ? `: ${name}` : ''}`, meal: '🍱 식사 시작', meeting: '🤝 미팅 시작', rest: '☕ 휴식 시작' };
+    const labels = { errand: `📋 돌발업무 시작${name ? `: ${name}` : ''}`, meal: '🍱 식사 시작', meeting: '🤝 미팅 시작', rest: '☕ 휴식 시작' };
     addLog(type, labels[type]);
     updateUI();
   }
@@ -890,7 +890,7 @@
   function returnToMain() {
     const type = mode;
     const elapsed = Math.floor(subSeconds / 60);
-    const labels = { errand: `📋 잡무 종료${currentErrandName ? ` (${currentErrandName})` : ''} — ${elapsed}분`, meal: `🍱 식사 종료 — ${elapsed}분`, meeting: `🤝 미팅 종료 — ${elapsed}분`, rest: `☕ 휴식 종료 — ${elapsed}분` };
+    const labels = { errand: `📋 돌발업무 종료${currentErrandName ? ` (${currentErrandName})` : ''} — ${elapsed}분`, meal: `🍱 식사 종료 — ${elapsed}분`, meeting: `🤝 미팅 종료 — ${elapsed}분`, rest: `☕ 휴식 종료 — ${elapsed}분` };
     addLog('return', labels[type] || `종료 — ${elapsed}분`);
 
     mode = 'focus';
@@ -976,10 +976,10 @@
     document.getElementById('reviewTotal').textContent = errandItems.length;
     document.getElementById('reviewDone').textContent = 0;
     document.getElementById('finishBtn').disabled = true;
-    // 검토완료 버튼 → 잡무 종료 후 복귀
+    // 검토완료 버튼 → 돌발업무 종료 후 복귀
     document.getElementById('finishBtn').onclick = () => {
       document.getElementById('reviewOverlay').classList.remove('show');
-      addLog('review', '🔍 잡무 검토 완료');
+      addLog('review', '🔍 돌발업무 검토 완료');
       returnToMain();
     };
     // 그냥 종료 → 그냥 복귀
