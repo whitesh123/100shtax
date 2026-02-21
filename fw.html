@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>업무일지</title>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d14;
+    --surface: #13131f;
+    --border: #1e1e32;
+    --accent: #7c6aff;
+    --accent2: #ff6a6a;
+    --green: #4dffb4;
+    --yellow: #f9e2af;
+    --blue: #89b4fa;
+    --peach: #fab387;
+    --pink: #f38ba8;
+    --text: #e8e8f0;
+    --muted: #8888aa;
+    --card: #16162a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Gowun Dodum', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 0 40px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(124,106,255,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 90%, rgba(77,255,180,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 500px;
+    padding: 0 20px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .header h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: 16px;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .header p { color: var(--muted); font-size: 12px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+
+  .task-label {
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .task-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .task-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,106,255,0.12); }
+  .task-input:disabled { opacity: 0.5; cursor: not-allowed; }
+  .task-input::placeholder { color: var(--muted); }
+
+  /* 타이머 영역 */
+  .timer-section { text-align: center; padding: 12px 0 8px; }
+
+  .timer-label {
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 4px;
+    height: 16px;
+  }
+
+  .timer-label.main { color: var(--green); }
+  .timer-label.sub { color: var(--peach); }
+  .timer-label.idle { color: var(--muted); }
+
+  .timer-display {
+    font-family: 'Space Mono', monospace;
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    transition: color 0.3s;
+  }
+
+  .timer-display.main { color: var(--green); }
+  .timer-display.sub { color: var(--peach); }
+  .timer-display.idle { color: var(--muted); }
+
+  /* 상태 배지 */
+  .status-badge {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 4px 14px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    transition: all 0.3s;
+  }
+
+  .status-badge.idle { background: var(--border); color: var(--muted); }
+  .status-badge.focus { background: rgba(77,255,180,0.15); color: var(--green); border: 1px solid rgba(77,255,180,0.3); }
+  .status-badge.paused { background: rgba(137,180,250,0.15); color: var(--blue); border: 1px solid rgba(137,180,250,0.3); }
+  .status-badge.errand { background: rgba(250,179,135,0.15); color: var(--peach); border: 1px solid rgba(250,179,135,0.3); }
+  .status-badge.meal { background: rgba(166,227,161,0.15); color: #a6e3a1; border: 1px solid rgba(166,227,161,0.3); }
+  .status-badge.meeting { background: rgba(124,106,255,0.15); color: var(--accent); border: 1px solid rgba(124,106,255,0.3); }
+  .status-badge.rest { background: rgba(243,139,168,0.15); color: var(--pink); border: 1px solid rgba(243,139,168,0.3); }
+
+  .next-checkin {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .next-checkin span { color: var(--peach); }
+
+  .progress-wrap {
+    margin-top: 12px;
+    height: 3px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--green));
+    border-radius: 99px;
+    width: 0%;
+    transition: width 1s linear;
+  }
+
+  /* 메인 버튼 */
+  .main-btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .btn {
+    padding: 13px;
+    border-radius: 11px;
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    letter-spacing: 0.02em;
+  }
+
+  .btn:disabled { opacity: 0.25; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+  .btn-focus { background: var(--accent); color: #fff; }
+  .btn-focus:not(:disabled):hover { background: #9580ff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,106,255,0.3); }
+
+  .btn-stop { background: transparent; border: 1px solid var(--accent2) !important; color: var(--accent2); }
+  .btn-stop:not(:disabled):hover { background: rgba(255,106,106,0.08); }
+
+  .btn-review { background: transparent; border: 1px solid var(--yellow) !important; color: var(--yellow); }
+  .btn-review:not(:disabled):hover { background: rgba(249,226,175,0.08); }
+
+  .btn-pause { background: transparent; border: 1px solid var(--blue) !important; color: var(--blue); }
+  .btn-pause:not(:disabled):hover { background: rgba(137,180,250,0.08); }
+
+  .btn-resume { background: var(--green); color: #0d0d14; }
+  .btn-resume:not(:disabled):hover { background: #6fffcc; transform: translateY(-1px); }
+
+  /* 인터럽트 버튼들 */
+  .interrupt-section {
+    margin-bottom: 12px;
+  }
+
+  .interrupt-label {
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 8px;
+  }
+
+  .interrupt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .btn-interrupt {
+    padding: 10px 6px;
+    border-radius: 10px;
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .btn-errand { background: rgba(250,179,135,0.15); border: 1px solid rgba(250,179,135,0.35) !important; color: var(--peach); }
+  .btn-errand:not(:disabled):hover { background: rgba(250,179,135,0.25); transform: translateY(-1px); }
+
+  .btn-meal { background: rgba(166,227,161,0.15); border: 1px solid rgba(166,227,161,0.35) !important; color: #a6e3a1; }
+  .btn-meal:not(:disabled):hover { background: rgba(166,227,161,0.25); transform: translateY(-1px); }
+
+  .btn-meeting { background: rgba(124,106,255,0.15); border: 1px solid rgba(124,106,255,0.35) !important; color: var(--accent); }
+  .btn-meeting:not(:disabled):hover { background: rgba(124,106,255,0.25); transform: translateY(-1px); }
+
+  .btn-rest { background: rgba(243,139,168,0.15); border: 1px solid rgba(243,139,168,0.35) !important; color: var(--pink); }
+  .btn-rest:not(:disabled):hover { background: rgba(243,139,168,0.25); transform: translateY(-1px); }
+
+  .btn-interrupt:disabled { opacity: 0.2; cursor: not-allowed; transform: none !important; }
+
+  /* 복귀 버튼 (인터럽트 중) */
+  .return-row {
+    display: none;
+    margin-bottom: 12px;
+  }
+
+  .return-row.show { display: block; }
+
+  .btn-return {
+    width: 100%;
+    padding: 14px;
+    border-radius: 11px;
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    background: var(--green);
+    color: #0d0d14;
+    animation: pulseGlow 2s ease infinite;
+  }
+
+  .btn-return:hover { background: #6fffcc; transform: translateY(-1px); }
+
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(77,255,180,0.3); }
+    50% { box-shadow: 0 0 0 6px rgba(77,255,180,0); }
+  }
+
+  /* 로그 */
+  .log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .log-title {
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .log-actions { display: flex; gap: 12px; }
+
+  .log-btn {
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: 'Gowun Dodum', sans-serif;
+    transition: color 0.2s;
+  }
+
+  .log-btn:hover { color: var(--accent); }
+  .log-btn.danger:hover { color: var(--accent2); }
+
+  .log-list {
+    list-style: none;
+    max-height: 200px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .log-list::-webkit-scrollbar { width: 4px; }
+  .log-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+  .log-item {
+    display: flex;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .log-item:last-child { border-bottom: none; }
+
+  .log-time {
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    flex-shrink: 0;
+    padding-top: 2px;
+    min-width: 38px;
+  }
+
+  .log-text { color: var(--text); line-height: 1.5; }
+  .log-text.focus { color: var(--green); }
+  .log-text.distract { color: var(--accent2); }
+  .log-text.system { color: var(--accent); }
+  .log-text.review { color: var(--yellow); }
+  .log-text.errand { color: var(--peach); }
+  .log-text.meal { color: #a6e3a1; }
+  .log-text.meeting { color: var(--accent); }
+  .log-text.rest { color: var(--pink); }
+  .log-text.return { color: var(--green); }
+
+  .log-empty { color: var(--muted); font-size: 12px; text-align: center; padding: 16px 0; }
+
+  /* 오버레이 */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+
+  .overlay.show { opacity: 1; pointer-events: all; }
+
+  .popup {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    transform: translateY(20px);
+    transition: transform 0.25s;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+  }
+
+  .overlay.show .popup { transform: translateY(0); }
+
+  .popup-icon { font-size: 36px; margin-bottom: 12px; display: block; animation: pulse 1.5s ease infinite; }
+  .popup-icon.static { animation: none; }
+
+  .popup-elapsed { font-size: 13px; color: var(--green); font-family: 'Space Mono', monospace; letter-spacing: 0.15em; margin-bottom: 8px; }
+
+  .popup-question { font-size: 16px; line-height: 1.6; margin-bottom: 16px; color: var(--text); }
+  .popup-question strong { color: var(--accent); }
+
+  .popup-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 13px;
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    margin-bottom: 13px;
+    transition: border-color 0.2s;
+  }
+
+  .popup-input:focus { border-color: var(--accent); }
+  .popup-input::placeholder { color: var(--muted); }
+
+  .popup-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .popup-buttons.single { grid-template-columns: 1fr; }
+
+  .popup-btn {
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 700;
+  }
+
+  .popup-btn.yes { background: var(--green); color: #0d0d14; }
+  .popup-btn.yes:hover { background: #6fffcc; transform: translateY(-1px); }
+  .popup-btn.no { background: transparent; border: 1px solid var(--accent2) !important; color: var(--accent2); }
+  .popup-btn.no:hover { background: rgba(255,106,106,0.1); }
+  .popup-btn.neutral { background: transparent; border: 1px solid var(--muted) !important; color: var(--muted); }
+  .popup-btn.neutral:hover { border-color: var(--text) !important; color: var(--text); }
+  .popup-btn.finish { background: var(--yellow); color: #0d0d14; }
+  .popup-btn.finish:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+  .popup-btn.finish:not(:disabled):hover { background: #fdeeba; transform: translateY(-1px); }
+  .popup-btn.errand-start { background: var(--peach); color: #0d0d14; }
+  .popup-btn.errand-start:hover { background: #ffc99e; transform: translateY(-1px); }
+
+  /* 잡무 입력 팝업 */
+  .errand-popup .popup-icon { animation: none; }
+
+  /* 검토 체크리스트 */
+  .review-checklist { text-align: left; margin-bottom: 16px; }
+
+  .review-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  .review-item:last-child { border-bottom: none; }
+
+  .review-check {
+    width: 19px;
+    height: 19px;
+    border: 2px solid var(--muted);
+    border-radius: 5px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 11px;
+  }
+
+  .review-item.checked .review-check { background: var(--yellow); border-color: var(--yellow); color: #0d0d14; }
+  .review-item-text { font-size: 13px; color: var(--text); line-height: 1.4; }
+
+  .review-progress { font-size: 13px; color: var(--muted); font-family: 'Space Mono', monospace; margin-bottom: 12px; }
+  .review-progress span { color: var(--yellow); }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>📋 업무일지</h1>
+    <p>15분마다 하루업무를 체크해드려요</p>
+  </div>
+
+  <!-- 집중 작업 입력 -->
+  <div class="card">
+    <div class="task-label">집중할 업무</div>
+    <input type="text" class="task-input" id="taskInput" placeholder="오늘 집중할 업무를 입력하세요" maxlength="50" />
+  </div>
+
+  <!-- 타이머 -->
+  <div class="card">
+    <div class="timer-section">
+      <div class="timer-label idle" id="timerLabel">대기 중</div>
+      <div class="timer-display idle" id="timerDisplay">00:00:00</div>
+      <div class="status-badge idle" id="statusBadge">대기</div>
+      <div class="next-checkin" id="nextCheckin" style="visibility:hidden;">다음 체크인까지 <span>--:--</span></div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border); display:flex; justify-content:center; align-items:center; gap:8px;">
+        <span style="font-size:12px; letter-spacing:0.15em; color:var(--muted); font-family:'Space Mono',monospace; text-transform:uppercase;">전체 집중</span>
+        <span id="totalFocusDisplay" style="font-family:'Space Mono',monospace; font-size:18px; font-weight:700; color:var(--accent);">00:00:00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 메인 버튼 행 -->
+  <div class="main-btn-row">
+    <button class="btn btn-focus" id="startBtn" onclick="handleMainBtn()">▶ 집중 시작</button>
+    <button class="btn btn-review" id="reviewBtn" onclick="handleReviewBtn()" disabled>🔍 검토하기</button>
+  </div>
+
+  <!-- 중단 버튼 행 (집중 중일 때) -->
+  <div class="interrupt-section" id="interruptSection">
+    <div class="interrupt-label">업무 중단</div>
+    <div class="interrupt-grid">
+      <button class="btn-interrupt btn-errand" id="btnErrand" onclick="startInterrupt('errand')" disabled>📋<br>돌발업무</button>
+      <button class="btn-interrupt btn-meal" id="btnMeal" onclick="startInterrupt('meal')" disabled>🍱<br>식사</button>
+      <button class="btn-interrupt btn-meeting" id="btnMeeting" onclick="startInterrupt('meeting')" disabled>🤝<br>미팅</button>
+      <button class="btn-interrupt btn-rest" id="btnRest" onclick="startInterrupt('rest')" disabled>☕<br>휴식</button>
+    </div>
+  </div>
+
+  <!-- 복귀 버튼 (인터럽트 중일 때) -->
+  <div class="return-row" id="returnRow">
+    <button class="btn-return" onclick="returnToMain()">↩ 집중 업무로 복귀</button>
+  </div>
+
+  <!-- 로그 -->
+  <div class="card">
+    <div class="log-header">
+      <div class="log-title">📋 업무 기록</div>
+      <div class="log-actions">
+        <button class="log-btn" onclick="sendEmail()">📧 메일 발송</button>
+        <button class="log-btn danger" onclick="clearLog()">초기화</button>
+      </div>
+    </div>
+    <ul class="log-list" id="logList">
+      <li class="log-empty">업무 기록이 여기에 쌓입니다</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- 체크인 팝업 -->
+<div class="overlay" id="checkinOverlay">
+  <div class="popup">
+    <span class="popup-icon">⏰</span>
+    <div class="popup-elapsed" id="popupElapsed">15분 경과</div>
+    <p class="popup-question">
+      지금 <strong id="popupTask"></strong><br>하고 있어요?
+    </p>
+    <input type="text" class="popup-input" id="popupInput" placeholder="지금 하고 있는 일을 적어줘요 (선택)" maxlength="60" />
+    <div class="popup-buttons">
+      <button class="popup-btn yes" onclick="submitCheckin(true)">✅ 집중 중!</button>
+      <button class="popup-btn no" onclick="submitCheckin(false)">😅 딴짓했어요</button>
+    </div>
+  </div>
+</div>
+
+<!-- 잡무 입력 팝업 -->
+<div class="overlay" id="errandOverlay">
+  <div class="popup errand-popup">
+    <span class="popup-icon static">📋</span>
+    <p class="popup-question">어떤 돌발업무인가요?</p>
+    <input type="text" class="popup-input" id="errandInput" placeholder="예: 거래처 전화, 세금계산서 발행..." maxlength="60" />
+    <div class="popup-buttons">
+      <button class="popup-btn errand-start" onclick="confirmErrand()">📋 돌발업무 시작</button>
+      <button class="popup-btn neutral" onclick="cancelErrand()">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- 검토 팝업 -->
+<div class="overlay" id="reviewOverlay">
+  <div class="popup">
+    <span class="popup-icon static">🔍</span>
+    <p class="popup-question" style="margin-bottom:8px;">끝내기 전에 검토해요!</p>
+    <div class="review-progress">완료 <span id="reviewDone">0</span> / <span id="reviewTotal">0</span></div>
+    <div class="review-checklist" id="reviewChecklist"></div>
+    <div class="popup-buttons">
+      <button class="popup-btn finish" id="finishBtn" onclick="finishSession()" disabled>✅ 검토 완료 · 종료</button>
+      <button class="popup-btn neutral" onclick="skipReview()">그냥 종료</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── 상태 ───────────────────────────────────────
+  // mode: 'idle' | 'focus' | 'paused' | 'errand' | 'meal' | 'meeting' | 'rest'
+  let mode = 'idle';
+  let mainSeconds = 0;       // 집중 누적 시간
+  let subSeconds = 0;        // 현재 중단 경과 시간
+  let errandSeconds = 0;     // 잡무 누적 시간
+  let totalFocusSeconds = 0; // 전체 집중(메인+잡무) 누적
+
+  const TOTAL_KEY = 'total_focus_seconds';
+  const TOTAL_DATE_KEY = 'total_focus_date';
+
+  function loadTotalFocus() {
+    try {
+      // 새벽 3시 리셋 체크
+      const savedDate = localStorage.getItem(TOTAL_DATE_KEY);
+      const now = new Date();
+      // 오늘 새벽 3시
+      const resetTime = new Date(now);
+      resetTime.setHours(3, 0, 0, 0);
+      // 어제 새벽 3시
+      const lastReset = new Date(resetTime);
+      lastReset.setDate(lastReset.getDate() - 1);
+
+      const saved = parseInt(localStorage.getItem(TOTAL_KEY) || '0');
+      const savedDateObj = savedDate ? new Date(savedDate) : null;
+
+      // 마지막 저장이 오늘 새벽 3시 이전이면 리셋
+      if (!savedDateObj || savedDateObj < resetTime && now >= resetTime) {
+        totalFocusSeconds = 0;
+        saveTotalFocus();
+      } else {
+        totalFocusSeconds = saved;
+      }
+      document.getElementById('totalFocusDisplay').textContent = fmt(totalFocusSeconds);
+    } catch(e) {}
+  }
+
+  function saveTotalFocus() {
+    localStorage.setItem(TOTAL_KEY, totalFocusSeconds);
+    localStorage.setItem(TOTAL_DATE_KEY, new Date().toISOString());
+  }
+
+  // 새벽 3시 자동 리셋 체크 (1분마다)
+  setInterval(() => {
+    const now = new Date();
+    if (now.getHours() === 3 && now.getMinutes() === 0) {
+      // 전체 집중시간 리셋
+      totalFocusSeconds = 0;
+      errandSeconds = 0;
+      window._prevTotalFocus = 0;
+      saveTotalFocus();
+      document.getElementById('totalFocusDisplay').textContent = fmt(0);
+      // 업무 기록 리셋
+      document.getElementById('logList').innerHTML = '<li class="log-empty">업무 기록이 여기에 쌓입니다</li>';
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, 60000);
+  let nextCheckin = 15 * 60;
+  const INTERVAL = 15 * 60;
+  let ticker = null;
+  let currentErrandName = '';
+
+  const EMAIL_TO = '';
+  const STORAGE_KEY = 'baek_work_log';
+
+  const REVIEW_ITEMS = [
+    '오류나 빠진 항목은 없나요?',
+    '숫자/금액이 정확한가요?',
+    '저장 또는 제출을 했나요?',
+    '다음에 이어서 할 일을 메모해뒀나요?'
+  ];
+
+  const MODE_INFO = {
+    idle:    { label: '대기',     badge: '대기',     timerClass: 'idle',  badgeClass: 'idle' },
+    focus:   { label: '집중 중',  badge: '🟢 집중',  timerClass: 'main',  badgeClass: 'focus' },
+    paused:  { label: '일시정지', badge: '⏸ 정지',  timerClass: 'idle',  badgeClass: 'paused' },
+    errand:  { label: '돌발업무 중',  badge: '📋 돌발업무',  timerClass: 'sub',   badgeClass: 'errand' },
+    meal:    { label: '식사 중',  badge: '🍱 식사',  timerClass: 'sub',   badgeClass: 'meal' },
+    meeting: { label: '미팅 중',  badge: '🤝 미팅',  timerClass: 'sub',   badgeClass: 'meeting' },
+    rest:    { label: '휴식 중',  badge: '☕ 휴식',  timerClass: 'sub',   badgeClass: 'rest' },
+  };
+
+  // ── 저장 ───────────────────────────────────────
+  function saveToStorage() {
+    const entries = [];
+    document.querySelectorAll('#logList .log-item').forEach(li => {
+      entries.push({
+        time: li.querySelector('.log-time').textContent,
+        type: li.querySelector('.log-text').className.replace('log-text ', ''),
+        text: li.querySelector('.log-text').textContent
+      });
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ entries, savedAt: new Date().toISOString() }));
+  }
+
+  function loadFromStorage() {
+    try {
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (!data || !data.entries || !data.entries.length) return;
+
+      // 새벽 3시 리셋 체크
+      const now = new Date();
+      const resetTime = new Date(now);
+      resetTime.setHours(3, 0, 0, 0);
+      const savedDate = data.savedAt ? new Date(data.savedAt) : null;
+      if (savedDate && now >= resetTime && savedDate < resetTime) {
+        localStorage.removeItem(STORAGE_KEY);
+        return;
+      }
+
+      const list = document.getElementById('logList');
+      list.innerHTML = '';
+      data.entries.forEach(e => {
+        const li = document.createElement('li');
+        li.className = 'log-item';
+        li.innerHTML = `<span class="log-time">${e.time}</span><span class="log-text ${e.type}">${e.text}</span>`;
+        list.appendChild(li);
+      });
+    } catch(e) {}
+  }
+
+  window.addEventListener('load', () => { loadFromStorage(); loadTotalFocus(); });
+
+  // ── 유틸 ───────────────────────────────────────
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function fmt(s) { return `${pad(Math.floor(s/3600))}:${pad(Math.floor((s%3600)/60))}:${pad(s%60)}`; }
+  function nowStr() { const d = new Date(); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+  function todayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`;
+  }
+
+  // ── UI 업데이트 ────────────────────────────────
+  function updateUI() {
+    const info = MODE_INFO[mode];
+    const td = document.getElementById('timerDisplay');
+    const tl = document.getElementById('timerLabel');
+    const sb = document.getElementById('statusBadge');
+
+    // 타이머 표시: 중단 중이면 sub, 아니면 main
+    const isInterrupt = ['errand','meal','meeting','rest'].includes(mode);
+    td.textContent = fmt(isInterrupt ? subSeconds : mainSeconds);
+    td.className = `timer-display ${info.timerClass}`;
+    tl.textContent = isInterrupt ? `${info.badge} 경과` : (mode === 'focus' ? '집중 시간' : info.label);
+    tl.className = `timer-label ${info.timerClass}`;
+    sb.textContent = info.badge;
+    sb.className = `status-badge ${info.badgeClass}`;
+
+    // 체크인 표시
+    const nci = document.getElementById('nextCheckin');
+    nci.style.visibility = mode === 'focus' ? 'visible' : 'hidden';
+
+    // 메인 버튼
+    const startBtn = document.getElementById('startBtn');
+    if (mode === 'idle') {
+      startBtn.textContent = '▶ 집중 시작';
+      startBtn.className = 'btn btn-focus';
+      startBtn.disabled = false;
+    } else if (mode === 'focus') {
+      startBtn.textContent = '⏸ 일시정지';
+      startBtn.className = 'btn btn-pause';
+      startBtn.disabled = false;
+    } else if (mode === 'paused') {
+      startBtn.textContent = '▶ 재개하기';
+      startBtn.className = 'btn btn-resume';
+      startBtn.disabled = false;
+    } else {
+      startBtn.textContent = '⏸ 일시정지';
+      startBtn.className = 'btn btn-pause';
+      startBtn.disabled = true;
+    }
+
+    // 검토/종료 버튼
+    const reviewBtn = document.getElementById('reviewBtn');
+    reviewBtn.disabled = mode === 'idle';
+    if (['errand','meal','meeting','rest'].includes(mode)) {
+        if (mode === 'errand') {
+        reviewBtn.textContent = '🔍 돌발업무 검토';
+      } else {
+        reviewBtn.textContent = '↩ 복귀';
+      }
+    } else {
+      reviewBtn.textContent = '🔍 검토하기';
+    }
+
+    // 인터럽트 버튼들
+    const interruptActive = mode === 'focus';
+    ['btnErrand','btnMeal','btnMeeting','btnRest'].forEach(id => {
+      document.getElementById(id).disabled = !interruptActive;
+    });
+
+    // 복귀 버튼
+    const returnRow = document.getElementById('returnRow');
+    if (isInterrupt) {
+      returnRow.classList.add('show');
+    } else {
+      returnRow.classList.remove('show');
+    }
+
+    // 입력창
+    document.getElementById('taskInput').disabled = mode !== 'idle';
+  }
+
+  // ── 메인 버튼 핸들러 ───────────────────────────
+  function handleMainBtn() {
+    if (mode === 'idle') {
+      const task = document.getElementById('taskInput').value.trim();
+      if (!task) {
+        document.getElementById('taskInput').focus();
+        document.getElementById('taskInput').style.borderColor = 'var(--accent2)';
+        setTimeout(() => document.getElementById('taskInput').style.borderColor = '', 1500);
+        return;
+      }
+      startFocus(task);
+    } else if (mode === 'focus') {
+      pauseFocus();
+    } else if (mode === 'paused') {
+      resumeFocus();
+    }
+  }
+
+  // ── 집중 시작 ──────────────────────────────────
+  function startFocus(task) {
+    mode = 'focus';
+    mainSeconds = 0;
+    errandSeconds = 0;
+    // 이전 세션 누적값 보존
+    window._prevTotalFocus = totalFocusSeconds;
+    nextCheckin = INTERVAL;
+    clearInterval(ticker);
+    ticker = setInterval(tick, 1000);
+    addLog('system', `▶ 집중 시작: ${task}`);
+    updateUI();
+  }
+
+  function pauseFocus() {
+    mode = 'paused';
+    clearInterval(ticker);
+    addLog('system', `⏸ 일시정지 (집중 ${Math.floor(mainSeconds/60)}분)`);
+    updateUI();
+  }
+
+  function resumeFocus() {
+    mode = 'focus';
+    clearInterval(ticker);
+    ticker = setInterval(tick, 1000);
+    addLog('system', `▶ 재개`);
+    updateUI();
+  }
+
+  // ── 인터럽트 ───────────────────────────────────
+  function startInterrupt(type) {
+    if (type === 'errand') {
+      document.getElementById('errandInput').value = '';
+      document.getElementById('errandOverlay').classList.add('show');
+      setTimeout(() => document.getElementById('errandInput').focus(), 300);
+      return;
+    }
+    applyInterrupt(type, '');
+  }
+
+  function confirmErrand() {
+    const name = document.getElementById('errandInput').value.trim();
+    document.getElementById('errandOverlay').classList.remove('show');
+    applyInterrupt('errand', name);
+  }
+
+  function cancelErrand() {
+    document.getElementById('errandOverlay').classList.remove('show');
+  }
+
+  function applyInterrupt(type, name) {
+    mode = type;
+    subSeconds = 0;
+    currentErrandName = name;
+    clearInterval(ticker);
+    ticker = setInterval(tick, 1000);
+
+    const labels = { errand: `📋 돌발업무 시작${name ? `: ${name}` : ''}`, meal: '🍱 식사 시작', meeting: '🤝 미팅 시작', rest: '☕ 휴식 시작' };
+    addLog(type, labels[type]);
+    updateUI();
+  }
+
+  function returnToMain() {
+    const type = mode;
+    const elapsed = Math.floor(subSeconds / 60);
+    const labels = { errand: `📋 돌발업무 종료${currentErrandName ? ` (${currentErrandName})` : ''} — ${elapsed}분`, meal: `🍱 식사 종료 — ${elapsed}분`, meeting: `🤝 미팅 종료 — ${elapsed}분`, rest: `☕ 휴식 종료 — ${elapsed}분` };
+    addLog('return', labels[type] || `종료 — ${elapsed}분`);
+
+    mode = 'focus';
+    subSeconds = 0;
+    currentErrandName = '';
+    clearInterval(ticker);
+    ticker = setInterval(tick, 1000);
+    addLog('system', '▶ 집중 업무 재개');
+    updateUI();
+  }
+
+  // ── 타이머 틱 ──────────────────────────────────
+  function tick() {
+    if (mode === 'focus') {
+      mainSeconds++;
+      const remaining = nextCheckin - mainSeconds;
+      const rm = Math.floor(remaining / 60);
+      const rs = remaining % 60;
+      document.getElementById('nextCheckin').innerHTML = `다음 체크인까지 <span>${pad(rm)}:${pad(rs)}</span>`;
+      document.getElementById('progressBar').style.width = `${Math.max(0, ((INTERVAL-(remaining))/INTERVAL)*100)}%`;
+      if (mainSeconds >= nextCheckin) { nextCheckin += INTERVAL; showCheckin(); }
+    } else if (['errand','meal','meeting','rest'].includes(mode)) {
+      subSeconds++;
+      if (mode === 'errand') errandSeconds++;
+    }
+
+    const isInterrupt = ['errand','meal','meeting','rest'].includes(mode);
+    document.getElementById('timerDisplay').textContent = fmt(isInterrupt ? subSeconds : mainSeconds);
+    totalFocusSeconds = (window._prevTotalFocus || 0) + mainSeconds + errandSeconds;
+    document.getElementById('totalFocusDisplay').textContent = fmt(totalFocusSeconds);
+    if ((mainSeconds + errandSeconds) % 30 === 0) saveTotalFocus(); // 30초마다 저장
+  }
+
+  // ── 체크인 팝업 ────────────────────────────────
+  function showCheckin() {
+    const task = document.getElementById('taskInput').value;
+    document.getElementById('popupTask').textContent = `「${task}」`;
+    document.getElementById('popupElapsed').textContent = `${Math.floor(mainSeconds/60)}분 경과`;
+    document.getElementById('popupInput').value = '';
+    document.getElementById('checkinOverlay').classList.add('show');
+    setTimeout(() => document.getElementById('popupInput').focus(), 300);
+  }
+
+  function submitCheckin(focused) {
+    const note = document.getElementById('popupInput').value.trim();
+    document.getElementById('checkinOverlay').classList.remove('show');
+    if (focused) addLog('focus', `✅ 집중 중${note ? ` — ${note}` : ''}`);
+    else addLog('distract', `😅 딴짓${note ? ` — ${note}` : ''}`);
+  }
+
+  // ── 검토 버튼 핸들러 ─────────────────────────────
+  function handleReviewBtn() {
+    if (mode === 'errand') {
+      showErrandReview();
+    } else if (['meal','meeting','rest'].includes(mode)) {
+      returnToMain();
+    } else {
+      showReview();
+    }
+  }
+
+  // 잡무/중단 검토 팝업 (메인 업무는 유지)
+  function showErrandReview() {
+    const cl = document.getElementById('reviewChecklist');
+    cl.innerHTML = '';
+    const errandItems = [
+      '요청한 내용을 정확히 처리했나요?',
+      '관련 서류나 메모를 남겼나요?',
+      '추가 후속 조치가 필요한 건 없나요?',
+    ];
+    errandItems.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `<div class="review-check">✓</div><div class="review-item-text">${item}</div>`;
+      div.addEventListener('click', () => {
+        div.classList.toggle('checked');
+        const done = document.querySelectorAll('.review-item.checked').length;
+        document.getElementById('reviewDone').textContent = done;
+        document.getElementById('finishBtn').disabled = done < errandItems.length;
+      });
+      cl.appendChild(div);
+    });
+    document.getElementById('reviewTotal').textContent = errandItems.length;
+    document.getElementById('reviewDone').textContent = 0;
+    document.getElementById('finishBtn').disabled = true;
+    // 검토완료 버튼 → 돌발업무 종료 후 복귀
+    document.getElementById('finishBtn').onclick = () => {
+      document.getElementById('reviewOverlay').classList.remove('show');
+      addLog('review', '🔍 돌발업무 검토 완료');
+      returnToMain();
+    };
+    // 그냥 종료 → 그냥 복귀
+    document.querySelector('#reviewOverlay .popup-btn.neutral').onclick = () => {
+      document.getElementById('reviewOverlay').classList.remove('show');
+      returnToMain();
+    };
+    document.getElementById('reviewOverlay').classList.add('show');
+  }
+
+  // ── 검토 팝업 ──────────────────────────────────
+  function showReview() {
+    const cl = document.getElementById('reviewChecklist');
+    cl.innerHTML = '';
+    REVIEW_ITEMS.forEach((item, i) => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `<div class="review-check">✓</div><div class="review-item-text">${item}</div>`;
+      div.addEventListener('click', () => {
+        div.classList.toggle('checked');
+        const done = document.querySelectorAll('.review-item.checked').length;
+        document.getElementById('reviewDone').textContent = done;
+        document.getElementById('finishBtn').disabled = done < REVIEW_ITEMS.length;
+      });
+      cl.appendChild(div);
+    });
+    document.getElementById('reviewTotal').textContent = REVIEW_ITEMS.length;
+    document.getElementById('reviewDone').textContent = 0;
+    document.getElementById('finishBtn').disabled = true;
+    document.getElementById('finishBtn').onclick = finishSession;
+    document.querySelector('#reviewOverlay .popup-btn.neutral').onclick = skipReview;
+    document.getElementById('reviewOverlay').classList.add('show');
+  }
+
+  function finishSession() {
+    document.getElementById('reviewOverlay').classList.remove('show');
+    addLog('review', '🔍 검토 완료 후 종료');
+    doStop(true);
+  }
+
+  function skipReview() {
+    document.getElementById('reviewOverlay').classList.remove('show');
+    doStop(false);
+  }
+
+  function doStop(reviewed) {
+    clearInterval(ticker);
+    addLog('system', `⏹ 업무 종료 ${reviewed ? '(검토완료)' : '(검토생략)'} — 집중 총 ${Math.floor(mainSeconds/60)}분`);
+    mode = 'idle';
+    mainSeconds = 0;
+    subSeconds = 0;
+    errandSeconds = 0;
+    window._prevTotalFocus = totalFocusSeconds;
+    saveTotalFocus();
+    document.getElementById('progressBar').style.width = '0%';
+    document.getElementById('nextCheckin').style.visibility = 'hidden';
+    updateUI();
+  }
+
+  // ── 로그 ───────────────────────────────────────
+  function addLog(type, text) {
+    const list = document.getElementById('logList');
+    const empty = list.querySelector('.log-empty');
+    if (empty) empty.remove();
+    const li = document.createElement('li');
+    li.className = 'log-item';
+    li.innerHTML = `<span class="log-time">${nowStr()}</span><span class="log-text ${type}">${text}</span>`;
+    list.insertBefore(li, list.firstChild);
+    saveToStorage();
+  }
+
+  function clearLog() {
+    if (!confirm('업무 기록을 모두 삭제할까요?')) return;
+    document.getElementById('logList').innerHTML = '<li class="log-empty">업무 기록이 여기에 쌓입니다</li>';
+    localStorage.removeItem(STORAGE_KEY);
+  }
+
+  // ── 메일 발송 ──────────────────────────────────
+  function sendEmail() {
+    const items = document.querySelectorAll('#logList .log-item');
+    if (!items.length) { alert('보낼 기록이 없어요!'); return; }
+
+    const task = document.getElementById('taskInput').value || '(업무명 없음)';
+    const today = todayStr();
+
+    let body = `[하루업무체크] ${today}\n`;
+    body += `주요 업무: ${task}\n`;
+    body += `━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+    const rows = [];
+    items.forEach(li => {
+      const t = li.querySelector('.log-time').textContent;
+      const txt = li.querySelector('.log-text').textContent;
+      rows.push(`${t}  ${txt}`);
+    });
+    body += rows.join('\n');
+
+
+    const subject = encodeURIComponent(`[업무일지] ${today}`);
+    body += `\n\n━━━━━━━━━━━━━━━━━━━━━━━\n전체 집중시간: ${fmt(totalFocusSeconds)}`;
+    window.location.href = `mailto:?subject=${subject}&body=${encodeURIComponent(body)}`;
+  }
+
+  // ── 키보드 ─────────────────────────────────────
+  document.getElementById('taskInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleMainBtn();
+  });
+
+  document.getElementById('popupInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitCheckin(true);
+  });
+
+  document.getElementById('errandInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') confirmErrand();
+  });
+
+  updateUI();
+</script>
+</body>
+</html>
