@@ -669,7 +669,8 @@
   let ticker = null;
   let currentErrandName = '';
 
-  const EMAIL_TO = '';
+  const EMAIL_TO = '100shtax@gmail.com';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxInoRviHvlZ4nNBCHDUsYQ4CNpP8wcIERLIwhc12y96ZsVplYZIY5Lj6b12tLLRlqs/exec';
   const STORAGE_KEY = 'baek_work_log';
 
   const REVIEW_ITEMS = [
@@ -729,6 +730,7 @@
   }
 
   window.addEventListener('load', () => {
+    updateUI();          // 버튼 상태 초기화
     loadFromStorage();   // 우선 로컬 표시
     loadLogsFromSheet(); // 구글 시트로 덮어씌우기
     loadTotalFocusFromSheet(); // 집중시간도 시트에서
@@ -785,14 +787,18 @@
 
     // 검토/종료 버튼
     const reviewBtn = document.getElementById('reviewBtn');
-    reviewBtn.disabled = mode === 'idle';
-    if (['errand','meal','meeting','rest'].includes(mode)) {
-        if (mode === 'errand') {
-        reviewBtn.textContent = '🔍 돌발업무 검토';
-      } else {
-        reviewBtn.textContent = '↩ 복귀';
-      }
+    if (mode === 'idle') {
+      reviewBtn.disabled = true;
+      reviewBtn.textContent = '🔍 검토하기';
+    } else if (mode === 'errand') {
+      reviewBtn.disabled = false;
+      reviewBtn.textContent = '🔍 돌발업무 검토';
+    } else if (['meal','meeting','rest'].includes(mode)) {
+      reviewBtn.disabled = false;
+      reviewBtn.textContent = '↩ 복귀';
     } else {
+      // focus, paused
+      reviewBtn.disabled = false;
       reviewBtn.textContent = '🔍 검토하기';
     }
 
@@ -1076,12 +1082,16 @@
     fetch(SCRIPT_URL, {
       method: 'POST',
       body: JSON.stringify(data),
-      headers: { 'Content-Type': 'text/plain' }
-    }).catch(e => console.log('시트 저장 오류:', e));
+      headers: { 'Content-Type': 'text/plain' },
+      redirect: 'follow'
+    })
+    .then(r => r.json())
+    .then(res => { if (!res.success) console.log('시트 오류:', res.message); })
+    .catch(e => console.log('시트 저장 오류:', e.message));
   }
 
   function loadLogsFromSheet() {
-    fetch(`${SCRIPT_URL}?action=getLogs`)
+    fetch(`${SCRIPT_URL}?action=getLogs`, { redirect: 'follow' })
       .then(r => r.json())
       .then(data => {
         if (!data.success || !data.logs.length) return;
@@ -1101,7 +1111,7 @@
   }
 
   function loadTotalFocusFromSheet() {
-    fetch(`${SCRIPT_URL}?action=getTotalFocus`)
+    fetch(`${SCRIPT_URL}?action=getTotalFocus`, { redirect: 'follow' })
       .then(r => r.json())
       .then(data => {
         if (!data.success) return;
@@ -1174,7 +1184,7 @@
 
     const subject = encodeURIComponent(`[업무일지] ${today}`);
     body += `\n\n━━━━━━━━━━━━━━━━━━━━━━━\n전체 집중시간: ${fmt(totalFocusSeconds)}`;
-    window.location.href = `mailto:?subject=${subject}&body=${encodeURIComponent(body)}`;
+    window.location.href = `mailto:${EMAIL_TO}?cc=${encodeURIComponent('rednnn@hanmail.net')}&subject=${subject}&body=${encodeURIComponent(body)}`;
   }
 
   // ── 키보드 ─────────────────────────────────────
@@ -1190,7 +1200,6 @@
     if (e.key === 'Enter') confirmErrand();
   });
 
-  updateUI();
 </script>
 </body>
 </html>
