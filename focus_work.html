@@ -489,14 +489,128 @@
 
   @keyframes fadeIn { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+  /* 로그인 화면 */
+  #loginScreen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .login-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 28px;
+    width: 100%;
+    max-width: 360px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+  }
+
+  .login-title {
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .login-sub {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  .login-field {
+    margin-bottom: 14px;
+  }
+
+  .login-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .login-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .login-input:focus { border-color: var(--accent); }
+
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 11px;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .login-btn:hover { background: #9580ff; transform: translateY(-1px); }
+  .login-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .login-error {
+    text-align: center;
+    font-size: 13px;
+    color: var(--accent2);
+    margin-top: 12px;
+    min-height: 20px;
+  }
 </style>
 </head>
 <body>
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-title">📋 업무일지</div>
+    <div class="login-sub">로그인 후 이용할 수 있어요</div>
+    <div class="login-field">
+      <label class="login-label">아이디</label>
+      <input type="text" class="login-input" id="loginId" placeholder="아이디 입력" autocomplete="username" />
+    </div>
+    <div class="login-field">
+      <label class="login-label">비밀번호</label>
+      <input type="password" class="login-input" id="loginPw" placeholder="비밀번호 입력" autocomplete="current-password" />
+    </div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">로그인</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
 <div class="container">
 
   <div class="header">
     <h1>📋 업무일지</h1>
     <p>15분마다 하루업무를 체크해드려요</p>
+    <p id="loginInfo" style="margin-top:6px; font-size:11px; color:var(--muted);">
+      <span id="loggedInName"></span>
+      <button onclick="doLogout()" style="margin-left:10px; background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer; font-family:'Gowun Dodum',sans-serif; text-decoration:underline;">로그아웃</button>
+    </p>
   </div>
 
   <!-- 집중 작업 입력 -->
@@ -608,6 +722,7 @@
   // mode: 'idle' | 'focus' | 'paused' | 'errand' | 'meal' | 'meeting' | 'rest'
   let mode = 'idle';
   let isRunning = false; // 절전 보정용
+  let authUser = { username: '', password: '', name: '' }; // 로그인 정보
   let mainSeconds = 0;       // 집중 누적 시간
   let subSeconds = 0;        // 현재 중단 경과 시간
   let errandSeconds = 0;     // 잡무 누적 시간
@@ -729,9 +844,18 @@
   }
 
   window.addEventListener('load', () => {
-    updateUI();              // 버튼 상태 초기화
-    loadLogsFromSheet();     // 구글 시트에서 불러오기
-    loadTotalFocusFromSheet(); // 집중시간도 시트에서
+    updateUI(); // 버튼 상태 초기화
+    // 저장된 로그인 정보 복원 시도
+    try {
+      const saved = JSON.parse(localStorage.getItem('auth_user'));
+      if (saved && saved.expires > Date.now()) {
+        authUser = { username: saved.username, password: saved.password, name: saved.name };
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('loggedInName').textContent = res.name + '님';
+        loadLogsFromSheet();
+        loadTotalFocusFromSheet();
+      }
+    } catch(e) {}
   });
 
   // ── 유틸 ───────────────────────────────────────
@@ -741,6 +865,73 @@
   function todayStr() {
     const d = new Date();
     return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`;
+  }
+
+  // ── 로그인 ────────────────────────────────────────
+  function doLogin() {
+    const username = document.getElementById('loginId').value.trim();
+    const password = document.getElementById('loginPw').value;
+    const btn = document.getElementById('loginBtn');
+    const err = document.getElementById('loginError');
+
+    if (!username || !password) {
+      err.textContent = '아이디와 비밀번호를 입력해주세요';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '확인 중...';
+    err.textContent = '';
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'login', username, password }),
+      headers: { 'Content-Type': 'text/plain' },
+      redirect: 'follow'
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        authUser = { username, password, name: res.name };
+        // 24시간 로그인 유지
+        localStorage.setItem('auth_user', JSON.stringify({
+          username, password, name: res.name,
+          expires: Date.now() + 24 * 60 * 60 * 1000
+        }));
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('loggedInName').textContent = saved.name + '님';
+        loadLogsFromSheet();
+        loadTotalFocusFromSheet();
+      } else {
+        err.textContent = res.message || '로그인 실패';
+        btn.disabled = false;
+        btn.textContent = '로그인';
+      }
+    })
+    .catch(() => {
+      err.textContent = '서버 연결 실패. 잠시 후 다시 시도해주세요';
+      btn.disabled = false;
+      btn.textContent = '로그인';
+    });
+  }
+
+  function doLogout() {
+    localStorage.removeItem('auth_user');
+    authUser = { username: '', password: '', name: '' };
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('loginId').value = '';
+    document.getElementById('loginPw').value = '';
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('loginBtn').disabled = false;
+    document.getElementById('loginBtn').textContent = '로그인';
+    // 상태 초기화
+    if (ticker) clearInterval(ticker);
+    mode = 'idle';
+    mainSeconds = 0; subSeconds = 0; errandSeconds = 0;
+    totalFocusSeconds = 0; window._prevTotalFocus = 0;
+    document.getElementById('logList').innerHTML = '<li class="log-empty">업무 기록이 여기에 쌓입니다</li>';
+    document.getElementById('totalFocusDisplay').textContent = '00:00:00';
+    updateUI();
   }
 
   // ── UI 업데이트 ────────────────────────────────
@@ -1081,7 +1272,7 @@
   function sheetPost(data) {
     fetch(SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ ...data, username: authUser.username, password: authUser.password }),
       headers: { 'Content-Type': 'text/plain' },
       redirect: 'follow'
     })
@@ -1093,7 +1284,12 @@
   function loadLogsFromSheet() {
     const list = document.getElementById('logList');
     list.innerHTML = '<li class="log-empty">불러오는 중...</li>';
-    fetch(`${SCRIPT_URL}?action=getLogs`, { redirect: 'follow' })
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'getLogs', username: authUser.username, password: authUser.password }),
+      headers: { 'Content-Type': 'text/plain' },
+      redirect: 'follow'
+    })
       .then(r => r.json())
       .then(data => {
         list.innerHTML = '';
@@ -1116,7 +1312,12 @@
   }
 
   function loadTotalFocusFromSheet() {
-    fetch(`${SCRIPT_URL}?action=getTotalFocus`, { redirect: 'follow' })
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'getTotalFocus', username: authUser.username, password: authUser.password }),
+      headers: { 'Content-Type': 'text/plain' },
+      redirect: 'follow'
+    })
       .then(r => r.json())
       .then(data => {
         if (!data.success) return;
@@ -1193,6 +1394,13 @@
   }
 
   // ── 키보드 ─────────────────────────────────────
+  document.getElementById('loginId').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('loginPw').focus();
+  });
+  document.getElementById('loginPw').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
   document.getElementById('taskInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') handleMainBtn();
   });
