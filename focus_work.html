@@ -1491,8 +1491,9 @@
     const subject = encodeURIComponent(`[업무일지] ${today}`);
     body += `\n\n━━━━━━━━━━━━━━━━━━━━━━━\n전체 집중시간: ${fmt(totalFocusSeconds)}`;
     const to = authUser.email || EMAIL_TO;
-    const ccPart = authUser.ccEmail ? `&cc=${encodeURIComponent(authUser.ccEmail)}` : '';
-    window.location.href = `mailto:${to}?${ccPart}&subject=${subject}&body=${encodeURIComponent(body)}`;
+    let mailUrl = `mailto:${to}?subject=${subject}&body=${encodeURIComponent(body)}`;
+    if (authUser.ccEmail) mailUrl += `&cc=${encodeURIComponent(authUser.ccEmail)}`;
+    window.location.href = mailUrl;
   }
 
   // ── 키보드 ─────────────────────────────────────
