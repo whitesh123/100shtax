@@ -660,7 +660,6 @@
       document.getElementById('totalFocusDisplay').textContent = fmt(0);
       // 업무 기록 리셋
       document.getElementById('logList').innerHTML = '<li class="log-empty">업무 기록이 여기에 쌓입니다</li>';
-      localStorage.removeItem(STORAGE_KEY);
       sheetPost({ action: 'clearLogs' });
     }
   }, 60000);
@@ -730,9 +729,8 @@
   }
 
   window.addEventListener('load', () => {
-    updateUI();          // 버튼 상태 초기화
-    loadFromStorage();   // 우선 로컬 표시
-    loadLogsFromSheet(); // 구글 시트로 덮어씌우기
+    updateUI();              // 버튼 상태 초기화
+    loadLogsFromSheet();     // 구글 시트에서 불러오기
     loadTotalFocusFromSheet(); // 집중시간도 시트에서
   });
 
@@ -1058,6 +1056,12 @@
   // ── 로그 ───────────────────────────────────────
   function addLog(type, text) {
     const timeStr = nowStr();
+    appendLogItem(timeStr, type, text);
+    // 구글 시트에 저장 (단일 소스)
+    sheetPost({ action: 'addLog', time: timeStr, type, text });
+  }
+
+  function appendLogItem(timeStr, type, text) {
     const list = document.getElementById('logList');
     const empty = list.querySelector('.log-empty');
     if (empty) empty.remove();
@@ -1065,15 +1069,11 @@
     li.className = 'log-item';
     li.innerHTML = `<span class="log-time">${timeStr}</span><span class="log-text ${type}">${text}</span>`;
     list.insertBefore(li, list.firstChild);
-    saveToStorage();
-    // 구글 시트에도 저장
-    sheetPost({ action: 'addLog', time: timeStr, type, text });
   }
 
   function clearLog() {
     if (!confirm('업무 기록을 모두 삭제할까요?')) return;
     document.getElementById('logList').innerHTML = '<li class="log-empty">업무 기록이 여기에 쌓입니다</li>';
-    localStorage.removeItem(STORAGE_KEY);
     sheetPost({ action: 'clearLogs' });
   }
 
@@ -1091,23 +1091,28 @@
   }
 
   function loadLogsFromSheet() {
+    const list = document.getElementById('logList');
+    list.innerHTML = '<li class="log-empty">불러오는 중...</li>';
     fetch(`${SCRIPT_URL}?action=getLogs`, { redirect: 'follow' })
       .then(r => r.json())
       .then(data => {
-        if (!data.success || !data.logs.length) return;
-        const list = document.getElementById('logList');
         list.innerHTML = '';
-        // 시트는 오래된 순으로 오므로 역순으로 표시
+        if (!data.success || !data.logs || !data.logs.length) {
+          list.innerHTML = '<li class="log-empty">업무 기록이 여기에 쌓입니다</li>';
+          return;
+        }
+        // 시트는 오래된 순 → 최신이 위로 오도록 역순 표시
         [...data.logs].reverse().forEach(entry => {
           const li = document.createElement('li');
           li.className = 'log-item';
           li.innerHTML = `<span class="log-time">${entry.time}</span><span class="log-text ${entry.type}">${entry.text}</span>`;
           list.appendChild(li);
         });
-        // 로컬에도 동기화
-        saveToStorage();
       })
-      .catch(e => console.log('시트 불러오기 오류:', e));
+      .catch(e => {
+        list.innerHTML = '<li class="log-empty">불러오기 실패 (오프라인?)</li>';
+        console.log('시트 불러오기 오류:', e);
+      });
   }
 
   function loadTotalFocusFromSheet() {
