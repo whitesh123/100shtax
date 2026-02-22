@@ -881,7 +881,7 @@
     try {
       const saved = JSON.parse(localStorage.getItem('auth_user'));
       if (saved && saved.expires > Date.now()) {
-        authUser = { username: saved.username, password: saved.password, name: saved.name, email: saved.email || '' };
+        authUser = { username: saved.username, password: saved.password, name: saved.name, email: saved.email || '', ccEmail: saved.ccEmail || '' };
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('loggedInName').textContent = res.name + '님';
         loadLogsFromSheet();
@@ -924,10 +924,10 @@
     .then(r => r.json())
     .then(res => {
       if (res.success) {
-        authUser = { username, password, name: res.name, email: res.email };
+        authUser = { username, password, name: res.name, email: res.email, ccEmail: res.ccEmail || '' };
         // 24시간 로그인 유지
         localStorage.setItem('auth_user', JSON.stringify({
-          username, password, name: res.name, email: res.email,
+          username, password, name: res.name, email: res.email, ccEmail: res.ccEmail || '',
           expires: Date.now() + 24 * 60 * 60 * 1000
         }));
         document.getElementById('loginScreen').style.display = 'none';
@@ -1491,8 +1491,7 @@
     const subject = encodeURIComponent(`[업무일지] ${today}`);
     body += `\n\n━━━━━━━━━━━━━━━━━━━━━━━\n전체 집중시간: ${fmt(totalFocusSeconds)}`;
     const to = authUser.email || EMAIL_TO;
-    const ccAddr = authUser.username === 'admin' ? 'rednnn@hanmail.net' : '';
-    const ccPart = ccAddr ? `&cc=${encodeURIComponent(ccAddr)}` : '';
+    const ccPart = authUser.ccEmail ? `&cc=${encodeURIComponent(authUser.ccEmail)}` : '';
     window.location.href = `mailto:${to}?${ccPart}&subject=${subject}&body=${encodeURIComponent(body)}`;
   }
 
