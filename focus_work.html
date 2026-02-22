@@ -599,6 +599,34 @@
     </div>
     <button class="login-btn" id="loginBtn" onclick="doLogin()">로그인</button>
     <div class="login-error" id="loginError"></div>
+    <div style="text-align:center; margin-top:16px;">
+      <button onclick="showRegister()" style="background:none; border:none; color:var(--muted); font-size:13px; cursor:pointer; font-family:'Gowun Dodum',sans-serif; text-decoration:underline;">회원가입</button>
+    </div>
+  </div>
+</div>
+
+<!-- 회원가입 화면 -->
+<div id="registerScreen" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:201; align-items:center; justify-content:center; padding:24px;">
+  <div class="login-box">
+    <div class="login-title">📋 회원가입</div>
+    <div class="login-sub">업무일지 계정을 만들어요</div>
+    <div class="login-field">
+      <label class="login-label">아이디</label>
+      <input type="text" class="login-input" id="regId" placeholder="영문/숫자 4자 이상" maxlength="20" />
+    </div>
+    <div class="login-field">
+      <label class="login-label">비밀번호</label>
+      <input type="password" class="login-input" id="regPw" placeholder="6자 이상" maxlength="30" />
+    </div>
+    <div class="login-field">
+      <label class="login-label">닉네임</label>
+      <input type="text" class="login-input" id="regName" placeholder="이름 또는 닉네임" maxlength="20" />
+    </div>
+    <button class="login-btn" id="regBtn" onclick="doRegister()">가입하기</button>
+    <div class="login-error" id="regError"></div>
+    <div style="text-align:center; margin-top:16px;">
+      <button onclick="showLogin()" style="background:none; border:none; color:var(--muted); font-size:13px; cursor:pointer; font-family:'Gowun Dodum',sans-serif; text-decoration:underline;">로그인으로 돌아가기</button>
+    </div>
   </div>
 </div>
 
@@ -899,7 +927,7 @@
           expires: Date.now() + 24 * 60 * 60 * 1000
         }));
         document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('loggedInName').textContent = saved.name + '님';
+        document.getElementById('loggedInName').textContent = res.name + '님';
         loadLogsFromSheet();
         loadTotalFocusFromSheet();
       } else {
@@ -912,6 +940,72 @@
       err.textContent = '서버 연결 실패. 잠시 후 다시 시도해주세요';
       btn.disabled = false;
       btn.textContent = '로그인';
+    });
+  }
+
+  function showRegister() {
+    document.getElementById('loginScreen').style.display = 'none';
+    const rs = document.getElementById('registerScreen');
+    rs.style.display = 'flex';
+    document.getElementById('regId').value = '';
+    document.getElementById('regPw').value = '';
+    document.getElementById('regName').value = '';
+    document.getElementById('regError').textContent = '';
+    document.getElementById('regBtn').disabled = false;
+    document.getElementById('regBtn').textContent = '가입하기';
+  }
+
+  function showLogin() {
+    document.getElementById('registerScreen').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('loginError').textContent = '';
+  }
+
+  function doRegister() {
+    const username = document.getElementById('regId').value.trim();
+    const password = document.getElementById('regPw').value;
+    const name = document.getElementById('regName').value.trim();
+    const btn = document.getElementById('regBtn');
+    const err = document.getElementById('regError');
+
+    if (!username || username.length < 4) { err.textContent = '아이디는 4자 이상이어야 해요'; return; }
+    if (!password || password.length < 6) { err.textContent = '비밀번호는 6자 이상이어야 해요'; return; }
+    if (!name) { err.textContent = '닉네임을 입력해주세요'; return; }
+
+    btn.disabled = true;
+    btn.textContent = '가입 중...';
+    err.textContent = '';
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'register', username, password, name }),
+      headers: { 'Content-Type': 'text/plain' },
+      redirect: 'follow'
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.success) {
+        // 가입 성공 → 자동 로그인
+        authUser = { username, password, name };
+        localStorage.setItem('auth_user', JSON.stringify({
+          username, password, name,
+          expires: Date.now() + 24 * 60 * 60 * 1000
+        }));
+        document.getElementById('registerScreen').style.display = 'none';
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('loggedInName').textContent = name + '님';
+        loadLogsFromSheet();
+        loadTotalFocusFromSheet();
+      } else {
+        err.textContent = res.message || '가입 실패';
+        btn.disabled = false;
+        btn.textContent = '가입하기';
+      }
+    })
+    .catch(() => {
+      err.textContent = '서버 연결 실패. 잠시 후 다시 시도해주세요';
+      btn.disabled = false;
+      btn.textContent = '가입하기';
     });
   }
 
@@ -1399,6 +1493,15 @@
   });
   document.getElementById('loginPw').addEventListener('keydown', e => {
     if (e.key === 'Enter') doLogin();
+  });
+  document.getElementById('regId').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('regPw').focus();
+  });
+  document.getElementById('regPw').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('regName').focus();
+  });
+  document.getElementById('regName').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doRegister();
   });
 
   document.getElementById('taskInput').addEventListener('keydown', e => {
