@@ -622,6 +622,10 @@
       <label class="login-label">닉네임</label>
       <input type="text" class="login-input" id="regName" placeholder="이름 또는 닉네임" maxlength="20" />
     </div>
+    <div class="login-field">
+      <label class="login-label">이메일</label>
+      <input type="email" class="login-input" id="regEmail" placeholder="업무일지 받을 이메일" maxlength="100" />
+    </div>
     <button class="login-btn" id="regBtn" onclick="doRegister()">가입하기</button>
     <div class="login-error" id="regError"></div>
     <div style="text-align:center; margin-top:16px;">
@@ -877,7 +881,7 @@
     try {
       const saved = JSON.parse(localStorage.getItem('auth_user'));
       if (saved && saved.expires > Date.now()) {
-        authUser = { username: saved.username, password: saved.password, name: saved.name };
+        authUser = { username: saved.username, password: saved.password, name: saved.name, email: saved.email || '' };
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('loggedInName').textContent = res.name + '님';
         loadLogsFromSheet();
@@ -920,10 +924,10 @@
     .then(r => r.json())
     .then(res => {
       if (res.success) {
-        authUser = { username, password, name: res.name };
+        authUser = { username, password, name: res.name, email: res.email };
         // 24시간 로그인 유지
         localStorage.setItem('auth_user', JSON.stringify({
-          username, password, name: res.name,
+          username, password, name: res.name, email: res.email,
           expires: Date.now() + 24 * 60 * 60 * 1000
         }));
         document.getElementById('loginScreen').style.display = 'none';
@@ -965,12 +969,14 @@
     const username = document.getElementById('regId').value.trim();
     const password = document.getElementById('regPw').value;
     const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
     const btn = document.getElementById('regBtn');
     const err = document.getElementById('regError');
 
     if (!username || username.length < 4) { err.textContent = '아이디는 4자 이상이어야 해요'; return; }
     if (!password || password.length < 6) { err.textContent = '비밀번호는 6자 이상이어야 해요'; return; }
     if (!name) { err.textContent = '닉네임을 입력해주세요'; return; }
+    if (!email || !email.includes('@')) { err.textContent = '이메일 주소를 올바르게 입력해주세요'; return; }
 
     btn.disabled = true;
     btn.textContent = '가입 중...';
@@ -978,7 +984,7 @@
 
     fetch(SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify({ action: 'register', username, password, name }),
+      body: JSON.stringify({ action: 'register', username, password, name, email }),
       headers: { 'Content-Type': 'text/plain' },
       redirect: 'follow'
     })
@@ -986,9 +992,9 @@
     .then(res => {
       if (res.success) {
         // 가입 성공 → 자동 로그인
-        authUser = { username, password, name };
+        authUser = { username, password, name, email };
         localStorage.setItem('auth_user', JSON.stringify({
-          username, password, name,
+          username, password, name, email,
           expires: Date.now() + 24 * 60 * 60 * 1000
         }));
         document.getElementById('registerScreen').style.display = 'none';
@@ -1484,7 +1490,10 @@
 
     const subject = encodeURIComponent(`[업무일지] ${today}`);
     body += `\n\n━━━━━━━━━━━━━━━━━━━━━━━\n전체 집중시간: ${fmt(totalFocusSeconds)}`;
-    window.location.href = `mailto:${EMAIL_TO}?cc=${encodeURIComponent('rednnn@hanmail.net')}&subject=${subject}&body=${encodeURIComponent(body)}`;
+    const to = authUser.email || EMAIL_TO;
+    const ccAddr = authUser.username === 'admin' ? 'rednnn@hanmail.net' : '';
+    const ccPart = ccAddr ? `&cc=${encodeURIComponent(ccAddr)}` : '';
+    window.location.href = `mailto:${to}?${ccPart}&subject=${subject}&body=${encodeURIComponent(body)}`;
   }
 
   // ── 키보드 ─────────────────────────────────────
@@ -1501,6 +1510,9 @@
     if (e.key === 'Enter') document.getElementById('regName').focus();
   });
   document.getElementById('regName').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('regEmail').focus();
+  });
+  document.getElementById('regEmail').addEventListener('keydown', e => {
     if (e.key === 'Enter') doRegister();
   });
 
