@@ -607,6 +607,7 @@
   // ── 상태 ───────────────────────────────────────
   // mode: 'idle' | 'focus' | 'paused' | 'errand' | 'meal' | 'meeting' | 'rest'
   let mode = 'idle';
+  let isRunning = false; // 절전 보정용
   let mainSeconds = 0;       // 집중 누적 시간
   let subSeconds = 0;        // 현재 중단 경과 시간
   let errandSeconds = 0;     // 잡무 누적 시간
@@ -644,6 +645,7 @@
   function saveTotalFocus() {
     localStorage.setItem(TOTAL_KEY, totalFocusSeconds);
     localStorage.setItem(TOTAL_DATE_KEY, new Date().toISOString());
+    sheetPost({ action: 'saveTotalFocus', seconds: totalFocusSeconds });
   }
 
   // 새벽 3시 자동 리셋 체크 (1분마다)
@@ -659,6 +661,7 @@
       // 업무 기록 리셋
       document.getElementById('logList').innerHTML = '<li class="log-empty">업무 기록이 여기에 쌓입니다</li>';
       localStorage.removeItem(STORAGE_KEY);
+      sheetPost({ action: 'clearLogs' });
     }
   }, 60000);
   let nextCheckin = 15 * 60;
@@ -666,7 +669,7 @@
   let ticker = null;
   let currentErrandName = '';
 
-  const EMAIL_TO = '100shtax@gmail.com';
+  const EMAIL_TO = '';
   const STORAGE_KEY = 'baek_work_log';
 
   const REVIEW_ITEMS = [
@@ -725,7 +728,11 @@
     } catch(e) {}
   }
 
-  window.addEventListener('load', () => { loadFromStorage(); loadTotalFocus(); });
+  window.addEventListener('load', () => {
+    loadFromStorage();   // 우선 로컬 표시
+    loadLogsFromSheet(); // 구글 시트로 덮어씌우기
+    loadTotalFocusFromSheet(); // 집중시간도 시트에서
+  });
 
   // ── 유틸 ───────────────────────────────────────
   function pad(n) { return String(n).padStart(2, '0'); }
@@ -828,6 +835,7 @@
   // ── 집중 시작 ──────────────────────────────────
   function startFocus(task) {
     mode = 'focus';
+    isRunning = true;
     mainSeconds = 0;
     errandSeconds = 0;
     // 이전 세션 누적값 보존
@@ -922,6 +930,7 @@
     totalFocusSeconds = (window._prevTotalFocus || 0) + mainSeconds + errandSeconds;
     document.getElementById('totalFocusDisplay').textContent = fmt(totalFocusSeconds);
     if ((mainSeconds + errandSeconds) % 30 === 0) saveTotalFocus(); // 30초마다 저장
+    lastTickTime = Date.now();
   }
 
   // ── 체크인 팝업 ────────────────────────────────
@@ -1029,6 +1038,7 @@
     clearInterval(ticker);
     addLog('system', `⏹ 업무 종료 ${reviewed ? '(검토완료)' : '(검토생략)'} — 집중 총 ${Math.floor(mainSeconds/60)}분`);
     mode = 'idle';
+    isRunning = false;
     mainSeconds = 0;
     subSeconds = 0;
     errandSeconds = 0;
@@ -1041,21 +1051,105 @@
 
   // ── 로그 ───────────────────────────────────────
   function addLog(type, text) {
+    const timeStr = nowStr();
     const list = document.getElementById('logList');
     const empty = list.querySelector('.log-empty');
     if (empty) empty.remove();
     const li = document.createElement('li');
     li.className = 'log-item';
-    li.innerHTML = `<span class="log-time">${nowStr()}</span><span class="log-text ${type}">${text}</span>`;
+    li.innerHTML = `<span class="log-time">${timeStr}</span><span class="log-text ${type}">${text}</span>`;
     list.insertBefore(li, list.firstChild);
     saveToStorage();
+    // 구글 시트에도 저장
+    sheetPost({ action: 'addLog', time: timeStr, type, text });
   }
 
   function clearLog() {
     if (!confirm('업무 기록을 모두 삭제할까요?')) return;
     document.getElementById('logList').innerHTML = '<li class="log-empty">업무 기록이 여기에 쌓입니다</li>';
     localStorage.removeItem(STORAGE_KEY);
+    sheetPost({ action: 'clearLogs' });
   }
+
+  // ── 구글 시트 연동 ────────────────────────────────
+  function sheetPost(data) {
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { 'Content-Type': 'text/plain' }
+    }).catch(e => console.log('시트 저장 오류:', e));
+  }
+
+  function loadLogsFromSheet() {
+    fetch(`${SCRIPT_URL}?action=getLogs`)
+      .then(r => r.json())
+      .then(data => {
+        if (!data.success || !data.logs.length) return;
+        const list = document.getElementById('logList');
+        list.innerHTML = '';
+        // 시트는 오래된 순으로 오므로 역순으로 표시
+        [...data.logs].reverse().forEach(entry => {
+          const li = document.createElement('li');
+          li.className = 'log-item';
+          li.innerHTML = `<span class="log-time">${entry.time}</span><span class="log-text ${entry.type}">${entry.text}</span>`;
+          list.appendChild(li);
+        });
+        // 로컬에도 동기화
+        saveToStorage();
+      })
+      .catch(e => console.log('시트 불러오기 오류:', e));
+  }
+
+  function loadTotalFocusFromSheet() {
+    fetch(`${SCRIPT_URL}?action=getTotalFocus`)
+      .then(r => r.json())
+      .then(data => {
+        if (!data.success) return;
+        // 새벽 3시 리셋 체크
+        const now = new Date();
+        const resetTime = new Date(now);
+        resetTime.setHours(3, 0, 0, 0);
+        const savedDate = localStorage.getItem(TOTAL_DATE_KEY) ? new Date(localStorage.getItem(TOTAL_DATE_KEY)) : null;
+        if (savedDate && now >= resetTime && savedDate < resetTime) {
+          totalFocusSeconds = 0;
+        } else {
+          totalFocusSeconds = data.seconds || 0;
+        }
+        window._prevTotalFocus = totalFocusSeconds;
+        document.getElementById('totalFocusDisplay').textContent = fmt(totalFocusSeconds);
+        localStorage.setItem(TOTAL_KEY, totalFocusSeconds);
+        localStorage.setItem(TOTAL_DATE_KEY, new Date().toISOString());
+      })
+      .catch(e => console.log('집중시간 불러오기 오류:', e));
+  }
+
+  // ── 절전모드 복귀 시 시간 보정 ───────────────────
+  let lastTickTime = Date.now();
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      const gap = Math.floor((Date.now() - lastTickTime) / 1000);
+      if (gap > 5 && isRunning) {
+        // 절전 중 경과한 시간 보정
+        if (mode === 'focus') {
+          mainSeconds += gap;
+          // 체크인 넘어갔으면 처리
+          while (mainSeconds >= nextCheckin) {
+            nextCheckin += INTERVAL;
+            showCheckin();
+          }
+        } else if (['errand','meal','meeting','rest'].includes(mode)) {
+          subSeconds += gap;
+        }
+        totalFocusSeconds = (window._prevTotalFocus || 0) + mainSeconds + errandSeconds;
+        document.getElementById('totalFocusDisplay').textContent = fmt(totalFocusSeconds);
+        saveTotalFocus();
+      }
+    }
+    lastTickTime = Date.now();
+  });
+
+  // tick마다 lastTickTime 갱신
+  const _origTick = tick;
 
   // ── 메일 발송 ──────────────────────────────────
   function sendEmail() {
@@ -1079,9 +1173,8 @@
 
 
     const subject = encodeURIComponent(`[업무일지] ${today}`);
-    const cc = '100shtax@gmail.com';
     body += `\n\n━━━━━━━━━━━━━━━━━━━━━━━\n전체 집중시간: ${fmt(totalFocusSeconds)}`;
-    window.location.href = `mailto:${EMAIL_TO}?cc=${encodeURIComponent('rednnn@hanmail.net')}&subject=${subject}&body=${encodeURIComponent(body)}`;
+    window.location.href = `mailto:?subject=${subject}&body=${encodeURIComponent(body)}`;
   }
 
   // ── 키보드 ─────────────────────────────────────
