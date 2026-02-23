@@ -883,7 +883,7 @@
       if (saved && saved.expires > Date.now()) {
         authUser = { username: saved.username, password: saved.password, name: saved.name, email: saved.email || '', ccEmail: saved.ccEmail || '' };
         document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('loggedInName').textContent = res.name + '님';
+        document.getElementById('loggedInName').textContent = saved.name + '님';
         loadLogsFromSheet();
         loadTotalFocusFromSheet();
       }
