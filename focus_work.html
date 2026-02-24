@@ -1608,14 +1608,15 @@
   }
 
   // ── 키보드 ─────────────────────────────────────
-  // 할일 엔터키로 이동
-  [1,2,3,4].forEach(i => {
-    document.getElementById(`todo${i}`).addEventListener('keydown', e => {
-      if (e.key === 'Enter') document.getElementById(`todo${i+1}`).focus();
-    });
-  });
-  document.getElementById('todo5').addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('taskInput').focus();
+  // 할일 엔터키 - 이벤트 위임
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const id = e.target.id;
+    if (id === 'todo1') document.getElementById('todo2').focus();
+    else if (id === 'todo2') document.getElementById('todo3').focus();
+    else if (id === 'todo3') document.getElementById('todo4').focus();
+    else if (id === 'todo4') document.getElementById('todo5').focus();
+    else if (id === 'todo5') document.getElementById('taskInput').focus();
   });
 
   document.getElementById('loginId').addEventListener('keydown', e => {
