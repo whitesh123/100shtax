@@ -1325,7 +1325,9 @@
 
   function applyInterrupt(type, name) {
     mode = type;
-    subSeconds = 0;
+    subSeconds = 0; subSecondsBase = 0;
+    if (type === 'errand') { errandSecondsBase = errandSeconds; }
+    segmentStart = Date.now();
     currentErrandName = name;
     clearInterval(ticker);
     ticker = setInterval(tick, 1000);
@@ -1343,6 +1345,8 @@
 
     mode = 'focus';
     subSeconds = 0;
+    mainSecondsBase = mainSeconds;
+    segmentStart = Date.now();
     currentErrandName = '';
     clearInterval(ticker);
     ticker = setInterval(tick, 1000);
