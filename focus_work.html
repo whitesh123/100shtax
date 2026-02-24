@@ -544,6 +544,20 @@
     cursor: default;
   }
 
+  .todo-pick-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 11px;
+    padding: 4px 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .todo-pick-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .todo-pick-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+
   /* 로그인 화면 */
   #loginScreen {
     position: fixed;
@@ -703,11 +717,11 @@
   <div class="todo-card" id="todoCard">
     <div class="todo-card-title">📋 오늘 할 일</div>
     <div class="todo-list">
-      <div class="todo-item"><span class="todo-num">1</span><input class="todo-input" id="todo1" type="text" placeholder="첫 번째 할 일" /></div>
-      <div class="todo-item"><span class="todo-num">2</span><input class="todo-input" id="todo2" type="text" placeholder="두 번째 할 일" /></div>
-      <div class="todo-item"><span class="todo-num">3</span><input class="todo-input" id="todo3" type="text" placeholder="세 번째 할 일" /></div>
-      <div class="todo-item"><span class="todo-num">4</span><input class="todo-input" id="todo4" type="text" placeholder="네 번째 할 일" /></div>
-      <div class="todo-item"><span class="todo-num">5</span><input class="todo-input" id="todo5" type="text" placeholder="다섯 번째 할 일" /></div>
+      <div class="todo-item"><span class="todo-num">1</span><input class="todo-input" id="todo1" type="text" placeholder="첫 번째 할 일" /><button class="todo-pick-btn" onclick="pickTodo(0)">▶</button></div>
+      <div class="todo-item"><span class="todo-num">2</span><input class="todo-input" id="todo2" type="text" placeholder="두 번째 할 일" /><button class="todo-pick-btn" onclick="pickTodo(1)">▶</button></div>
+      <div class="todo-item"><span class="todo-num">3</span><input class="todo-input" id="todo3" type="text" placeholder="세 번째 할 일" /><button class="todo-pick-btn" onclick="pickTodo(2)">▶</button></div>
+      <div class="todo-item"><span class="todo-num">4</span><input class="todo-input" id="todo4" type="text" placeholder="네 번째 할 일" /><button class="todo-pick-btn" onclick="pickTodo(3)">▶</button></div>
+      <div class="todo-item"><span class="todo-num">5</span><input class="todo-input" id="todo5" type="text" placeholder="다섯 번째 할 일" /><button class="todo-pick-btn" onclick="pickTodo(4)">▶</button></div>
     </div>
   </div>
 
@@ -1086,6 +1100,18 @@
   }
 
   // ── 할일 목록 ────────────────────────────────────
+  function pickTodo(idx) {
+    const val = document.getElementById(`todo${idx + 1}`).value.trim();
+    if (!val) return;
+    currentTodoIdx = idx;
+    document.getElementById('taskInput').value = val;
+    // 집중할 업무 입력창 하이라이트
+    const taskInput = document.getElementById('taskInput');
+    taskInput.style.borderColor = 'var(--accent)';
+    taskInput.focus();
+    setTimeout(() => { taskInput.style.borderColor = ''; }, 1500);
+  }
+
   function syncCurrentTodo() {
     // 할일 목록에서 현재 인덱스의 값을 taskInput에 반영
     todoList = [1,2,3,4,5].map(i => document.getElementById(`todo${i}`).value.trim());
@@ -1104,7 +1130,6 @@
       currentTodoIdx = next;
       document.getElementById('taskInput').value = todoList[next];
       // 다음 할일 하이라이트
-      highlightCurrentTodo();
     } else {
       currentTodoIdx = 0;
       document.getElementById('taskInput').value = '';
@@ -1112,22 +1137,14 @@
     updateTodoUI();
   }
 
-  function highlightCurrentTodo() {
-    [1,2,3,4,5].forEach(i => {
-      const input = document.getElementById(`todo${i}`);
-      if (input && !input.classList.contains('done')) {
-        input.style.borderColor = i === currentTodoIdx + 1 ? 'var(--accent)' : '';
-      }
-    });
-  }
-
   function updateTodoUI() {
     const isBusy = mode !== 'idle';
     [1,2,3,4,5].forEach(i => {
       const input = document.getElementById(`todo${i}`);
+      const btn = input ? input.parentElement.querySelector('.todo-pick-btn') : null;
       if (input) input.disabled = isBusy;
+      if (btn) btn.disabled = isBusy;
     });
-    highlightCurrentTodo();
   }
 
   function doLogout() {
