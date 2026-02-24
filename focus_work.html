@@ -1274,6 +1274,8 @@
     // 이전 세션 누적값 보존
     window._prevTotalFocus = totalFocusSeconds;
     nextCheckin = INTERVAL;
+    segmentStart = Date.now();
+    mainSecondsBase = 0;
     clearInterval(ticker);
     ticker = setInterval(tick, 1000);
     addLog('system', `▶ 집중 시작: ${task}`);
@@ -1285,12 +1287,15 @@
   function pauseFocus() {
     mode = 'paused';
     clearInterval(ticker);
+    segmentStart = null;
     addLog('system', `⏸ 일시정지 (집중 ${Math.floor(mainSeconds/60)}분)`);
     updateUI();
   }
 
   function resumeFocus() {
     mode = 'focus';
+    mainSecondsBase = mainSeconds;
+    segmentStart = Date.now();
     clearInterval(ticker);
     ticker = setInterval(tick, 1000);
     addLog('system', `▶ 재개`);
@@ -1347,24 +1352,27 @@
 
   // ── 타이머 틱 ──────────────────────────────────
   function tick() {
+    if (!segmentStart) { segmentStart = Date.now(); }
+    const elapsed = Math.floor((Date.now() - segmentStart) / 1000);
+
     if (mode === 'focus') {
-      mainSeconds++;
+      mainSeconds = mainSecondsBase + elapsed;
       const remaining = nextCheckin - mainSeconds;
-      const rm = Math.floor(remaining / 60);
-      const rs = remaining % 60;
+      const rm = Math.floor(Math.max(0, remaining) / 60);
+      const rs = Math.max(0, remaining) % 60;
       document.getElementById('nextCheckin').innerHTML = `다음 체크인까지 <span>${pad(rm)}:${pad(rs)}</span>`;
-      document.getElementById('progressBar').style.width = `${Math.max(0, ((INTERVAL-(remaining))/INTERVAL)*100)}%`;
+      document.getElementById('progressBar').style.width = `${Math.max(0, ((INTERVAL - remaining) / INTERVAL) * 100)}%`;
       if (mainSeconds >= nextCheckin) { nextCheckin += INTERVAL; showCheckin(); }
     } else if (['errand','meal','meeting','rest'].includes(mode)) {
-      subSeconds++;
-      if (mode === 'errand') errandSeconds++;
+      subSeconds = subSecondsBase + elapsed;
+      if (mode === 'errand') errandSeconds = errandSecondsBase + elapsed;
     }
 
     const isInterrupt = ['errand','meal','meeting','rest'].includes(mode);
     document.getElementById('timerDisplay').textContent = fmt(isInterrupt ? subSeconds : mainSeconds);
     totalFocusSeconds = (window._prevTotalFocus || 0) + mainSeconds + errandSeconds;
     document.getElementById('totalFocusDisplay').textContent = fmt(totalFocusSeconds);
-    if ((mainSeconds + errandSeconds) % 30 === 0) saveTotalFocus(); // 30초마다 저장
+    if ((mainSeconds + errandSeconds) % 30 === 0) saveTotalFocus();
     lastTickTime = Date.now();
   }
 
@@ -1477,6 +1485,8 @@
     mainSeconds = 0;
     subSeconds = 0;
     errandSeconds = 0;
+    mainSecondsBase = 0; subSecondsBase = 0; errandSecondsBase = 0;
+    segmentStart = null;
     window._prevTotalFocus = totalFocusSeconds;
     saveTotalFocus();
     document.getElementById('progressBar').style.width = '0%';
