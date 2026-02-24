@@ -490,6 +490,60 @@
   @keyframes fadeIn { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
+  /* 할일 목록 */
+  .todo-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+  }
+  .todo-card-title {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 12px;
+  }
+  .todo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .todo-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .todo-num {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    width: 16px;
+    flex-shrink: 0;
+  }
+  .todo-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .todo-input:focus { border-color: var(--accent); }
+  .todo-input.done {
+    text-decoration: line-through;
+    opacity: 0.4;
+  }
+  .todo-input:disabled {
+    cursor: default;
+  }
+
   /* 로그인 화면 */
   #loginScreen {
     position: fixed;
@@ -756,6 +810,8 @@
   let mode = 'idle';
   let isRunning = false; // 절전 보정용
   let authUser = { username: '', password: '', name: '' }; // 로그인 정보
+  let todoList = ['','','','','']; // 할일 목록
+  let currentTodoIdx = 0; // 현재 할일 인덱스
   let mainSeconds = 0;       // 집중 누적 시간
   let subSeconds = 0;        // 현재 중단 경과 시간
   let errandSeconds = 0;     // 잡무 누적 시간
@@ -885,6 +941,7 @@
         authUser = { username: saved.username, password: saved.password, name: saved.name, email: saved.email || '', ccEmail: saved.ccEmail || '' };
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('loggedInName').textContent = saved.name + '님';
+        updateTodoUI();
         loadLogsFromSheet();
         loadTotalFocusFromSheet();
       }
@@ -1016,6 +1073,51 @@
     });
   }
 
+  // ── 할일 목록 ────────────────────────────────────
+  function syncCurrentTodo() {
+    // 할일 목록에서 현재 인덱스의 값을 taskInput에 반영
+    todoList = [1,2,3,4,5].map(i => document.getElementById(`todo${i}`).value.trim());
+    const current = todoList[currentTodoIdx];
+    if (current) document.getElementById('taskInput').value = current;
+  }
+
+  function markTodoDone() {
+    // 현재 할일 완료 처리
+    const input = document.getElementById(`todo${currentTodoIdx + 1}`);
+    if (input) input.classList.add('done');
+    // 다음 할일로 이동
+    let next = currentTodoIdx + 1;
+    while (next < 5 && !todoList[next]) next++;
+    if (next < 5) {
+      currentTodoIdx = next;
+      document.getElementById('taskInput').value = todoList[next];
+      // 다음 할일 하이라이트
+      highlightCurrentTodo();
+    } else {
+      currentTodoIdx = 0;
+      document.getElementById('taskInput').value = '';
+    }
+    updateTodoUI();
+  }
+
+  function highlightCurrentTodo() {
+    [1,2,3,4,5].forEach(i => {
+      const input = document.getElementById(`todo${i}`);
+      if (input && !input.classList.contains('done')) {
+        input.style.borderColor = i === currentTodoIdx + 1 ? 'var(--accent)' : '';
+      }
+    });
+  }
+
+  function updateTodoUI() {
+    const isBusy = mode !== 'idle';
+    [1,2,3,4,5].forEach(i => {
+      const input = document.getElementById(`todo${i}`);
+      if (input) input.disabled = isBusy;
+    });
+    highlightCurrentTodo();
+  }
+
   function doLogout() {
     localStorage.removeItem('auth_user');
     authUser = { username: '', password: '', name: '' };
@@ -1032,6 +1134,12 @@
     totalFocusSeconds = 0; window._prevTotalFocus = 0;
     document.getElementById('logList').innerHTML = '<li class="log-empty">업무 기록이 여기에 쌓입니다</li>';
     document.getElementById('totalFocusDisplay').textContent = '00:00:00';
+    [1,2,3,4,5].forEach(i => {
+      const el = document.getElementById(`todo${i}`);
+      if (el) { el.value = ''; el.classList.remove('done'); el.disabled = false; el.style.borderColor = ''; }
+    });
+    currentTodoIdx = 0;
+    todoList = ['','','','',''];
     updateUI();
   }
 
@@ -1140,6 +1248,8 @@
     clearInterval(ticker);
     ticker = setInterval(tick, 1000);
     addLog('system', `▶ 집중 시작: ${task}`);
+    // 할일 입력창 비활성화
+    updateTodoUI();
     updateUI();
   }
 
@@ -1498,6 +1608,16 @@
   }
 
   // ── 키보드 ─────────────────────────────────────
+  // 할일 엔터키로 이동
+  [1,2,3,4].forEach(i => {
+    document.getElementById(`todo${i}`).addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById(`todo${i+1}`).focus();
+    });
+  });
+  document.getElementById('todo5').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('taskInput').focus();
+  });
+
   document.getElementById('loginId').addEventListener('keydown', e => {
     if (e.key === 'Enter') document.getElementById('loginPw').focus();
   });
