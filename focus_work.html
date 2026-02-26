@@ -90,19 +90,24 @@
   .task-input {
     width: 100%;
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: 2px solid #00ffe7;
     border-radius: 10px;
     padding: 12px 14px;
     font-family: 'Gowun Dodum', sans-serif;
     font-size: 15px;
-    color: var(--text);
+    color: #ccff00;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 8px rgba(0,255,231,0.35), inset 0 0 6px rgba(0,255,231,0.08);
+    text-shadow: 0 0 8px rgba(204,255,0,0.6);
   }
 
-  .task-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,106,255,0.12); }
+  .task-input:focus {
+    border-color: #00ffe7;
+    box-shadow: 0 0 14px rgba(0,255,231,0.6), inset 0 0 8px rgba(0,255,231,0.12);
+  }
   .task-input:disabled { opacity: 0.5; cursor: not-allowed; }
-  .task-input::placeholder { color: var(--muted); }
+  .task-input::placeholder { color: rgba(0,255,231,0.3); }
 
   /* 타이머 영역 */
   .timer-section { text-align: center; padding: 12px 0 8px; }
