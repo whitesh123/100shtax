@@ -1151,8 +1151,9 @@
     updateTodoUI();
   }
 
+  let processedTodos = []; // 이미 처리한 항목 추적
+
   function loadFromFocusApp() {
-    // 할일관리 앱에서 보낸 할일 확인
     try {
       const raw = localStorage.getItem('focus_todos');
       if (!raw) return;
@@ -1161,8 +1162,11 @@
 
       const todoListEl = document.getElementById('todoList');
 
-      // 기존 빈 칸에 먼저 채우고, 모자라면 행 추가
-      incoming.forEach(text => {
+      // 아직 처리 안 한 새 항목만 추가
+      const newItems = incoming.filter(text => !processedTodos.includes(text));
+      if (newItems.length === 0) return;
+
+      newItems.forEach(text => {
         // 비어있는 입력칸 찾기
         const emptyInput = Array.from(todoListEl.querySelectorAll('.todo-input'))
           .find(inp => !inp.value.trim() && !inp.classList.contains('done'));
@@ -1170,7 +1174,6 @@
         if (emptyInput) {
           emptyInput.value = text;
         } else {
-          // 빈 칸 없으면 새 행 추가
           todoCount++;
           const div = document.createElement('div');
           div.className = 'todo-item';
@@ -1178,9 +1181,9 @@
           todoListEl.appendChild(div);
           div.querySelector('.todo-input').value = text;
         }
+        processedTodos.push(text);
       });
 
-      localStorage.removeItem('focus_todos');
       updateTodoUI();
     } catch(e) {}
   }
@@ -1190,7 +1193,7 @@
     if (authUser.username && localStorage.getItem('focus_todos')) {
       loadFromFocusApp();
     }
-  }, 2000);
+  }, 1000);
 
   function syncCurrentTodo() {
     const items = Array.from(document.querySelectorAll('.todo-item'));
@@ -1263,6 +1266,7 @@
     }
     currentTodoIdx = 0;
     todoList = ['','','','',''];
+    processedTodos = [];
     updateUI();
   }
 
