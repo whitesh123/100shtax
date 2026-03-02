@@ -1163,7 +1163,6 @@
       if (!Array.isArray(state) || state.length === 0) return;
 
       const todoListEl = document.getElementById('todoList');
-      // 기존 행 모두 제거 후 저장된 상태로 복원
       todoListEl.innerHTML = '';
       todoCount = 0;
       state.forEach((item, i) => {
@@ -1175,6 +1174,8 @@
         const input = div.querySelector('.todo-input');
         input.value = item.value || '';
         if (item.done) input.classList.add('done');
+        // 이미 있는 값은 processedTodos에 등록해서 중복 방지
+        if (item.value) processedTodos.push(item.value);
       });
       updateTodoUI();
     } catch(e) {}
