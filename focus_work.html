@@ -1166,6 +1166,9 @@
       const newItems = incoming.filter(text => !processedTodos.includes(text));
       if (newItems.length === 0) return;
 
+      // 처리 전에 즉시 localStorage 제거 (새로고침 시 재적용 방지)
+      localStorage.removeItem('focus_todos');
+
       newItems.forEach(text => {
         // 비어있는 입력칸 찾기
         const emptyInput = Array.from(todoListEl.querySelectorAll('.todo-input'))
