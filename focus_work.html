@@ -990,6 +990,7 @@
         updateTodoUI();
         loadLogsFromSheet();
         loadTotalFocusFromSheet();
+        loadFromFocusApp();
       }
     } catch(e) {}
   });
@@ -1038,6 +1039,7 @@
         document.getElementById('loggedInName').textContent = res.name + '님';
         loadLogsFromSheet();
         loadTotalFocusFromSheet();
+        loadFromFocusApp();
       } else {
         err.textContent = res.message || '로그인 실패';
         btn.disabled = false;
@@ -1148,6 +1150,47 @@
     div.querySelector('.todo-input').focus();
     updateTodoUI();
   }
+
+  function loadFromFocusApp() {
+    // 할일관리 앱에서 보낸 할일 확인
+    try {
+      const raw = localStorage.getItem('focus_todos');
+      if (!raw) return;
+      const incoming = JSON.parse(raw);
+      if (!Array.isArray(incoming) || incoming.length === 0) return;
+
+      const todoListEl = document.getElementById('todoList');
+
+      // 기존 빈 칸에 먼저 채우고, 모자라면 행 추가
+      incoming.forEach(text => {
+        // 비어있는 입력칸 찾기
+        const emptyInput = Array.from(todoListEl.querySelectorAll('.todo-input'))
+          .find(inp => !inp.value.trim() && !inp.classList.contains('done'));
+
+        if (emptyInput) {
+          emptyInput.value = text;
+        } else {
+          // 빈 칸 없으면 새 행 추가
+          todoCount++;
+          const div = document.createElement('div');
+          div.className = 'todo-item';
+          div.innerHTML = `<span class="todo-num">${todoCount}</span><input class="todo-input" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button>`;
+          todoListEl.appendChild(div);
+          div.querySelector('.todo-input').value = text;
+        }
+      });
+
+      localStorage.removeItem('focus_todos');
+      updateTodoUI();
+    } catch(e) {}
+  }
+
+  // 주기적으로 확인 (업무일지가 이미 열려있을 때 새 항목 감지)
+  setInterval(() => {
+    if (authUser.username && localStorage.getItem('focus_todos')) {
+      loadFromFocusApp();
+    }
+  }, 2000);
 
   function syncCurrentTodo() {
     const items = Array.from(document.querySelectorAll('.todo-item'));
