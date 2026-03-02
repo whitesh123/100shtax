@@ -990,6 +990,7 @@
         updateTodoUI();
         loadLogsFromSheet();
         loadTotalFocusFromSheet();
+        loadTodoState();
         loadFromFocusApp();
       }
     } catch(e) {}
@@ -1039,6 +1040,7 @@
         document.getElementById('loggedInName').textContent = res.name + '님';
         loadLogsFromSheet();
         loadTotalFocusFromSheet();
+        loadTodoState();
         loadFromFocusApp();
       } else {
         err.textContent = res.message || '로그인 실패';
@@ -1139,6 +1141,45 @@
 
   let todoCount = 5;
 
+  function saveTodoState() {
+    try {
+      const items = Array.from(document.querySelectorAll('.todo-item'));
+      const state = items.map(item => {
+        const input = item.querySelector('.todo-input');
+        return {
+          value: input ? input.value : '',
+          done: input ? input.classList.contains('done') : false
+        };
+      });
+      localStorage.setItem('todo_state_' + authUser.username, JSON.stringify(state));
+    } catch(e) {}
+  }
+
+  function loadTodoState() {
+    try {
+      const raw = localStorage.getItem('todo_state_' + authUser.username);
+      if (!raw) return;
+      const state = JSON.parse(raw);
+      if (!Array.isArray(state) || state.length === 0) return;
+
+      const todoListEl = document.getElementById('todoList');
+      // 기존 행 모두 제거 후 저장된 상태로 복원
+      todoListEl.innerHTML = '';
+      todoCount = 0;
+      state.forEach((item, i) => {
+        todoCount++;
+        const div = document.createElement('div');
+        div.className = 'todo-item';
+        div.innerHTML = `<span class="todo-num">${todoCount}</span><input class="todo-input" ${i < 5 ? `id="todo${i+1}"` : ''} type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button>`;
+        todoListEl.appendChild(div);
+        const input = div.querySelector('.todo-input');
+        input.value = item.value || '';
+        if (item.done) input.classList.add('done');
+      });
+      updateTodoUI();
+    } catch(e) {}
+  }
+
   function addTodoRow() {
     todoCount++;
     const list = document.getElementById('todoList');
@@ -1149,6 +1190,7 @@
     // 엔터키 자동 연결은 이벤트 위임으로 처리됨
     div.querySelector('.todo-input').focus();
     updateTodoUI();
+    saveTodoState();
   }
 
   let processedTodos = []; // 이미 처리한 항목 추적
@@ -1165,9 +1207,6 @@
       // 아직 처리 안 한 새 항목만 추가
       const newItems = incoming.filter(text => !processedTodos.includes(text));
       if (newItems.length === 0) return;
-
-      // 처리 전에 즉시 localStorage 제거 (새로고침 시 재적용 방지)
-      localStorage.removeItem('focus_todos');
 
       newItems.forEach(text => {
         // 비어있는 입력칸 찾기
@@ -1187,6 +1226,7 @@
         processedTodos.push(text);
       });
 
+      saveTodoState();
       updateTodoUI();
     } catch(e) {}
   }
@@ -1228,6 +1268,7 @@
     } else {
       document.getElementById('taskInput').value = '';
     }
+    saveTodoState();
     updateTodoUI();
   }
 
@@ -1765,6 +1806,11 @@
     } else {
       document.getElementById('taskInput').focus();
     }
+  });
+
+  // 할일 입력 변경 시 자동 저장
+  document.getElementById('todoList').addEventListener('input', e => {
+    if (e.target.classList.contains('todo-input')) saveTodoState();
   });
 
   document.getElementById('loginId').addEventListener('keydown', e => {
