@@ -1312,6 +1312,9 @@
                                     title="복사하기">
                                     📋
                                 </button>
+                                ${!todo.completed ? `<button onclick="sendTodoToFocus('${todo.title.replace(/'/g, "\\'")}') " 
+    class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition transform hover:scale-110" 
+    title="업무일지에 추가">📌</button>` : ''}
                                 ${progress === 100 ? `
                                     <button onclick="archiveTodo(${todo.id})" 
                                         class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition transform hover:scale-110" 
@@ -1834,5 +1837,20 @@
             }
         });
     </script>
+    <script>
+function sendTodoToFocus(title) {
+    let data = [];
+    try {
+        const saved = localStorage.getItem('focus_todos');
+        if (saved) data = JSON.parse(saved);
+        if (!Array.isArray(data)) data = [];
+    } catch(e) {}
+    if (!data.includes(title)) {
+        data.push(title);
+        localStorage.setItem('focus_todos', JSON.stringify(data));
+    }
+    window.open('https://whitesh123.github.io/100shtax/focus_work.html', 'focus_work');
+}
+</script>
 </body>
 </html>
