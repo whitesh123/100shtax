@@ -562,6 +562,19 @@
   }
   .todo-pick-btn:hover { border-color: var(--accent); color: var(--accent); }
   .todo-pick-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+  .todo-del-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 11px;
+    padding: 4px 7px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .todo-del-btn:hover { border-color: #ff4d4d; color: #ff4d4d; }
+  .todo-del-btn:disabled { opacity: 0.2; cursor: not-allowed; }
   .todo-add-btn {
     background: none;
     border: 1px solid var(--border);
@@ -737,11 +750,11 @@
       <button class="todo-add-btn" id="todoAddBtn" onclick="addTodoRow()">+ 추가</button>
     </div>
     <div class="todo-list" id="todoList">
-      <div class="todo-item"><span class="todo-num">1</span><input class="todo-input" id="todo1" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button></div>
-      <div class="todo-item"><span class="todo-num">2</span><input class="todo-input" id="todo2" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button></div>
-      <div class="todo-item"><span class="todo-num">3</span><input class="todo-input" id="todo3" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button></div>
-      <div class="todo-item"><span class="todo-num">4</span><input class="todo-input" id="todo4" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button></div>
-      <div class="todo-item"><span class="todo-num">5</span><input class="todo-input" id="todo5" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button></div>
+      <div class="todo-item"><span class="todo-num">1</span><input class="todo-input" id="todo1" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button><button class="todo-del-btn" onclick="delTodoRow(this)">✕</button></div>
+      <div class="todo-item"><span class="todo-num">2</span><input class="todo-input" id="todo2" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button><button class="todo-del-btn" onclick="delTodoRow(this)">✕</button></div>
+      <div class="todo-item"><span class="todo-num">3</span><input class="todo-input" id="todo3" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button><button class="todo-del-btn" onclick="delTodoRow(this)">✕</button></div>
+      <div class="todo-item"><span class="todo-num">4</span><input class="todo-input" id="todo4" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button><button class="todo-del-btn" onclick="delTodoRow(this)">✕</button></div>
+      <div class="todo-item"><span class="todo-num">5</span><input class="todo-input" id="todo5" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button><button class="todo-del-btn" onclick="delTodoRow(this)">✕</button></div>
     </div>
   </div>
 
@@ -1169,7 +1182,7 @@
         todoCount++;
         const div = document.createElement('div');
         div.className = 'todo-item';
-        div.innerHTML = `<span class="todo-num">${todoCount}</span><input class="todo-input" ${i < 5 ? `id="todo${i+1}"` : ''} type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button>`;
+        div.innerHTML = `<span class="todo-num">${todoCount}</span><input class="todo-input" ${i < 5 ? `id="todo${i+1}"` : ''} type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button><button class="todo-del-btn" onclick="delTodoRow(this)">✕</button>`;
         todoListEl.appendChild(div);
         const input = div.querySelector('.todo-input');
         input.value = item.value || '';
@@ -1186,12 +1199,30 @@
     const list = document.getElementById('todoList');
     const div = document.createElement('div');
     div.className = 'todo-item';
-    div.innerHTML = `<span class="todo-num">${todoCount}</span><input class="todo-input" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button>`;
+    div.innerHTML = `<span class="todo-num">${todoCount}</span><input class="todo-input" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button><button class="todo-del-btn" onclick="delTodoRow(this)">✕</button>`;
     list.appendChild(div);
     // 엔터키 자동 연결은 이벤트 위임으로 처리됨
     div.querySelector('.todo-input').focus();
     updateTodoUI();
     saveTodoState();
+  }
+
+  function delTodoRow(btn) {
+    const items = document.querySelectorAll('.todo-item');
+    if (items.length <= 1) {
+      // 마지막 한 줄은 삭제 안 하고 내용만 지움
+      const input = btn.parentElement.querySelector('.todo-input');
+      if (input) { input.value = ''; input.classList.remove('done'); }
+    } else {
+      btn.parentElement.remove();
+      // 번호 재정렬
+      document.querySelectorAll('.todo-item').forEach((item, i) => {
+        item.querySelector('.todo-num').textContent = i + 1;
+      });
+      todoCount = document.querySelectorAll('.todo-item').length;
+    }
+    saveTodoState();
+    updateTodoUI();
   }
 
   let processedTodos = []; // 이미 처리한 항목 추적
@@ -1209,6 +1240,9 @@
       const newItems = incoming.filter(text => !processedTodos.includes(text));
       if (newItems.length === 0) return;
 
+      // 처리 즉시 삭제 (새로고침 시 재적용 방지 - todo_state로 영속성 관리)
+      localStorage.removeItem('focus_todos');
+
       newItems.forEach(text => {
         // 비어있는 입력칸 찾기
         const emptyInput = Array.from(todoListEl.querySelectorAll('.todo-input'))
@@ -1220,7 +1254,7 @@
           todoCount++;
           const div = document.createElement('div');
           div.className = 'todo-item';
-          div.innerHTML = `<span class="todo-num">${todoCount}</span><input class="todo-input" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button>`;
+          div.innerHTML = `<span class="todo-num">${todoCount}</span><input class="todo-input" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button><button class="todo-del-btn" onclick="delTodoRow(this)">✕</button>`;
           todoListEl.appendChild(div);
           div.querySelector('.todo-input').value = text;
         }
@@ -1276,10 +1310,13 @@
   function updateTodoUI() {
     const isBusy = mode !== 'idle';
     document.querySelectorAll('.todo-input').forEach(input => {
-      input.disabled = false; // 항상 입력 가능
+      input.disabled = false;
     });
     document.querySelectorAll('.todo-pick-btn').forEach(btn => {
-      btn.disabled = isBusy; // 집중 중엔 ▶ 비활성
+      btn.disabled = isBusy;
+    });
+    document.querySelectorAll('.todo-del-btn').forEach(btn => {
+      btn.disabled = isBusy;
     });
   }
 
@@ -1306,7 +1343,7 @@
     for (let i = 1; i <= 5; i++) {
       const div = document.createElement('div');
       div.className = 'todo-item';
-      div.innerHTML = `<span class="todo-num">${i}</span><input class="todo-input" id="todo${i}" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button>`;
+      div.innerHTML = `<span class="todo-num">${i}</span><input class="todo-input" id="todo${i}" type="text" placeholder="할 일 입력" /><button class="todo-pick-btn" onclick="pickTodoByEl(this)">▶</button><button class="todo-del-btn" onclick="delTodoRow(this)">✕</button>`;
       todoListEl.appendChild(div);
     }
     currentTodoIdx = 0;
