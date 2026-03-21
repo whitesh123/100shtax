@@ -230,7 +230,7 @@ header{position:sticky;top:0;z-index:200;background:var(--surface);border-bottom
     <div class="logo">법인세 <em>세무조정</em></div>
     <div class="hdr-inputs">
       <div class="hfield wide"><label for="co">업체명</label><input type="text" id="co" placeholder="(주)○○○" maxlength="40"></div>
-      <div class="hfield yr"><label for="yr">사업연도</label><input type="text" id="yr" placeholder="2024" maxlength="10"></div>
+      <div class="hfield yr"><label for="yr">사업연도</label><input type="text" id="yr" placeholder="" maxlength="10"></div>
     </div>
     <div class="hdr-right">
       <div class="prog-pill" id="prog-pill">0 / 0 항목 완료</div>
@@ -377,7 +377,8 @@ const STEPS = [
       { id:'s13b', sub:'13-2', title:'통합고용 명세서 · 공제세액계산서 · 조정명세서',
         items:[{label:'통합고용세액공제 상시근로자 명세서 작성'},
                {label:'통합고용세액공제 공제세액계산서 작성'},
-               {label:'세액공제조정명세서 (3) 작성'}] },
+               {label:'세액공제조정명세서 (3) 작성'},
+               {label:'공제감면세액합계표 작성'}] },
       { id:'s13c', sub:'13-3', title:'세액공제신청서 · 농특세 서류',
         items:[{label:'세액공제 신청서'},{label:'농특세 감면세액합계표'},
                {label:'농특세 과표·세액조정계산서'},{label:'농특세 과표·세액신고서'}] },
@@ -386,20 +387,38 @@ const STEPS = [
     ]
   },
 
-  { id:'s14', num:'14', color:'blue',  badge:'원천세',
+  { id:'g14', type:'group', num:'14', color:'green', badge:'연구개발', naable:true,
+    title:'연구인력개발비 세액공제 (해당시)',
+    steps:[
+      { id:'s14a', sub:'14-1', title:'연구인력개발비 발생명세서 작성',
+        items:[{label:'연구인력개발비 발생명세서 작성'}] },
+      { id:'s14b', sub:'14-2', title:'세액공제조정명세서 (3) · 공제감면세액합계표',
+        items:[{label:'세액공제조정명세서 (3) 작성'},
+               {label:'공제감면세액합계표 작성'}] },
+      { id:'s14c', sub:'14-3', title:'세액공제신청서 작성',
+        items:[{label:'세액공제신청서 작성'}] },
+    ]
+  },
+
+  { id:'s15', num:'15', color:'blue',  badge:'원천세',
     title:'원천납부세액명세서 작성',
     items:[{label:'원천납부세액명세서 작성'},
            {label:'지방세 특별징수명세서 작성', note:'지방세쪽 함께 작성'}] },
 
-  { id:'s15', num:'15', color:'red',   badge:'완성',
+  { id:'s16', num:'16', color:'red',   badge:'완성',
     title:'법인세 과세표준 및 세액조정계산서 완성',
     items:[{label:'세액조정계산서 최종 수치 확정'}] },
 
-  { id:'s16', num:'16', color:'red',   badge:'완성',
+  { id:'s17', num:'17', color:'red',   badge:'완성',
+    title:'법인 지방소득세 신고서 완성',
+    items:[{label:'법인지방소득세 과표 및 세액조정계산서 작성'},
+           {label:'법인지방소득세 과표신고서 작성'}] },
+
+  { id:'s18', num:'18', color:'red',   badge:'완성',
     title:'자본금과 적립금 조정명세서 갑표 완성',
     items:[{label:'갑표 이월결손금 등 최종 정리'}] },
 
-  { id:'s17', num:'17', color:'green', badge:'마무리',
+  { id:'s19', num:'19', color:'green', badge:'마무리',
     title:'법인세 과세표준 및 세액신고서 마무리',
     items:[{label:'최종 신고서 완성 및 제출 준비'}] },
 ];
