@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>법인세 세무조정 체크리스트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f4f0;
+  --surface: #ffffff;
+  --surface2: #f0eeea;
+  --border: #e0ddd6;
+  --border-mid: #c8c4bc;
+  --text: #1a1916;
+  --text2: #6b6760;
+  --text3: #a09c96;
+
+  --blue: #1d5fc4;
+  --blue-bg: #e8eef9;
+  --blue-border: #b3c6ee;
+  --blue-glow: rgba(29,95,196,0.12);
+
+  --amber: #b86010;
+  --amber-bg: #fdf0e0;
+  --amber-border: #f0c882;
+  --amber-glow: rgba(184,96,16,0.12);
+
+  --green: #1a7a45;
+  --green-bg: #e4f4ec;
+  --green-border: #86d4a8;
+  --green-glow: rgba(26,122,69,0.12);
+
+  --red: #b82020;
+  --red-bg: #fce8e8;
+  --red-border: #f0a0a0;
+  --red-glow: rgba(184,32,32,0.12);
+
+  --progress-h: 5px;
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── HEADER ── */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: auto;
+  min-height: 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+}
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+  gap: 12px;
+}
+.logo {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text);
+  white-space: nowrap;
+}
+.logo em {
+  font-style: normal;
+  color: var(--blue);
+}
+.header-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+  max-width: 440px;
+}
+.header-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  transition: border-color 0.15s;
+}
+.header-field:focus-within {
+  border-color: var(--blue-border);
+  background: var(--surface);
+}
+.header-field label {
+  font-size: 11px;
+  color: var(--text3);
+  white-space: nowrap;
+  font-weight: 500;
+}
+.header-field input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  width: 120px;
+}
+.header-field input::placeholder { color: var(--text3); }
+.header-field.wide input { width: 160px; }
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.prog-pill {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  color: var(--text2);
+  min-width: 108px;
+  text-align: center;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+.prog-pill.complete {
+  background: var(--green-bg);
+  border-color: var(--green-border);
+  color: var(--green);
+}
+.save-btn {
+  font-size: 12px;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #fff;
+  background: var(--blue);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 5px 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.save-btn:hover { background: #1650a8; }
+.save-btn:active { transform: scale(0.97); }
+.save-btn.saving {
+  background: var(--green);
+  pointer-events: none;
+}
+.reset-btn {
+  font-size: 12px;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: var(--text3);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.reset-btn:hover { color: var(--text2); border-color: var(--border-mid); background: var(--surface2); }
+
+/* ── PROGRESS BAR ── */
+.prog-bar-wrap {
+  height: var(--progress-h);
+  background: var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 199;
+}
+.prog-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue) 0%, var(--green) 100%);
+  transition: width 0.35s ease;
+  width: 0%;
+}
+
+/* ── MAIN LAYOUT ── */
+.main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+/* ── CONNECTOR ── */
+.connector {
+  width: 2px;
+  height: 16px;
+  background: var(--border-mid);
+  margin: 0 auto;
+  position: relative;
+}
+.connector::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid var(--border-mid);
+}
+
+/* ── STEP CARD ── */
+.step-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.step-card.active {
+  border-width: 1.5px;
+}
+.step-card.t-blue.active  { border-color: var(--blue-border); box-shadow: 0 0 0 4px var(--blue-glow), 0 2px 12px rgba(0,0,0,0.06); }
+.step-card.t-amber.active { border-color: var(--amber-border); box-shadow: 0 0 0 4px var(--amber-glow), 0 2px 12px rgba(0,0,0,0.06); }
+.step-card.t-green.active { border-color: var(--green-border); box-shadow: 0 0 0 4px var(--green-glow), 0 2px 12px rgba(0,0,0,0.06); }
+.step-card.t-red.active   { border-color: var(--red-border);   box-shadow: 0 0 0 4px var(--red-glow),   0 2px 12px rgba(0,0,0,0.06); }
+.step-card.done { opacity: 0.72; }
+.step-card.done.active { opacity: 1; }
+
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.step-header:hover { background: var(--surface2); }
+
+.step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+  font-family: 'IBM Plex Mono', monospace;
+  border: 1.5px solid;
+  transition: all 0.2s;
+}
+.t-blue  .step-num { background: var(--blue-bg);  color: var(--blue);  border-color: var(--blue-border); }
+.t-amber .step-num { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+.t-green .step-num { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
+.t-red   .step-num { background: var(--red-bg);   color: var(--red);   border-color: var(--red-border); }
+
+.step-title {
+  flex: 1;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+.step-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 4px;
+  border: 1px solid;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+.t-blue  .step-badge { background: var(--blue-bg);  color: var(--blue);  border-color: var(--blue-border); }
+.t-amber .step-badge { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+.t-green .step-badge { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
+.t-red   .step-badge { background: var(--red-bg);   color: var(--red);   border-color: var(--red-border); }
+
+.step-done-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  background: transparent;
+}
+.step-done-icon svg { opacity: 0; transition: opacity 0.2s; }
+.step-card.done .step-done-icon {
+  background: var(--green-bg);
+  border-color: var(--green-border);
+}
+.step-card.done .step-done-icon svg { opacity: 1; }
+
+.chevron {
+  width: 16px;
+  height: 16px;
+  color: var(--text3);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.step-card.active .chevron { transform: rotate(180deg); }
+
+/* ── STEP BODY ── */
+.step-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.step-body.open { max-height: 1200px; }
+
+.item-list {
+  padding: 4px 16px 14px 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.item-row:hover { background: var(--surface2); }
+
+.item-cb {
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  border: 1.5px solid var(--border-mid);
+  flex-shrink: 0;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  transition: all 0.15s;
+}
+.item-cb svg { opacity: 0; transition: opacity 0.15s; }
+
+.item-row.checked .item-cb {
+  background: var(--green-bg);
+  border-color: var(--green-border);
+}
+.item-row.checked .item-cb svg { opacity: 1; }
+.item-row.checked .item-label {
+  color: var(--text3);
+  text-decoration: line-through;
+  text-decoration-color: var(--border-mid);
+}
+
+.item-label {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.55;
+}
+.item-note {
+  font-size: 11px;
+  color: var(--text3);
+  display: block;
+  margin-top: 1px;
+}
+
+/* ── GROUP CARD ── */
+.group-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.group-card.active {
+  border-width: 1.5px;
+}
+.g-amber.active { border-color: var(--amber-border); box-shadow: 0 0 0 4px var(--amber-glow), 0 2px 12px rgba(0,0,0,0.06); }
+.g-blue.active  { border-color: var(--blue-border);  box-shadow: 0 0 0 4px var(--blue-glow),  0 2px 12px rgba(0,0,0,0.06); }
+.g-green.active { border-color: var(--green-border); box-shadow: 0 0 0 4px var(--green-glow), 0 2px 12px rgba(0,0,0,0.06); }
+
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.g-amber .group-header { background: var(--amber-bg); }
+.g-blue  .group-header { background: var(--blue-bg); }
+.g-green .group-header { background: var(--green-bg); }
+.group-header:hover { filter: brightness(0.97); }
+
+.group-label {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.g-amber .group-label { color: var(--amber); }
+.g-blue  .group-label { color: var(--blue); }
+.g-green .group-label { color: var(--green); }
+
+.group-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid;
+}
+.g-amber .group-badge { background: rgba(184,96,16,0.1); color: var(--amber); border-color: var(--amber-border); }
+.g-blue  .group-badge { background: rgba(29,95,196,0.1);  color: var(--blue);  border-color: var(--blue-border); }
+.g-green .group-badge { background: rgba(26,122,69,0.1);  color: var(--green); border-color: var(--green-border); }
+
+.group-chevron {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.2s;
+}
+.g-amber .group-chevron { color: var(--amber); }
+.g-blue  .group-chevron { color: var(--blue); }
+.g-green .group-chevron { color: var(--green); }
+.group-card.active .group-chevron { transform: rotate(180deg); }
+
+.group-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+}
+.group-body.open { max-height: 3000px; }
+
+.group-inner-step {
+  border-bottom: 1px solid var(--border);
+}
+.group-inner-step:last-child { border-bottom: none; }
+
+/* inner step header (no outer radius, flat) */
+.inner-step-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px 11px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.12s;
+}
+.inner-step-header:hover { background: var(--surface2); }
+
+.inner-step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1.5px solid;
+  transition: all 0.2s;
+}
+.g-amber .inner-step-dot { background: var(--amber-bg); border-color: var(--amber-border); }
+.g-blue  .inner-step-dot { background: var(--blue-bg);  border-color: var(--blue-border); }
+.g-green .inner-step-dot { background: var(--green-bg); border-color: var(--green-border); }
+
+.inner-step-title {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.inner-done-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.inner-done-icon svg { opacity: 0; transition: opacity 0.2s; }
+.inner-step.done .inner-done-icon {
+  background: var(--green-bg);
+  border-color: var(--green-border);
+}
+.inner-step.done .inner-done-icon svg { opacity: 1; }
+.inner-step.done .inner-step-title { color: var(--text3); }
+
+.inner-chevron {
+  width: 14px;
+  height: 14px;
+  color: var(--text3);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.inner-step.active .inner-chevron { transform: rotate(180deg); }
+
+.inner-item-list {
+  padding: 2px 16px 12px 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.step-card, .group-card, .connector {
+  animation: fadeSlideIn 0.3s ease both;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="logo">법인세 <em>세무조정</em></div>
+    <div class="header-inputs">
+      <div class="header-field wide">
+        <label for="company-name">업체명</label>
+        <input type="text" id="company-name" placeholder="예) (주)명진세무" maxlength="40">
+      </div>
+      <div class="header-field">
+        <label for="biz-year">사업연도</label>
+        <input type="text" id="biz-year" placeholder="2024" maxlength="10" style="width:60px">
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="prog-pill" id="prog-pill">0 / 0 항목 완료</div>
+      <button class="save-btn" id="save-btn" onclick="saveAsHtml()">💾 저장</button>
+      <button class="reset-btn" onclick="resetAll()">초기화</button>
+    </div>
+  </div>
+</header>
+
+<div class="prog-bar-wrap">
+  <div class="prog-bar-fill" id="prog-bar"></div>
+</div>
+
+<div class="main" id="main"></div>
+
+<script>
+const CHECK_SVG = (sz=9) => `<svg width="${sz}" height="${sz}" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5.5 4,8 8.5,2" stroke="${sz>=11?'var(--green)':'var(--green)'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const CHEVRON_SVG = (cls='chevron') => `<svg class="${cls}" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,6 8,10 12,6"/></svg>`;
+
+const STEPS = [
+  {
+    id:'s1', num:'1', color:'blue', badge:'기초작업',
+    title:'재무제표 점검 및 불러오기',
+    items:[
+      { label:'회계관리 → 재무제표 메뉴 진입' },
+      { label:'법인조정메뉴 → 표준재무제표 불러오기' },
+    ]
+  },
+  {
+    id:'s2', num:'2', color:'blue', badge:'수입금액',
+    title:'수입금액조정명세서 · 조정후 수입금액명세서',
+    items:[
+      { label:'수입금액조정명세서 불러오기' },
+      { label:'조정후 수입금액명세서 불러오기' },
+    ]
+  },
+  {
+    id:'s3', num:'3', color:'blue', badge:'기준검토',
+    title:'중소기업기준검토표 불러오기',
+    items:[
+      { label:'중소기업기준검토표 작성 및 확인' },
+    ]
+  },
+  {
+    id:'s4', num:'4', color:'blue', badge:'명세서',
+    title:'주식 등 변동상황명세서 작성',
+    items:[
+      { label:'주주 변동내역 확인 후 작성' },
+    ]
+  },
+  {
+    id:'g5', type:'group', color:'amber', badge:'핵심',
+    title:'STEP 5 — 과목별 세무조정',
+    steps:[
+      { id:'s5a', title:'법인세 추납액, 법인세 등', items:[{label:'법인세 추납액 조정'},{label:'법인세 등 손금불산입 처리'}] },
+      { id:'s5b', title:'퇴직급여 · 퇴직연금', items:[{label:'퇴직급여충당금 한도 계산'},{label:'퇴직연금 부담금 조정'}] },
+      { id:'s5c', title:'대손충당금', items:[{label:'대손충당금 한도초과액 계산'}] },
+      { id:'s5d', title:'기업업무추진비 (접대비)', items:[{label:'접대비 한도 계산 및 초과액 조정'}] },
+      { id:'s5e', title:'재고자산', items:[{label:'재고자산 평가방법 확인'},{label:'평가손 조정'}] },
+      { id:'s5f', title:'세금과공과', items:[{label:'손금불산입 세금 분류'}] },
+      { id:'s5g', title:'선급비용', items:[{label:'기간귀속 확인 및 조정'}] },
+      { id:'s5h', title:'기부금', items:[{label:'법정기부금 한도 계산'},{label:'지정기부금 한도 계산'}] },
+      { id:'s5i', title:'가지급금 인정이자', items:[{label:'인정이자 계산 (당기분)'},{label:'익금산입 · 소득처분 처리'}] },
+      { id:'s5j', title:'업무무관지급이자', items:[{label:'업무무관자산 적수 계산'},{label:'지급이자 손금불산입액 계산'}] },
+      { id:'s5k', title:'외화자산 평가차손익', items:[{label:'외화환산손익 세무조정'}] },
+      { id:'s5l', title:'그 외 자산 평가차손익', items:[{label:'시가법 적용 자산 평가조정'}] },
+      { id:'s5m', title:'업무용승용차', items:[{label:'업무사용비율 확인'},{label:'한도초과액 계산 및 조정'}] },
+      { id:'s5n', title:'감가상각', items:[{label:'상각범위액 계산'},{label:'한도초과·시인부족액 처리'}] },
+    ]
+  },
+  {
+    id:'s6', num:'6', color:'amber', badge:'재무반영',
+    title:'가지급금 인정이자 처리 후 재무제표 재작업',
+    items:[
+      { label:'전년도 가지급금 인정이자 회수 확인' },
+      { label:'당해연도 인정이자 재무제표 반영' },
+      { label:'STEP 1 재수행 (재무제표 점검 및 불러오기)', note:'인정이자 반영 후 반드시 재수행' },
+    ]
+  },
+  {
+    id:'g7', type:'group', color:'amber', badge:'점검',
+    title:'STEP 7 — 소득금액 점검 및 명세서 작성',
+    steps:[
+      { id:'s7a', title:'소득금액조정합계표 점검', items:[{label:'가산·차감 조정항목 합계 검토'}] },
+      { id:'s7b', title:'주요계정명세서 작성', items:[{label:'주요 계정과목별 명세 기재'}] },
+      { id:'s7c', title:'자본금과적립금 조정명세서 을표 작성', items:[{label:'유보·△유보 내역 정리'}] },
+      { id:'s7d', title:'소득자료명세서 작성', items:[{label:'인정상여 있는 경우 작성'},{label:'소득자 귀속 확인'}] },
+    ]
+  },
+  {
+    id:'s8', num:'8', color:'amber', badge:'세액계산',
+    title:'법인세 과세표준 및 세액조정계산서 (1차)',
+    items:[
+      { label:'법인세 과세표준·세액조정계산서 불러오기', note:'미완성 단계 — 완성은 STEP 16' },
+      { label:'자본금과적립금 갑표 → 이월결손금 확인' },
+    ]
+  },
+  {
+    id:'g9', type:'group', color:'blue', badge:'서류',
+    title:'STEP 9 — 전산조직 · 지출증명',
+    steps:[
+      { id:'s9a', title:'전산조직운용명세서 작성', items:[{label:'전산조직 현황 기재'}] },
+      { id:'s9b', title:'지출증명서류 수취검토서 작성', items:[
+        {label:'적격증빙 미수취 여부 확인'},
+        {label:'미수취 발견 시 가산세액 계산서 작성', note:'적격증빙 미수취 해당시'}
+      ]},
+    ]
+  },
+  {
+    id:'s11', num:'11', color:'blue', badge:'소득구분',
+    title:'소득구분계산서 작성',
+    items:[
+      { label:'소득구분계산서 작성' },
+    ]
+  },
+  {
+    id:'g12', type:'group', color:'green', badge:'세액감면',
+    title:'STEP 12 — 중소기업특별세액감면 (해당시)',
+    steps:[
+      { id:'s12a', title:'공제감면세액계산서 (2) 작성', items:[{label:'중소기업특별세액감면액 계산'}] },
+      { id:'s12b', title:'공제감면세액합계표 · 세액감면신청서', items:[{label:'합계표 및 신청서 작성'}] },
+      { id:'s12c', title:'최저한세 조정계산서 작성', items:[{label:'최저한세 적용 여부 확인 및 조정'}] },
+    ]
+  },
+  {
+    id:'g13', type:'group', color:'green', badge:'외국납부',
+    title:'STEP 13 — 외국납부세액공제 (해당시)',
+    steps:[
+      { id:'s13a', title:'공제감면세액계산서 (5) 작성', items:[{label:'외국납부세액공제 계산'}] },
+      { id:'s13b', title:'국가별 외국납부세액공제명세서', items:[{label:'국가별 명세서 작성'}] },
+    ]
+  },
+  {
+    id:'g14', type:'group', color:'green', badge:'고용공제',
+    title:'STEP 14 — 통합고용증대세액공제 (해당시)',
+    steps:[
+      { id:'s14a', title:'근로자고용현황 작성', items:[{label:'상시근로자 현황 집계'}] },
+      { id:'s14b', title:'세액공제조정명세서 (3) · 통합고용 상시근로자 명세서', items:[
+        {label:'세액공제조정명세서 (3) 작성'},
+        {label:'통합고용세액공제 상시근로자 명세서 작성'}
+      ]},
+      { id:'s14c', title:'세액공제신청서 · 농특세 서류', items:[
+        {label:'세액공제 신청서'},
+        {label:'농특세 감면세액합계표'},
+        {label:'농특세 과표·세액조정계산서'},
+        {label:'농특세 과표·세액신고서'},
+      ]},
+      { id:'s14d', title:'최저한세 조정계산서', items:[{label:'최저한세 재조정 (공제 반영 후)'}] },
+    ]
+  },
+  {
+    id:'s15', num:'15', color:'blue', badge:'원천세',
+    title:'원천납부세액명세서 작성',
+    items:[
+      { label:'원천납부세액명세서 작성' },
+      { label:'지방세 특별징수명세서 작성', note:'지방세쪽 함께 작성' },
+    ]
+  },
+  {
+    id:'s16', num:'16', color:'red', badge:'완성',
+    title:'법인세 과세표준 및 세액조정계산서 완성',
+    items:[
+      { label:'세액조정계산서 최종 수치 확정' },
+    ]
+  },
+  {
+    id:'s17', num:'17', color:'red', badge:'완성',
+    title:'자본금과 적립금 조정명세서 갑표 완성',
+    items:[
+      { label:'갑표 이월결손금 등 최종 정리' },
+    ]
+  },
+  {
+    id:'s18', num:'18', color:'green', badge:'마무리',
+    title:'법인세 과세표준 및 세액신고서 마무리',
+    items:[
+      { label:'최종 신고서 완성 및 제출 준비' },
+    ]
+  },
+];
+
+const checkedItems = new Set();
+let totalItems = 0;
+
+function itemId(stepId, idx) { return stepId + '_' + idx; }
+
+function buildItemRow(stepId, item, idx, listEl) {
+  const id = itemId(stepId, idx);
+  totalItems++;
+  const row = document.createElement('div');
+  row.className = 'item-row';
+  row.dataset.id = id;
+  row.innerHTML = `
+    <div class="item-cb">${CHECK_SVG(9)}</div>
+    <div class="item-label">${item.label}${item.note ? `<span class="item-note">${item.note}</span>` : ''}</div>
+  `;
+  row.addEventListener('click', e => {
+    e.stopPropagation();
+    if (checkedItems.has(id)) checkedItems.delete(id);
+    else checkedItems.add(id);
+    row.classList.toggle('checked', checkedItems.has(id));
+    updateParentDone(listEl, stepId);
+    updateProgress();
+  });
+  return row;
+}
+
+function buildItemList(stepId, items, cls='item-list') {
+  const list = document.createElement('div');
+  list.className = cls;
+  items.forEach((item, idx) => list.appendChild(buildItemRow(stepId, item, idx, list)));
+  return list;
+}
+
+function allChecked(listEl) {
+  const rows = listEl.querySelectorAll('.item-row');
+  return rows.length > 0 && [...rows].every(r => checkedItems.has(r.dataset.id));
+}
+
+function updateParentDone(listEl, stepId) {
+  // find the closest step card or inner-step
+  const card = listEl.closest('.step-card') || listEl.closest('.inner-step');
+  if (card) card.classList.toggle('done', allChecked(listEl));
+}
+
+function buildStepCard(step) {
+  const card = document.createElement('div');
+  card.className = `step-card t-${step.color}`;
+  card.dataset.id = step.id;
+
+  const header = document.createElement('div');
+  header.className = 'step-header';
+  header.innerHTML = `
+    <div class="step-num">${step.num}</div>
+    <div class="step-title">${step.title}</div>
+    <div class="step-badge">${step.badge}</div>
+    <div class="step-done-icon">${CHECK_SVG(11)}</div>
+    ${CHEVRON_SVG('chevron')}
+  `;
+
+  const body = document.createElement('div');
+  body.className = 'step-body';
+  const list = buildItemList(step.id, step.items);
+  body.appendChild(list);
+
+  header.addEventListener('click', () => {
+    const open = body.classList.toggle('open');
+    card.classList.toggle('active', open);
+  });
+
+  card.appendChild(header);
+  card.appendChild(body);
+  return card;
+}
+
+function buildGroupCard(grp) {
+  const card = document.createElement('div');
+  card.className = `group-card g-${grp.color}`;
+  card.dataset.id = grp.id;
+
+  const header = document.createElement('div');
+  header.className = 'group-header';
+  header.innerHTML = `
+    <div class="group-label">${grp.title}</div>
+    <div class="group-badge">${grp.badge}</div>
+    ${CHEVRON_SVG('group-chevron')}
+  `;
+
+  const body = document.createElement('div');
+  body.className = 'group-body';
+
+  grp.steps.forEach(s => {
+    const innerWrap = document.createElement('div');
+    innerWrap.className = `inner-step group-inner-step`;
+    innerWrap.dataset.id = s.id;
+
+    const innerHeader = document.createElement('div');
+    innerHeader.className = 'inner-step-header';
+    innerHeader.innerHTML = `
+      <div class="inner-step-dot"></div>
+      <div class="inner-step-title">${s.title}</div>
+      <div class="inner-done-icon">${CHECK_SVG(9)}</div>
+      ${CHEVRON_SVG('inner-chevron')}
+    `;
+
+    const innerBody = document.createElement('div');
+    innerBody.className = 'step-body';
+    const list = buildItemList(s.id, s.items, 'inner-item-list');
+    innerBody.appendChild(list);
+
+    innerHeader.addEventListener('click', () => {
+      const open = innerBody.classList.toggle('open');
+      innerWrap.classList.toggle('active', open);
+    });
+
+    innerWrap.appendChild(innerHeader);
+    innerWrap.appendChild(innerBody);
+    body.appendChild(innerWrap);
+  });
+
+  header.addEventListener('click', () => {
+    const open = body.classList.toggle('open');
+    card.classList.toggle('active', open);
+  });
+
+  card.appendChild(header);
+  card.appendChild(body);
+  return card;
+}
+
+function buildConnector() {
+  const d = document.createElement('div');
+  d.className = 'connector';
+  return d;
+}
+
+// Build DOM
+const main = document.getElementById('main');
+STEPS.forEach((s, i) => {
+  if (i > 0) {
+    const conn = buildConnector();
+    conn.style.animationDelay = (i * 0.04) + 's';
+    main.appendChild(conn);
+  }
+  let el;
+  if (s.type === 'group') el = buildGroupCard(s);
+  else el = buildStepCard(s);
+  el.style.animationDelay = (i * 0.04) + 's';
+  main.appendChild(el);
+});
+
+function updateProgress() {
+  const done = checkedItems.size;
+  const pct = totalItems > 0 ? (done / totalItems * 100) : 0;
+  document.getElementById('prog-bar').style.width = pct + '%';
+  const pill = document.getElementById('prog-pill');
+  pill.textContent = `${done} / ${totalItems} 항목 완료`;
+  pill.classList.toggle('complete', done === totalItems && totalItems > 0);
+}
+
+function resetAll() {
+  if (!confirm('체크 내용을 모두 초기화하시겠습니까?')) return;
+  checkedItems.clear();
+  document.querySelectorAll('.item-row').forEach(r => r.classList.remove('checked'));
+  document.querySelectorAll('.step-card, .inner-step').forEach(c => c.classList.remove('done'));
+  updateProgress();
+}
+
+function saveAsHtml() {
+  // 현재 상태를 data attribute에 인코딩 후 doctype 포함 전체 HTML로 저장
+  const company = document.getElementById('company-name').value.trim();
+  const bizYear = document.getElementById('biz-year').value.trim();
+
+  // checked 목록 직렬화
+  const checkedArr = Array.from(checkedItems);
+  // open 상태 직렬화
+  const openSteps = Array.from(document.querySelectorAll('.step-body.open'))
+    .map(el => {
+      const card = el.closest('[data-id]');
+      return card ? card.dataset.id : null;
+    }).filter(Boolean);
+  const openGroups = Array.from(document.querySelectorAll('.group-body.open'))
+    .map(el => {
+      const card = el.closest('[data-id]');
+      return card ? card.dataset.id : null;
+    }).filter(Boolean);
+
+  const state = JSON.stringify({ checked: checkedArr, openSteps, openGroups, company, bizYear });
+  const encoded = btoa(unescape(encodeURIComponent(state)));
+
+  // 현재 HTML의 </body> 직前에 복원 스크립트 삽입
+  let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+  // 이전 저장 스크립트 블록 제거
+  html = html.replace(/<script id="saved-state-restore"[\s\S]*?<\/script>/g, '');
+
+  const restoreScript = `<script id="saved-state-restore">
+(function(){
+  const encoded = "${encoded}";
+  try {
+    const state = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+    window.__SAVED_STATE__ = state;
+  } catch(e) {}
+})();
+<\/script>`;
+
+  html = html.replace('</body>', restoreScript + '\n</body>');
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fname = (company || '법인세세무조정') + (bizYear ? '_' + bizYear : '') + '_체크리스트.html';
+  a.href = url;
+  a.download = fname;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  // 저장 피드백
+  const btn = document.getElementById('save-btn');
+  btn.textContent = '✓ 저장됨';
+  btn.classList.add('saving');
+  setTimeout(() => {
+    btn.textContent = '💾 저장';
+    btn.classList.remove('saving');
+  }, 1800);
+}
+
+updateProgress();
+
+// 저장된 상태 복원
+(function restoreSavedState() {
+  const state = window.__SAVED_STATE__;
+  if (!state) return;
+
+  // 업체명·사업연도 복원
+  if (state.company) document.getElementById('company-name').value = state.company;
+  if (state.bizYear) document.getElementById('biz-year').value = state.bizYear;
+
+  // 체크 복원
+  if (state.checked && state.checked.length) {
+    state.checked.forEach(id => {
+      checkedItems.add(id);
+      const row = document.querySelector(`.item-row[data-id="${id}"]`);
+      if (row) row.classList.add('checked');
+    });
+    // done 상태 재계산
+    document.querySelectorAll('.item-list, .inner-item-list').forEach(list => {
+      const rows = list.querySelectorAll('.item-row');
+      if (!rows.length) return;
+      const allDone = [...rows].every(r => checkedItems.has(r.dataset.id));
+      const card = list.closest('.step-card') || list.closest('.inner-step');
+      if (card) card.classList.toggle('done', allDone);
+    });
+    updateProgress();
+  }
+
+  // 열림 상태 복원 (step)
+  if (state.openSteps) {
+    state.openSteps.forEach(id => {
+      const card = document.querySelector(`.step-card[data-id="${id}"], .inner-step[data-id="${id}"]`);
+      if (!card) return;
+      const body = card.querySelector('.step-body');
+      if (body) { body.classList.add('open'); card.classList.add('active'); }
+    });
+  }
+  // 열림 상태 복원 (group)
+  if (state.openGroups) {
+    state.openGroups.forEach(id => {
+      const card = document.querySelector(`.group-card[data-id="${id}"]`);
+      if (!card) return;
+      const body = card.querySelector('.group-body');
+      if (body) { body.classList.add('open'); card.classList.add('active'); }
+    });
+  }
+})();
+</script>
+</body>
+</html>
