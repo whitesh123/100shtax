@@ -348,11 +348,13 @@ const STEPS = [
   { id:'g11', type:'group', num:'11', color:'green', badge:'세액감면', naable:true,
     title:'중소기업특별세액감면 (해당시)',
     steps:[
-      { id:'s11a', sub:'11-1', title:'공제감면세액계산서 (2) 작성',
+      { id:'s11a', sub:'11-1', title:'근로자고용현황 작성',
+        items:[{label:'상시근로자 현황 집계'}] },
+      { id:'s11b', sub:'11-2', title:'공제감면세액계산서 (2) 작성',
         items:[{label:'중소기업특별세액감면액 계산'}] },
-      { id:'s11b', sub:'11-2', title:'공제감면세액합계표 · 세액감면신청서',
+      { id:'s11c', sub:'11-3', title:'공제감면세액합계표 · 세액감면신청서',
         items:[{label:'합계표 및 신청서 작성'}] },
-      { id:'s11c', sub:'11-3', title:'최저한세 조정계산서 작성',
+      { id:'s11d', sub:'11-4', title:'최저한세 조정계산서 작성',
         items:[{label:'최저한세 적용 여부 확인 및 조정'}] },
     ]
   },
