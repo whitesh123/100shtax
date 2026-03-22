@@ -309,7 +309,7 @@ const STEPS = [
     ]
   },
 
-  { id:'s6',  num:'6',  color:'amber', badge:'재무반영',
+  { id:'s6',  num:'6',  color:'amber', badge:'재무반영', naable:true,
     title:'가지급금 인정이자 처리 후 재무제표 재작업',
     items:[{label:'전년도 가지급금 인정이자 회수 확인'},
            {label:'당해연도 인정이자 재무제표 반영'},
@@ -366,10 +366,15 @@ const STEPS = [
   { id:'g12', type:'group', num:'12', color:'green', badge:'외국납부', naable:true,
     title:'외국납부세액공제 (해당시)',
     steps:[
-      { id:'s12a', sub:'12-1', title:'공제감면세액계산서 (5) 작성',
+      { id:'s12a', sub:'12-1', title:'국가별 외국납부세액공제명세서',
+        items:[{label:'국가별 외국납부세액공제명세서 작성'}] },
+      { id:'s12b', sub:'12-2', title:'소득종류별 외국납부세액명세서',
+        items:[{label:'소득종류별 외국납부세액명세서 작성'}] },
+      { id:'s12c', sub:'12-3', title:'공제감면세액계산서 (5) 작성',
         items:[{label:'외국납부세액공제 계산'}] },
-      { id:'s12b', sub:'12-2', title:'국가별 외국납부세액공제명세서',
-        items:[{label:'국가별 명세서 작성'}] },
+      { id:'s12d', sub:'12-4', title:'공제감면세액합계표 작성',
+        warn:'✎ 직접 입력 요망 (잘 안 불러와짐)',
+        items:[{label:'공제감면세액합계표 직접 입력'}] },
     ]
   },
 
