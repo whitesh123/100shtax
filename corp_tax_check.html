@@ -468,6 +468,7 @@ header {
     <div class="hdr-right">
       <div class="prog-pill" id="prog-pill">0 / 0 항목 완료</div>
       <button class="print-btn" onclick="printDoc()">🖨 출력</button>
+      <button class="print-btn" onclick="savePdf()" style="background:var(--red-bg);color:var(--red);border-color:var(--red-bd);">📄 PDF</button>
       <button class="reset-btn" onclick="resetAll()">초기화</button>
     </div>
   </div>
@@ -892,18 +893,37 @@ function resetAll() {
 
 /* ── 출력 ── */
 function printDoc() {
-  // 인쇄 전 na가 아닌 모든 body 펼침
   document.querySelectorAll('.step-body, .group-body').forEach(b => {
     const card = b.closest('[data-id]');
     if(card && naSet.has(card.dataset.id)) return;
-    if(b.style.display === 'none') return; // single 카드 body
+    if(b.style.display === 'none') return;
     b.classList.add('open');
   });
   document.querySelectorAll('.step-card:not(.na), .group-card:not(.na)').forEach(c => c.classList.add('active'));
+  setTimeout(() => { window.print(); }, 100);
+}
+
+/* ── PDF 저장 ── */
+function savePdf() {
+  const co = document.getElementById('co').value.trim();
+  const yr = document.getElementById('yr').value.trim();
+  const fname = (co || '법인세세무조정') + (yr ? '_' + yr : '') + '_체크리스트';
+
+  // 모두 펼치기
+  document.querySelectorAll('.step-body, .group-body').forEach(b => {
+    const card = b.closest('[data-id]');
+    if(card && naSet.has(card.dataset.id)) return;
+    if(b.style.display === 'none') return;
+    b.classList.add('open');
+  });
+  document.querySelectorAll('.step-card:not(.na), .group-card:not(.na)').forEach(c => c.classList.add('active'));
+
   setTimeout(() => {
+    // document.title을 파일명으로 바꿔서 인쇄 대화상자의 기본 파일명 설정
+    const origTitle = document.title;
+    document.title = fname;
     window.print();
-    // 인쇄 후 원래 상태로 복원 (열려있지 않았던 것 닫기)
-    // 단순히 닫지 않고 현재 열린 상태 유지 — 사용자가 수동으로 닫을 수 있음
+    document.title = origTitle;
   }, 100);
 }
 
