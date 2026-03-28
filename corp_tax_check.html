@@ -102,6 +102,38 @@ header {
 }
 .reset-btn:hover { color: var(--text2); border-color: var(--border-mid); background: var(--surface2); }
 
+.print-btn {
+  font-size: 12px; font-family: 'Noto Sans KR', sans-serif;
+  color: var(--text2); background: var(--surface2);
+  border: 1px solid var(--border); border-radius: var(--rs);
+  padding: 5px 11px; cursor: pointer; transition: all .15s;
+  font-weight: 500; white-space: nowrap;
+}
+.print-btn:hover { background: var(--surface); border-color: var(--border-mid); color: var(--text); }
+
+/* ══ PRINT ══ */
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  header { position: static !important; box-shadow: none !important; border-bottom: 1.5px solid #ccc !important; }
+  .hdr-right { display: none !important; }
+  .pb-wrap { display: none !important; }
+  .print-btn, .save-btn, .reset-btn { display: none !important; }
+  .main { padding: 12px 8px 20px !important; }
+  /* 모든 step-body / group-body 강제 펼침 */
+  .step-body { max-height: none !important; overflow: visible !important; display: block !important; }
+  .group-body { max-height: none !important; overflow: visible !important; }
+  /* na 항목은 인쇄서 제외 */
+  .step-card.na, .inner-step.na, .group-card.na { display: none !important; }
+  /* 카드 그림자 제거 */
+  .step-card, .group-card { box-shadow: none !important; break-inside: avoid; }
+  .connector { display: none !important; }
+  /* 체크된 항목 취소선 유지 */
+  .item-row.checked .item-label { text-decoration: line-through; color: #aaa !important; }
+  /* 컬러 배지 유지 */
+  .step-badge, .group-badge, .warn-badge, .inner-num, .step-num, .group-num { border: 1px solid !important; }
+  @page { margin: 15mm 12mm; size: A4; }
+}
+
 /* ══ PROGRESS BAR ══ */
 .pb-wrap { height: 3px; background: var(--border); }
 .pb-fill { height: 100%; background: linear-gradient(90deg, var(--blue) 0%, var(--green) 100%); transition: width .4s ease; width: 0%; }
@@ -444,6 +476,7 @@ header {
     </div>
     <div class="hdr-right">
       <div class="prog-pill" id="prog-pill">0 / 0 항목 완료</div>
+      <button class="print-btn" onclick="printDoc()">🖨 출력</button>
       <button class="save-btn" id="save-btn" onclick="saveAsHtml()">💾 저장</button>
       <button class="reset-btn" onclick="resetAll()">초기화</button>
     </div>
@@ -475,21 +508,21 @@ const STEPS = [
   { id:'g5', type:'group', num:'5', color:'amber', badge:'핵심',
     title:'과목별 세무조정',
     steps:[
-      { id:'s5a', sub:'5-1',  title:'법인세 추납액, 법인세 등',
+      { id:'s5a', sub:'5-1',  title:'법인세 추납액, 법인세 등', naable:true,
         items:[{label:'법인세 추납액 조정'},{label:'법인세 등 손금불산입 처리'}] },
-      { id:'s5b', sub:'5-2',  title:'퇴직급여 · 퇴직연금',
+      { id:'s5b', sub:'5-2',  title:'퇴직급여 · 퇴직연금', naable:true,
         items:[{label:'퇴직급여충당금 한도 계산'},{label:'퇴직연금 부담금 조정'}] },
-      { id:'s5c', sub:'5-3',  title:'대손충당금',
+      { id:'s5c', sub:'5-3',  title:'대손충당금', naable:true,
         items:[{label:'대손충당금 한도초과액 계산'}] },
-      { id:'s5d', sub:'5-4',  title:'기업업무추진비 (접대비)',
+      { id:'s5d', sub:'5-4',  title:'기업업무추진비 (접대비)', naable:true,
         items:[{label:'접대비 한도 계산 및 초과액 조정'}] },
-      { id:'s5e', sub:'5-5',  title:'재고자산',
+      { id:'s5e', sub:'5-5',  title:'재고자산', naable:true,
         items:[{label:'재고자산 평가방법 확인'},{label:'평가손 조정'}] },
-      { id:'s5f', sub:'5-6',  title:'세금과공과',
+      { id:'s5f', sub:'5-6',  title:'세금과공과', naable:true,
         items:[{label:'손금불산입 세금 분류'}] },
-      { id:'s5g', sub:'5-7',  title:'선급비용',
+      { id:'s5g', sub:'5-7',  title:'선급비용', naable:true,
         items:[{label:'기간귀속 확인 및 조정'}] },
-      { id:'s5i', sub:'5-8',  title:'가지급금 인정이자',
+      { id:'s5i', sub:'5-8',  title:'가지급금 인정이자', naable:true,
         items:[{label:'인정이자 계산 (당기분)'},{label:'익금산입 · 소득처분 처리'}] },
       { id:'s5j', sub:'5-9',  title:'업무무관지급이자', naable:true,
         items:[{label:'업무무관자산 적수 계산'},{label:'지급이자 손금불산입액 계산'}] },
@@ -499,13 +532,13 @@ const STEPS = [
         items:[{label:'시가법 적용 자산 평가조정'}] },
       { id:'s5m', sub:'5-12', title:'업무용승용차', naable:true,
         items:[{label:'업무사용비율 확인'},{label:'한도초과액 계산 및 조정'}] },
-      { id:'s5n', sub:'5-13', title:'감가상각',
+      { id:'s5n', sub:'5-13', title:'감가상각', naable:true,
         items:[{label:'상각범위액 계산'},{label:'한도초과·시인부족액 처리'}] },
-      { id:'s5o', sub:'5-14', title:'합계잔액시산표 추가 세무조정 검토',
+      { id:'s5o', sub:'5-14', title:'합계잔액시산표 추가 세무조정 검토', naable:true,
         items:[{label:'합계잔액시산표에 세무조정 할 것 더 없는지 체크'}] },
-      { id:'s5p', sub:'5-15', title:'전기 이전 유보사항 체크',
+      { id:'s5p', sub:'5-15', title:'전기 이전 유보사항 체크', naable:true,
         items:[{label:'전기 이전 유보사항 체크'}] },
-      { id:'s5h', sub:'5-16', title:'기부금',
+      { id:'s5h', sub:'5-16', title:'기부금', naable:true,
         warn:'⚠ 세액조정계산서 저장 후 작업',
         items:[{label:'법인세 과표 및 세액조정계산서 먼저 저장', note:'기부금 한도 계산 전 반드시 선행'},
                {label:'법정기부금 한도 계산'},
@@ -549,7 +582,7 @@ const STEPS = [
     ]
   },
 
-  { id:'s10', num:'10', color:'blue', badge:'소득구분',
+  { id:'s10', num:'10', color:'blue', badge:'소득구분', naable:true,
     title:'소득구분계산서 작성',
     items:[{label:'소득구분계산서 작성'}] },
 
@@ -613,7 +646,7 @@ const STEPS = [
     ]
   },
 
-  { id:'s15', num:'15', color:'blue',  badge:'원천세',
+  { id:'s15', num:'15', color:'blue',  badge:'원천세', naable:true,
     title:'원천납부세액명세서 작성',
     items:[{label:'원천납부세액명세서 작성'},
            {label:'지방세 특별징수명세서 작성', note:'지방세쪽 함께 작성'}] },
@@ -866,6 +899,23 @@ function resetAll() {
   updateProg();
 }
 
+/* ── 출력 ── */
+function printDoc() {
+  // 인쇄 전 na가 아닌 모든 body 펼침
+  document.querySelectorAll('.step-body, .group-body').forEach(b => {
+    const card = b.closest('[data-id]');
+    if(card && naSet.has(card.dataset.id)) return;
+    if(b.style.display === 'none') return; // single 카드 body
+    b.classList.add('open');
+  });
+  document.querySelectorAll('.step-card:not(.na), .group-card:not(.na)').forEach(c => c.classList.add('active'));
+  setTimeout(() => {
+    window.print();
+    // 인쇄 후 원래 상태로 복원 (열려있지 않았던 것 닫기)
+    // 단순히 닫지 않고 현재 열린 상태 유지 — 사용자가 수동으로 닫을 수 있음
+  }, 100);
+}
+
 /* ── 저장 ── */
 function saveAsHtml() {
   const co = document.getElementById('co').value.trim();
@@ -876,74 +926,96 @@ function saveAsHtml() {
     .map(el=>{ const c=el.closest('[data-id]'); return c?c.dataset.id:null; }).filter(Boolean);
   const state = JSON.stringify({checked:[...checked],na:[...naSet],openSt,openGr,co,yr});
   const enc = btoa(unescape(encodeURIComponent(state)));
-  let html = '<!DOCTYPE html>\n'+document.documentElement.outerHTML;
-  html = html.replace(/<script id="ssr"[\s\S]*?<\/script>/g,'');
-  html = html.replace('</body>',
-    `<script id="ssr">(function(){try{window.__SS__=JSON.parse(decodeURIComponent(escape(atob("${enc}"))));}catch(e){}})()\;<\/script>\n</body>`);
-  const blob = new Blob([html],{type:'text/html;charset=utf-8'});
+
+  // outerHTML 캡처 전 input value를 DOM 속성에 강제 반영
+  document.getElementById('co').setAttribute('value', co);
+  document.getElementById('yr').setAttribute('value', yr);
+
+  let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+  // input value 속성 원복 (화면 유지)
+  document.getElementById('co').removeAttribute('value');
+  document.getElementById('yr').removeAttribute('value');
+
+  // 이전 저장 스크립트 제거
+  html = html.replace(/<script id="ssr"[\s\S]*?<\/script>/g, '');
+
+  // 복원 스크립트: DOMContentLoaded 이후 실행되도록 이벤트 리스너 방식으로
+  const restoreScript = `<script id="ssr">
+(function(){
+  var enc="${enc}";
+  function run(){
+    try{
+      var st=JSON.parse(decodeURIComponent(escape(atob(enc))));
+      // 업체명/연도 복원
+      var co=document.getElementById('co'), yr=document.getElementById('yr');
+      if(co && st.co) co.value=st.co;
+      if(yr && st.yr) yr.value=st.yr;
+      // na 복원
+      if(st.na) st.na.forEach(function(id){
+        naSet.add(id);
+        var el=document.querySelector('[data-id="'+id+'"]');
+        if(el) el.classList.add('na');
+        var step=STEPS.find(function(s){return s.id===id;});
+        if(step && step._naCell) step._naCell.classList.add('active');
+      });
+      // checked 복원
+      if(st.checked) st.checked.forEach(function(id){
+        checked.add(id);
+        var row=document.querySelector('.item-row[data-id="'+id+'"]');
+        if(row) row.classList.add('checked');
+      });
+      // done 재계산
+      document.querySelectorAll('.step-card.single,.inner-step.single').forEach(function(card){
+        if(checked.has(card.dataset.id+'_0')) card.classList.add('done');
+      });
+      document.querySelectorAll('.item-list,.inner-item-list').forEach(function(list){
+        var rows=list.querySelectorAll('.item-row');
+        if(!rows.length) return;
+        var card=list.closest('.step-card')||list.closest('.inner-step');
+        if(card) card.classList.toggle('done',[...rows].every(function(r){return checked.has(r.dataset.id);}));
+      });
+      // open 복원
+      if(st.openSt) st.openSt.forEach(function(id){
+        var c=document.querySelector('.step-card[data-id="'+id+'"],.inner-step[data-id="'+id+'"]');
+        if(!c||naSet.has(id)) return;
+        var b=c.querySelector('.step-body');
+        if(b&&b.style.display!=='none'){b.classList.add('open');c.classList.add('active');}
+      });
+      if(st.openGr) st.openGr.forEach(function(id){
+        var c=document.querySelector('.group-card[data-id="'+id+'"]');
+        if(!c||naSet.has(id)) return;
+        var b=c.querySelector('.group-body');
+        if(b){b.classList.add('open');c.classList.add('active');}
+      });
+      updateProg();
+    }catch(e){ console.warn('복원 오류:', e); }
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', run);
+  } else {
+    // DOM 빌드 완료 후 실행 보장
+    setTimeout(run, 0);
+  }
+})();
+<\/script>`;
+
+  html = html.replace('</body>', restoreScript + '\n</body>');
+
+  const blob = new Blob([html], {type:'text/html;charset=utf-8'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href=url; a.download=(co||'법인세세무조정')+(yr?'_'+yr:'')+'_체크리스트.html'; a.click();
+  a.href=url;
+  a.download=(co||'법인세세무조정')+(yr?'_'+yr:'')+'_체크리스트.html';
+  a.click();
   URL.revokeObjectURL(url);
+
   const btn=document.getElementById('save-btn');
   btn.textContent='✓ 저장됨'; btn.classList.add('saving');
   setTimeout(()=>{btn.textContent='💾 저장';btn.classList.remove('saving');},1800);
 }
 
-/* ── 상태 복원 ── */
 updateProg();
-(function restore(){
-  const st = window.__SS__;
-  if(!st) return;
-  if(st.co) document.getElementById('co').value=st.co;
-  if(st.yr) document.getElementById('yr').value=st.yr;
-
-  // na 복원
-  if(st.na) st.na.forEach(id=>{
-    naSet.add(id);
-    const el=document.querySelector(`[data-id="${id}"]`);
-    if(el) {
-      el.classList.add('na');
-      const grpStep = STEPS.find(s=>s.id===id);
-      if(grpStep && grpStep._naCell) grpStep._naCell.classList.add('active');
-    }
-  });
-
-  // checked 복원
-  if(st.checked) st.checked.forEach(id=>{
-    checked.add(id);
-    const row=document.querySelector(`.item-row[data-id="${id}"]`);
-    if(row) row.classList.add('checked');
-  });
-
-  // done 재계산 (단일 포함)
-  document.querySelectorAll('.step-card.single,.inner-step.single').forEach(card=>{
-    const sid = card.dataset.id;
-    if(checked.has(sid+'_0')) card.classList.add('done');
-  });
-  document.querySelectorAll('.item-list,.inner-item-list').forEach(list=>{
-    const rows=list.querySelectorAll('.item-row');
-    if(!rows.length) return;
-    const card=list.closest('.step-card')||list.closest('.inner-step');
-    if(card) card.classList.toggle('done',[...rows].every(r=>checked.has(r.dataset.id)));
-  });
-
-  // open 복원
-  if(st.openSt) st.openSt.forEach(id=>{
-    const c=document.querySelector(`.step-card[data-id="${id}"],.inner-step[data-id="${id}"]`);
-    if(!c||naSet.has(id)) return;
-    const b=c.querySelector('.step-body');
-    if(b&&b.style.display!=='none'){b.classList.add('open'); c.classList.add('active');}
-  });
-  if(st.openGr) st.openGr.forEach(id=>{
-    const c=document.querySelector(`.group-card[data-id="${id}"]`);
-    if(!c||naSet.has(id)) return;
-    const b=c.querySelector('.group-body');
-    if(b){b.classList.add('open'); c.classList.add('active');}
-  });
-
-  updateProg();
-})();
 </script>
 </body>
 </html>
