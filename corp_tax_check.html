@@ -917,105 +917,114 @@ function printDoc() {
 }
 
 /* ── 저장 ── */
-function saveAsHtml() {
+async function saveAsHtml() {
   const co = document.getElementById('co').value.trim();
   const yr = document.getElementById('yr').value.trim();
   const openSt = [...document.querySelectorAll('.step-body.open')]
     .map(el=>{ const c=el.closest('[data-id]'); return c?c.dataset.id:null; }).filter(Boolean);
   const openGr = [...document.querySelectorAll('.group-body.open')]
     .map(el=>{ const c=el.closest('[data-id]'); return c?c.dataset.id:null; }).filter(Boolean);
-  const state = JSON.stringify({checked:[...checked],na:[...naSet],openSt,openGr,co,yr});
-  const enc = btoa(unescape(encodeURIComponent(state)));
+  const state = {checked:[...checked], na:[...naSet], openSt, openGr, co, yr};
+  const enc = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
 
-  // outerHTML 캡처 전 input value를 DOM 속성에 강제 반영
-  document.getElementById('co').setAttribute('value', co);
-  document.getElementById('yr').setAttribute('value', yr);
+  const btn = document.getElementById('save-btn');
 
-  let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  try {
+    // 현재 파일의 원본 소스를 그대로 fetch
+    const resp = await fetch(location.href);
+    let src = await resp.text();
 
-  // input value 속성 원복 (화면 유지)
-  document.getElementById('co').removeAttribute('value');
-  document.getElementById('yr').removeAttribute('value');
+    // 이전 저장 스크립트 제거 후 새 상태 주입
+    src = src.replace(/<script id="ssr"[\s\S]*?<\/script>\s*/g, '');
+    src = src.replace('</body>',
+      `<script id="ssr">window.__SS__="${enc}";<\/script>\n</body>`);
 
-  // 이전 저장 스크립트 제거
-  html = html.replace(/<script id="ssr"[\s\S]*?<\/script>/g, '');
+    const blob = new Blob([src], {type:'text/html;charset=utf-8'});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = (co||'법인세세무조정')+(yr?'_'+yr:'')+'_체크리스트.html';
+    a.click();
+    URL.revokeObjectURL(url);
 
-  // 복원 스크립트: DOMContentLoaded 이후 실행되도록 이벤트 리스너 방식으로
-  const restoreScript = `<script id="ssr">
-(function(){
-  var enc="${enc}";
-  function run(){
-    try{
-      var st=JSON.parse(decodeURIComponent(escape(atob(enc))));
-      // 업체명/연도 복원
-      var co=document.getElementById('co'), yr=document.getElementById('yr');
-      if(co && st.co) co.value=st.co;
-      if(yr && st.yr) yr.value=st.yr;
-      // na 복원
-      if(st.na) st.na.forEach(function(id){
-        naSet.add(id);
-        var el=document.querySelector('[data-id="'+id+'"]');
-        if(el) el.classList.add('na');
-        var step=STEPS.find(function(s){return s.id===id;});
-        if(step && step._naCell) step._naCell.classList.add('active');
-      });
-      // checked 복원
-      if(st.checked) st.checked.forEach(function(id){
-        checked.add(id);
-        var row=document.querySelector('.item-row[data-id="'+id+'"]');
-        if(row) row.classList.add('checked');
-      });
-      // done 재계산
-      document.querySelectorAll('.step-card.single,.inner-step.single').forEach(function(card){
-        if(checked.has(card.dataset.id+'_0')) card.classList.add('done');
-      });
-      document.querySelectorAll('.item-list,.inner-item-list').forEach(function(list){
-        var rows=list.querySelectorAll('.item-row');
-        if(!rows.length) return;
-        var card=list.closest('.step-card')||list.closest('.inner-step');
-        if(card) card.classList.toggle('done',[...rows].every(function(r){return checked.has(r.dataset.id);}));
-      });
-      // open 복원
-      if(st.openSt) st.openSt.forEach(function(id){
-        var c=document.querySelector('.step-card[data-id="'+id+'"],.inner-step[data-id="'+id+'"]');
-        if(!c||naSet.has(id)) return;
-        var b=c.querySelector('.step-body');
-        if(b&&b.style.display!=='none'){b.classList.add('open');c.classList.add('active');}
-      });
-      if(st.openGr) st.openGr.forEach(function(id){
-        var c=document.querySelector('.group-card[data-id="'+id+'"]');
-        if(!c||naSet.has(id)) return;
-        var b=c.querySelector('.group-body');
-        if(b){b.classList.add('open');c.classList.add('active');}
-      });
-      updateProg();
-    }catch(e){ console.warn('복원 오류:', e); }
+    btn.textContent='✓ 저장됨'; btn.classList.add('saving');
+    setTimeout(()=>{ btn.textContent='💾 저장'; btn.classList.remove('saving'); }, 1800);
+
+  } catch(e) {
+    // fetch 실패 시 (로컬 file:// 환경) — XMLHttpRequest 폴백
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', location.href, false); // 동기
+    try {
+      xhr.send();
+      let src = xhr.responseText;
+      src = src.replace(/<script id="ssr"[\s\S]*?<\/script>\s*/g, '');
+      src = src.replace('</body>',
+        `<script id="ssr">window.__SS__="${enc}";<\/script>\n</body>`);
+      const blob = new Blob([src], {type:'text/html;charset=utf-8'});
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = (co||'법인세세무조정')+(yr?'_'+yr:'')+'_체크리스트.html';
+      a.click();
+      URL.revokeObjectURL(url);
+      btn.textContent='✓ 저장됨'; btn.classList.add('saving');
+      setTimeout(()=>{ btn.textContent='💾 저장'; btn.classList.remove('saving'); }, 1800);
+    } catch(e2) {
+      alert('저장 실패: 브라우저에서 직접 열린 파일은 재저장이 제한될 수 있습니다.\n먼저 claude.ai에서 다운로드한 원본 파일을 사용해 주세요.');
+    }
   }
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded', run);
-  } else {
-    // DOM 빌드 완료 후 실행 보장
-    setTimeout(run, 0);
-  }
-})();
-<\/script>`;
-
-  html = html.replace('</body>', restoreScript + '\n</body>');
-
-  const blob = new Blob([html], {type:'text/html;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href=url;
-  a.download=(co||'법인세세무조정')+(yr?'_'+yr:'')+'_체크리스트.html';
-  a.click();
-  URL.revokeObjectURL(url);
-
-  const btn=document.getElementById('save-btn');
-  btn.textContent='✓ 저장됨'; btn.classList.add('saving');
-  setTimeout(()=>{btn.textContent='💾 저장';btn.classList.remove('saving');},1800);
 }
 
 updateProg();
+
+/* ── 상태 복원 (저장된 파일 열 때) ── */
+(function restore(){
+  if(!window.__SS__) return;
+  try {
+    const st = JSON.parse(decodeURIComponent(escape(atob(window.__SS__))));
+    if(st.co) document.getElementById('co').value = st.co;
+    if(st.yr) document.getElementById('yr').value = st.yr;
+
+    (st.na||[]).forEach(id => {
+      naSet.add(id);
+      const el = document.querySelector(`[data-id="${id}"]`);
+      if(el) el.classList.add('na');
+      const step = STEPS.find(s=>s.id===id);
+      if(step && step._naCell) step._naCell.classList.add('active');
+    });
+
+    (st.checked||[]).forEach(id => {
+      checked.add(id);
+      const row = document.querySelector(`.item-row[data-id="${id}"]`);
+      if(row) row.classList.add('checked');
+    });
+
+    document.querySelectorAll('.step-card.single,.inner-step.single').forEach(card => {
+      if(checked.has(card.dataset.id+'_0')) card.classList.add('done');
+    });
+    document.querySelectorAll('.item-list,.inner-item-list').forEach(list => {
+      const rows = list.querySelectorAll('.item-row');
+      if(!rows.length) return;
+      const card = list.closest('.step-card')||list.closest('.inner-step');
+      if(card) card.classList.toggle('done', [...rows].every(r=>checked.has(r.dataset.id)));
+    });
+
+    (st.openSt||[]).forEach(id => {
+      const c = document.querySelector(`.step-card[data-id="${id}"],.inner-step[data-id="${id}"]`);
+      if(!c||naSet.has(id)) return;
+      const b = c.querySelector('.step-body');
+      if(b && b.style.display!=='none') { b.classList.add('open'); c.classList.add('active'); }
+    });
+    (st.openGr||[]).forEach(id => {
+      const c = document.querySelector(`.group-card[data-id="${id}"]`);
+      if(!c||naSet.has(id)) return;
+      const b = c.querySelector('.group-body');
+      if(b) { b.classList.add('open'); c.classList.add('active'); }
+    });
+
+    updateProg();
+  } catch(e) { console.warn('복원 오류:', e); }
+})();
 </script>
 </body>
 </html>
