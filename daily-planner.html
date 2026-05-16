@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>하루 일과표</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F5F3EE;
+  --surface: #FDFCFA;
+  --surface2: #F0EDE8;
+  --border: #DDD9D2;
+  --border-strong: #C8C3BB;
+  --text: #1A1816;
+  --text-2: #5A554E;
+  --text-3: #9A948C;
+  --am: #2B5E8A;
+  --am-bg: #EBF3FA;
+  --am-border: #B8D4EC;
+  --pm: #3A7A52;
+  --pm-bg: #EAF4EE;
+  --pm-border: #A8D4B8;
+  --night: #5A4A8A;
+  --night-bg: #F0ECF8;
+  --night-border: #C8B8E8;
+  --accent: #C84B2A;
+  --done-bg: #F0EDE8;
+  --done-text: #A8A09A;
+  --done-border: #D8D4CE;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --chip-radius: 20px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 2rem 1rem 4rem;
+}
+
+.page { max-width: 760px; margin: 0 auto; }
+
+.page-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem; }
+.page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.page-date { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-3); }
+
+.pool-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+.pool-section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
+.pool-section-title { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-2); }
+.pool-hint { font-size: 11px; color: var(--text-3); margin-left: auto; }
+
+.pool-chips {
+  min-height: 56px;
+  display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start;
+  padding: 10px;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-sm);
+  transition: background 0.15s, border-color 0.15s;
+}
+.pool-empty { font-size: 12px; color: var(--text-3); align-self: center; pointer-events: none; }
+
+.add-row { display: flex; gap: 8px; margin-top: 0.75rem; }
+.add-input {
+  flex: 1; padding: 8px 12px; font-size: 13px;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); outline: none;
+  transition: border-color 0.15s;
+}
+.add-input:focus { border-color: var(--border-strong); }
+.add-input::placeholder { color: var(--text-3); }
+.add-btn {
+  padding: 8px 16px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif;
+  background: var(--text); color: var(--surface); border: none;
+  border-radius: var(--radius-sm); cursor: pointer; font-weight: 500;
+  transition: opacity 0.15s;
+}
+.add-btn:hover { opacity: 0.82; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 8px 5px 10px;
+  border-radius: var(--chip-radius);
+  font-size: 12px; font-weight: 500;
+  cursor: grab; user-select: none;
+  border: 1px solid transparent;
+  transition: transform 0.1s, box-shadow 0.1s, opacity 0.15s, background 0.2s, color 0.2s;
+  line-height: 1.3;
+}
+.chip:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); transform: translateY(-1px); }
+.chip:active { cursor: grabbing; transform: scale(0.96); }
+.chip.dragging { opacity: 0.3; box-shadow: none; transform: none; }
+
+.chip.done {
+  background: var(--done-bg) !important;
+  color: var(--done-text) !important;
+  border-color: var(--done-border) !important;
+}
+.chip.done .chip-label { text-decoration: line-through; opacity: 0.7; }
+.chip.done .check-btn { color: #5A9A5A !important; opacity: 1 !important; }
+
+.check-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; line-height: 1; padding: 1px 3px;
+  opacity: 0.35; color: inherit;
+  transition: opacity 0.1s, color 0.15s;
+  display: flex; align-items: center; flex-shrink: 0;
+  border-radius: 3px;
+}
+.check-btn:hover { opacity: 0.9; }
+
+.chip-x {
+  background: none; border: none; cursor: pointer;
+  font-size: 13px; line-height: 1; padding: 0 2px;
+  opacity: 0.3; color: inherit;
+  transition: opacity 0.1s;
+  display: flex; align-items: center; flex-shrink: 0;
+}
+.chip-x:hover { opacity: 1; }
+
+.chip-pool .check-btn { display: none; }
+
+.day-divider { display: flex; align-items: center; gap: 12px; margin: 1.5rem 0 1rem; }
+.day-divider-line { flex: 1; height: 1px; background: var(--border); }
+.day-divider-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-3);
+  font-family: 'DM Mono', monospace;
+}
+
+.section { margin-bottom: 1.25rem; }
+.section-head { display: flex; align-items: center; gap: 8px; margin-bottom: 0.6rem; }
+.section-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.section-name { font-size: 14px; font-weight: 700; }
+.section-time { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text-3); margin-left: auto; }
+.goal-input {
+  width: 100%; background: transparent; border: none;
+  border-bottom: 1px dashed var(--border); outline: none;
+  font-size: 12px; color: var(--text-2);
+  font-family: 'Noto Sans KR', sans-serif;
+  padding: 4px 2px; margin-bottom: 0.6rem;
+}
+.goal-input::placeholder { color: var(--text-3); }
+
+.slots-grid { display: grid; gap: 8px; }
+.slots-grid.two { grid-template-columns: 1fr 1fr; }
+.slots-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+.slots-grid.one { grid-template-columns: 1fr; }
+
+.slot-wrap { display: flex; flex-direction: column; gap: 4px; }
+.slot-label { font-size: 11px; color: var(--text-3); font-weight: 500; padding-left: 2px; }
+.slot {
+  min-height: 52px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--surface);
+  padding: 8px; display: flex; flex-wrap: wrap; gap: 6px;
+  align-content: flex-start;
+  transition: background 0.15s, border-color 0.15s;
+}
+.slot.drag-over { border-color: var(--border-strong); background: var(--surface2); }
+
+.sec-am .section-icon { background: var(--am-bg); color: var(--am); }
+.sec-am .section-name { color: var(--am); }
+.sec-am .slot.drag-over { background: var(--am-bg); border-color: var(--am-border); }
+.sec-pm .section-icon { background: var(--pm-bg); color: var(--pm); }
+.sec-pm .section-name { color: var(--pm); }
+.sec-pm .slot.drag-over { background: var(--pm-bg); border-color: var(--pm-border); }
+.sec-night .section-icon { background: var(--night-bg); color: var(--night); }
+.sec-night .section-name { color: var(--night); }
+.sec-night .slot.drag-over { background: var(--night-bg); border-color: var(--night-border); }
+
+.cp-0 { background: #EBF3FA; color: #1E4A70; border-color: #B8D4EC; }
+.cp-1 { background: #EAF4EE; color: #2A5C3C; border-color: #A8D4B8; }
+.cp-2 { background: #FBF1E4; color: #7A4810; border-color: #E8C88A; }
+.cp-3 { background: #F0ECF8; color: #42307A; border-color: #C8B8E8; }
+.cp-4 { background: #FAF0EE; color: #7A2E1E; border-color: #E8BEB8; }
+.cp-5 { background: #EEF8F4; color: #1E5A48; border-color: #A8DCC8; }
+.cp-6 { background: #F8F4E4; color: #5A4A18; border-color: #D8C888; }
+.cp-7 { background: #F4EEFC; color: #5A2878; border-color: #D0B0E8; }
+
+.stats-bar {
+  display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 12px; color: var(--text-2);
+  font-family: 'DM Mono', monospace;
+}
+.stat-item { display: flex; gap: 6px; align-items: center; }
+.stat-dot { width: 7px; height: 7px; border-radius: 50%; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <div class="page-title">하루 일과표</div>
+    <div class="page-date" id="today-date"></div>
+  </div>
+
+  <div class="pool-section">
+    <div class="pool-section-header">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="color:var(--text-2)"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="12" x2="10" y2="12"/></svg>
+      <span class="pool-section-title">오늘 할 일</span>
+      <span class="pool-hint">드래그해서 시간대에 배치 (원본 유지)</span>
+    </div>
+    <div class="pool-chips" id="pool">
+      <span class="pool-empty" id="pool-empty">할 일을 추가하면 여기에 표시됩니다</span>
+    </div>
+    <div class="add-row">
+      <input class="add-input" type="text" id="new-task" placeholder="할 일 입력 후 Enter" />
+      <button class="add-btn" onclick="addTask()">추가</button>
+    </div>
+  </div>
+
+  <div class="day-divider">
+    <div class="day-divider-line"></div>
+    <div class="day-divider-label">시간대별 배치</div>
+    <div class="day-divider-line"></div>
+  </div>
+
+  <div class="section sec-am">
+    <div class="section-head">
+      <div class="section-icon">☀️</div>
+      <span class="section-name">오전</span>
+      <span class="section-time">Morning</span>
+    </div>
+    <input class="goal-input" placeholder="오전 목표…" />
+    <div class="slots-grid two">
+      <div class="slot-wrap">
+        <div class="slot-label">아침 전</div>
+        <div class="slot" id="slot-before-breakfast"
+          ondragover="onDragOver(event)" ondrop="onDrop(event,'slot-before-breakfast')" ondragleave="onDragLeave(event)"></div>
+      </div>
+      <div class="slot-wrap">
+        <div class="slot-label">아침 먹고</div>
+        <div class="slot" id="slot-after-breakfast"
+          ondragover="onDragOver(event)" ondrop="onDrop(event,'slot-after-breakfast')" ondragleave="onDragLeave(event)"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section sec-pm">
+    <div class="section-head">
+      <div class="section-icon">🌤</div>
+      <span class="section-name">오후</span>
+      <span class="section-time">Afternoon</span>
+    </div>
+    <input class="goal-input" placeholder="오후 목표…" />
+    <div class="slots-grid two">
+      <div class="slot-wrap">
+        <div class="slot-label">점심 먹고</div>
+        <div class="slot" id="slot-after-lunch"
+          ondragover="onDragOver(event)" ondrop="onDrop(event,'slot-after-lunch')" ondragleave="onDragLeave(event)"></div>
+      </div>
+      <div class="slot-wrap">
+        <div class="slot-label">저녁 전</div>
+        <div class="slot" id="slot-before-dinner"
+          ondragover="onDragOver(event)" ondrop="onDrop(event,'slot-before-dinner')" ondragleave="onDragLeave(event)"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section sec-night">
+    <div class="section-head">
+      <div class="section-icon">🌙</div>
+      <span class="section-name">저녁 · 밤</span>
+      <span class="section-time">Evening &amp; Night</span>
+    </div>
+    <input class="goal-input" placeholder="저녁·밤 목표…" />
+    <div class="slots-grid three">
+      <div class="slot-wrap">
+        <div class="slot-label">저녁 후</div>
+        <div class="slot" id="slot-evening"
+          ondragover="onDragOver(event)" ondrop="onDrop(event,'slot-evening')" ondragleave="onDragLeave(event)"></div>
+      </div>
+      <div class="slot-wrap">
+        <div class="slot-label">밤 업무</div>
+        <div class="slot" id="slot-night"
+          ondragover="onDragOver(event)" ondrop="onDrop(event,'slot-night')" ondragleave="onDragLeave(event)"></div>
+      </div>
+      <div class="slot-wrap">
+        <div class="slot-label">내일 준비</div>
+        <div class="slot" id="slot-tomorrow"
+          ondragover="onDragOver(event)" ondrop="onDrop(event,'slot-tomorrow')" ondragleave="onDragLeave(event)"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item"><div class="stat-dot" style="background:var(--text-3)"></div><span id="stat-total">전체 0개</span></div>
+    <div class="stat-item"><div class="stat-dot" style="background:var(--am)"></div><span id="stat-placed">배치됨 0개</span></div>
+    <div class="stat-item"><div class="stat-dot" style="background:#5A9A5A"></div><span id="stat-done">완료 0개</span></div>
+    <div class="stat-item"><div class="stat-dot" style="background:var(--accent)"></div><span id="stat-pool">미배치 0개</span></div>
+  </div>
+
+</div>
+<script>
+const PALETTES = ['cp-0','cp-1','cp-2','cp-3','cp-4','cp-5','cp-6','cp-7'];
+let tasks = {};
+let counter = 0;
+let placedCounter = 0;
+let dragTaskId = null;
+let dragPlacedId = null;
+
+function today() {
+  const d = new Date();
+  const days = ['일','월','화','수','목','금','토'];
+  return d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0') + ' (' + days[d.getDay()] + ')';
+}
+document.getElementById('today-date').textContent = today();
+
+function makePoolChip(id) {
+  const t = tasks[id];
+  const chip = document.createElement('div');
+  chip.className = 'chip chip-pool ' + PALETTES[t.ci % PALETTES.length];
+  chip.id = 'chip-pool-' + id;
+  chip.draggable = true;
+  chip.title = '드래그해서 시간대에 배치';
+  chip.innerHTML = '<span class="chip-label">' + t.text + '</span><button class="chip-x" onclick="removeTask(\'' + id + '\')" title="삭제">×</button>';
+  chip.addEventListener('dragstart', function(e) {
+    dragTaskId = id; dragPlacedId = null;
+    e.dataTransfer.effectAllowed = 'copy';
+    setTimeout(function() { chip.classList.add('dragging'); }, 0);
+  });
+  chip.addEventListener('dragend', function() {
+    chip.classList.remove('dragging'); dragTaskId = null;
+  });
+  return chip;
+}
+
+function makePlacedChip(taskId, placedId) {
+  const t = tasks[taskId];
+  const chip = document.createElement('div');
+  chip.className = 'chip ' + PALETTES[t.ci % PALETTES.length];
+  chip.id = 'chip-placed-' + placedId;
+  chip.draggable = true;
+  chip.dataset.taskId = taskId;
+  chip.dataset.placedId = placedId;
+  chip.dataset.done = 'false';
+  chip.innerHTML = '<button class="check-btn" onclick="toggleDone(\'' + placedId + '\')" title="완료">✓</button><span class="chip-label">' + t.text + '</span><button class="chip-x" onclick="removePlaced(\'' + placedId + '\')" title="제거">×</button>';
+  chip.addEventListener('dragstart', function(e) {
+    dragPlacedId = placedId; dragTaskId = taskId;
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(function() { chip.classList.add('dragging'); }, 0);
+  });
+  chip.addEventListener('dragend', function() {
+    chip.classList.remove('dragging'); dragPlacedId = null; dragTaskId = null;
+  });
+  return chip;
+}
+
+function toggleDone(placedId) {
+  const chip = document.getElementById('chip-placed-' + placedId);
+  if (!chip) return;
+  const isDone = chip.dataset.done === 'true';
+  chip.dataset.done = isDone ? 'false' : 'true';
+  chip.classList.toggle('done', !isDone);
+  updateStats();
+}
+
+function addTask() {
+  const inp = document.getElementById('new-task');
+  const text = inp.value.trim();
+  if (!text) return;
+  const id = 'task-' + (++counter);
+  tasks[id] = { text: text, ci: counter - 1 };
+  const pool = document.getElementById('pool');
+  const empty = document.getElementById('pool-empty');
+  if (empty) empty.remove();
+  pool.appendChild(makePoolChip(id));
+  inp.value = ''; inp.focus();
+  updateStats();
+}
+
+function removeTask(id) {
+  const poolChip = document.getElementById('chip-pool-' + id);
+  if (poolChip) poolChip.remove();
+  document.querySelectorAll('[data-task-id="' + id + '"]').forEach(function(el) { el.remove(); });
+  delete tasks[id];
+  const pool = document.getElementById('pool');
+  if (!pool.querySelector('.chip')) {
+    const span = document.createElement('span');
+    span.className = 'pool-empty'; span.id = 'pool-empty';
+    span.textContent = '할 일을 추가하면 여기에 표시됩니다';
+    pool.appendChild(span);
+  }
+  updateStats();
+}
+
+function removePlaced(placedId) {
+  const el = document.getElementById('chip-placed-' + placedId);
+  if (el) el.remove();
+  updateStats();
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = dragPlacedId ? 'move' : 'copy';
+  e.currentTarget.classList.add('drag-over');
+}
+function onDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function onDrop(e, targetId) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!dragTaskId) return;
+  if (targetId === 'pool') return;
+  const target = document.getElementById(targetId);
+  if (!target) return;
+  if (dragPlacedId) {
+    const existing = document.getElementById('chip-placed-' + dragPlacedId);
+    if (existing) target.appendChild(existing);
+  } else {
+    const pid = 'placed-' + (++placedCounter);
+    target.appendChild(makePlacedChip(dragTaskId, pid));
+  }
+  updateStats();
+}
+
+function updateStats() {
+  const total = Object.keys(tasks).length;
+  const placedTaskIds = new Set();
+  let doneCount = 0;
+  document.querySelectorAll('[data-task-id]').forEach(function(el) {
+    placedTaskIds.add(el.dataset.taskId);
+    if (el.dataset.done === 'true') doneCount++;
+  });
+  const unplaced = total - placedTaskIds.size;
+  document.getElementById('stat-total').textContent = '전체 ' + total + '개';
+  document.getElementById('stat-placed').textContent = '배치됨 ' + placedTaskIds.size + '개';
+  document.getElementById('stat-done').textContent = '완료 ' + doneCount + '개';
+  document.getElementById('stat-pool').textContent = '미배치 ' + unplaced + '개';
+}
+
+document.getElementById('new-task').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') addTask();
+});
+</script>
+</body>
+</html>
