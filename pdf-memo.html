@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF 메모 공간 추가기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --border: #E0DDDA;
+    --border-strong: #C8C4BF;
+    --ink: #1A1917;
+    --ink-2: #5A5855;
+    --ink-3: #9A9895;
+    --accent: #1A1917;
+    --accent-fg: #FFFFFF;
+    --line: #D8D5D1;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  }
+
+  html { font-size: 15px; }
+  body {
+    font-family: 'Nanum Gothic', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  header h1 { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+  header span { font-size: 13px; color: var(--ink-3); }
+
+  main {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px 60px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 520px;
+    overflow: hidden;
+  }
+
+  .card-section {
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  /* Drop zone */
+  .drop-zone {
+    border: 1.5px dashed var(--border-strong);
+    border-radius: var(--radius);
+    padding: 36px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    position: relative;
+  }
+  .drop-zone:hover, .drop-zone.over {
+    background: var(--bg);
+    border-color: var(--ink);
+  }
+  .drop-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .drop-icon {
+    width: 40px; height: 40px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+  }
+  .drop-icon svg { width: 20px; height: 20px; stroke: var(--ink-2); stroke-width: 1.8; fill: none; }
+  .drop-zone p { font-size: 14px; color: var(--ink-2); font-weight: 700; margin-bottom: 4px; }
+  .drop-zone span { font-size: 12px; color: var(--ink-3); }
+
+  /* File info */
+  .file-info {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .file-icon {
+    width: 36px; height: 36px; flex-shrink: 0;
+    background: var(--ink);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 800; color: var(--accent-fg);
+    letter-spacing: 0.5px;
+  }
+  .file-meta { flex: 1; min-width: 0; }
+  .file-meta strong { display: block; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .file-meta small { font-size: 11px; color: var(--ink-3); }
+  .file-clear {
+    background: none; border: none; cursor: pointer;
+    color: var(--ink-3); padding: 4px; border-radius: 4px;
+    display: flex; align-items: center;
+    transition: color 0.1s;
+  }
+  .file-clear:hover { color: var(--ink); }
+  .file-clear svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+  /* Options */
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .opt-block label { display: block; font-size: 12px; color: var(--ink-3); margin-bottom: 6px; font-weight: 700; }
+  select {
+    width: 100%; padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--surface);
+    font-family: inherit;
+    font-size: 14px; font-weight: 700;
+    color: var(--ink);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%239A9895' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+  select:focus { outline: none; border-color: var(--ink); }
+
+  .slider-wrap { display: flex; flex-direction: column; gap: 6px; }
+  .slider-header { display: flex; justify-content: space-between; align-items: center; }
+  .slider-val { font-size: 13px; font-weight: 800; }
+  input[type=range] {
+    width: 100%; height: 4px;
+    -webkit-appearance: none;
+    background: var(--border);
+    border-radius: 2px;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    background: var(--ink);
+    border-radius: 50%;
+  }
+  input[type=range]:focus { outline: none; }
+
+  /* Preview */
+  #preview-wrap { display: none; }
+  #preview-canvas {
+    width: 100%; display: block;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    width: 100%; padding: 13px;
+    background: var(--ink); color: var(--accent-fg);
+    border: none; border-radius: 8px;
+    font-family: inherit; font-size: 14px; font-weight: 800;
+    cursor: pointer; letter-spacing: -0.2px;
+    transition: opacity 0.15s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:hover:not(:disabled) { opacity: 0.85; }
+  .btn-primary:active:not(:disabled) { transform: scale(0.99); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-primary svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2.5; fill: none; }
+
+  .btn-secondary {
+    width: 100%; padding: 11px;
+    background: none; color: var(--ink);
+    border: 1px solid var(--border-strong); border-radius: 8px;
+    font-family: inherit; font-size: 13px; font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-bottom: 10px;
+  }
+  .btn-secondary:hover { background: var(--bg); }
+
+  /* Progress */
+  #progress-wrap { display: none; }
+  .progress-bar {
+    height: 3px; background: var(--border);
+    border-radius: 2px; overflow: hidden; margin-bottom: 8px;
+  }
+  .progress-fill { height: 100%; background: var(--ink); width: 0; transition: width 0.3s; border-radius: 2px; }
+  #progress-text { font-size: 12px; color: var(--ink-3); font-weight: 700; }
+
+  /* Result */
+  #result-wrap { display: none; }
+  .result-box {
+    padding: 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .result-box p { font-size: 12px; color: var(--ink-3); margin-bottom: 10px; font-weight: 700; }
+  .result-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    text-decoration: none; color: var(--ink);
+    transition: border-color 0.15s;
+  }
+  .result-link:hover { border-color: var(--ink); }
+  .result-link-icon {
+    width: 32px; height: 32px;
+    background: var(--ink); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .result-link-icon svg { width: 14px; height: 14px; stroke: white; stroke-width: 2.5; fill: none; }
+  .result-link-name { flex: 1; font-size: 13px; font-weight: 700; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .result-link-arrow { color: var(--ink-3); font-size: 18px; }
+
+  /* Error */
+  #error-msg { display: none; font-size: 13px; color: #C0392B; font-weight: 700; margin-top: 10px; padding: 12px; background: #FDF2F2; border: 1px solid #F5C6C6; border-radius: 7px; }
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>PDF 메모 공간 추가기</h1>
+  <span>명진세무회계사무소</span>
+</header>
+
+<main>
+  <div class="card">
+
+    <!-- Step 1: Upload -->
+    <div class="card-section">
+      <div class="section-label">① 파일 선택</div>
+
+      <div class="drop-zone" id="drop-zone">
+        <input type="file" id="file-input" accept=".pdf">
+        <div class="drop-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        </div>
+        <p>PDF를 여기에 드래그하거나 클릭</p>
+        <span>최대 50MB · PDF 파일만 가능</span>
+      </div>
+
+      <div class="file-info" id="file-info">
+        <div class="file-icon">PDF</div>
+        <div class="file-meta">
+          <strong id="file-name-display"></strong>
+          <small id="file-size-display"></small>
+        </div>
+        <button class="file-clear" id="file-clear" aria-label="파일 제거">
+          <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Options -->
+    <div class="card-section" id="options-section" style="display:none">
+      <div class="section-label">② 설정</div>
+      <div class="options-grid">
+        <div class="opt-block">
+          <label for="orientation">용지 방향</label>
+          <select id="orientation">
+            <option value="portrait">세로 (Portrait)</option>
+            <option value="landscape">가로 (Landscape)</option>
+          </select>
+        </div>
+        <div class="opt-block">
+          <label>메모 공간 크기</label>
+          <div class="slider-wrap">
+            <div class="slider-header">
+              <span style="font-size:12px;color:var(--ink-3);font-weight:700;">비율</span>
+              <span class="slider-val"><span id="ratio-val">25</span>%</span>
+            </div>
+            <input type="range" id="memo-ratio" min="20" max="50" value="25" step="1">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="card-section" id="preview-section" style="display:none">
+      <div class="section-label">미리보기 (1페이지)</div>
+      <div id="preview-wrap">
+        <canvas id="preview-canvas"></canvas>
+      </div>
+      <button class="btn-secondary" id="btn-preview">미리보기 확인</button>
+    </div>
+
+    <!-- Step 3: Process -->
+    <div class="card-section" id="action-section" style="display:none">
+      <div class="section-label">③ 변환</div>
+
+      <button class="btn-primary" id="btn-process" disabled>
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        메모 공간 추가 후 다운로드
+      </button>
+
+      <div id="error-msg"></div>
+
+      <div id="progress-wrap" style="margin-top:14px;">
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div id="progress-text">처리 중...</div>
+      </div>
+
+      <div id="result-wrap" style="margin-top:14px;">
+        <div class="result-box">
+          <p>✓ 완료! 아래를 클릭해서 다운로드하세요.</p>
+          <a class="result-link" id="result-link" href="#" download>
+            <div class="result-link-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            </div>
+            <span class="result-link-name" id="result-name"></span>
+            <span class="result-link-arrow">↓</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>브라우저에서 직접 처리 · 파일이 서버로 전송되지 않습니다</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  let currentFile = null;
+
+  const $ = id => document.getElementById(id);
+
+  // Drag & drop
+  const dropZone = $('drop-zone');
+  const fileInput = $('file-input');
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('over');
+    const f = e.dataTransfer.files[0];
+    if (f && f.type === 'application/pdf') loadFile(f);
+    else showError('PDF 파일만 지원합니다.');
+  });
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+
+  function loadFile(f) {
+    if (f.size > 50 * 1024 * 1024) { showError('파일 크기가 50MB를 초과합니다.'); return; }
+    currentFile = f;
+    dropZone.style.display = 'none';
+    $('file-info').style.display = 'flex';
+    $('file-name-display').textContent = f.name;
+    $('file-size-display').textContent = formatSize(f.size) + ' · ' + '업로드 완료';
+    $('options-section').style.display = '';
+    $('preview-section').style.display = '';
+    $('action-section').style.display = '';
+    $('btn-process').disabled = false;
+    $('result-wrap').style.display = 'none';
+    $('error-msg').style.display = 'none';
+    $('preview-wrap').style.display = 'none';
+    $('progress-wrap').style.display = 'none';
+  }
+
+  function formatSize(bytes) {
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+    return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+  }
+
+  $('file-clear').addEventListener('click', () => {
+    currentFile = null; fileInput.value = '';
+    dropZone.style.display = '';
+    $('file-info').style.display = 'none';
+    $('options-section').style.display = 'none';
+    $('preview-section').style.display = 'none';
+    $('action-section').style.display = 'none';
+    $('btn-process').disabled = true;
+  });
+
+  $('memo-ratio').addEventListener('input', () => {
+    $('ratio-val').textContent = $('memo-ratio').value;
+  });
+
+  // Preview
+  $('btn-preview').addEventListener('click', async () => {
+    if (!currentFile) return;
+    $('btn-preview').textContent = '생성 중...';
+    try {
+      const ab = await currentFile.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
+      const page = await pdf.getPage(1);
+      const orientation = $('orientation').value;
+      const ratio = parseInt($('memo-ratio').value) / 100;
+      const vp = page.getViewport({ scale: 1 });
+      const origW = vp.width, origH = vp.height;
+
+      let newW, newH;
+      if (orientation === 'landscape') {
+        newW = Math.max(origW, origH); newH = Math.min(origW, origH);
+      } else {
+        newW = Math.min(origW, origH); newH = Math.max(origW, origH);
+      }
+
+      const SCALE = 2;
+      const canvas = $('preview-canvas');
+      canvas.width = Math.round(newW * SCALE);
+      canvas.height = Math.round(newH * SCALE);
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const topMargin = 42.5;
+      const contentW = newW * (1 - ratio);
+      const scale = Math.min(contentW / origW, (newH - topMargin) / origH) * 0.97 * SCALE;
+      const scaledW = origW * scale;
+      const scaledH = origH * scale;
+
+      // 메모 박스 (Canvas)
+      function drawMemoCanvas(mx, my, mw, mh) {
+        if (mw < 10 || mh < 10) return;
+        const padX = 12*SCALE, padY = 10*SCALE, r = 6*SCALE;
+        ctx.beginPath();
+        ctx.moveTo(mx+r, my); ctx.lineTo(mx+mw-r, my); ctx.quadraticCurveTo(mx+mw, my, mx+mw, my+r);
+        ctx.lineTo(mx+mw, my+mh-r); ctx.quadraticCurveTo(mx+mw, my+mh, mx+mw-r, my+mh);
+        ctx.lineTo(mx+r, my+mh); ctx.quadraticCurveTo(mx, my+mh, mx, my+mh-r);
+        ctx.lineTo(mx, my+r); ctx.quadraticCurveTo(mx, my, mx+r, my); ctx.closePath();
+        ctx.strokeStyle = 'rgb(204,204,204)'; ctx.lineWidth = 0.6*SCALE; ctx.stroke();
+        ctx.fillStyle = 'rgb(200,200,200)'; ctx.font = `${9*SCALE}px Georgia,serif`;
+        ctx.textAlign = 'left'; ctx.fillText('memo', mx+padX, my+padY+9*SCALE);
+        const areaTop = my+padY+18*SCALE, areaBot = my+mh-padY;
+        const count = Math.floor((areaBot - areaTop) / (18*SCALE));
+        const sp = count > 0 ? (areaBot - areaTop) / count : 18*SCALE;
+        ctx.strokeStyle = 'rgb(185,185,185)'; ctx.lineWidth = 0.4*SCALE;
+        ctx.setLineDash([3*SCALE, 3*SCALE]);
+        for (let k = 0; k <= count; k++) {
+          const ly = areaTop + k * sp;
+          ctx.beginPath(); ctx.moveTo(mx+padX, ly); ctx.lineTo(mx+mw-padX, ly); ctx.stroke();
+        }
+        ctx.setLineDash([]);
+      }
+
+      // 체크란 (Canvas)
+      function drawCheckCanvas(mx, my, mw, mh) {
+        if (mw < 10 || mh < 10) return;
+        const padX = 12*SCALE, padY = 14*SCALE, r = 6*SCALE;
+        const boxSize = 8*SCALE, lineSpacing = 26*SCALE;
+        ctx.beginPath();
+        ctx.moveTo(mx+r, my); ctx.lineTo(mx+mw-r, my); ctx.quadraticCurveTo(mx+mw, my, mx+mw, my+r);
+        ctx.lineTo(mx+mw, my+mh-r); ctx.quadraticCurveTo(mx+mw, my+mh, mx+mw-r, my+mh);
+        ctx.lineTo(mx+r, my+mh); ctx.quadraticCurveTo(mx, my+mh, mx, my+mh-r);
+        ctx.lineTo(mx, my+r); ctx.quadraticCurveTo(mx, my, mx+r, my); ctx.closePath();
+        ctx.strokeStyle = 'rgb(204,204,204)'; ctx.lineWidth = 0.6*SCALE; ctx.stroke();
+        ctx.fillStyle = 'rgb(200,200,200)'; ctx.font = `${9*SCALE}px Georgia,serif`;
+        ctx.textAlign = 'left'; ctx.fillText('check!', mx+padX, my+padY+9*SCALE);
+        const areaTop = my+padY+20*SCALE, areaBot = my+mh-padY;
+        const count = Math.floor((areaBot - areaTop) / lineSpacing);
+        const sp = count > 0 ? (areaBot - areaTop) / count : lineSpacing;
+        ctx.strokeStyle = 'rgb(190,190,190)'; ctx.lineWidth = 0.5*SCALE;
+        for (let k = 0; k <= count; k++) {
+          const cy = areaTop + k * sp;
+          ctx.strokeRect(mx+padX, cy-boxSize/2, boxSize, boxSize);
+        }
+      }
+
+      if (orientation === 'landscape') {
+        const dx = ((contentW * SCALE) - scaledW) / 2;
+        const dy = ((newH - topMargin) * SCALE - scaledH) / 2;
+        const rvp = page.getViewport({ scale });
+        await page.render({ canvasContext: ctx, viewport: rvp, transform: [1, 0, 0, 1, dx, dy] }).promise;
+        drawMemoCanvas(contentW*SCALE, 0, (newW-contentW)*SCALE, newH*SCALE);
+      } else {
+        const dy = topMargin * SCALE;
+        const rvp = page.getViewport({ scale });
+        await page.render({ canvasContext: ctx, viewport: rvp, transform: [1, 0, 0, 1, 0, dy] }).promise;
+        drawMemoCanvas(scaledW, dy, newW*SCALE - scaledW, scaledH);
+        if (dy > 30) drawCheckCanvas(0, dy + scaledH, newW*SCALE, newH*SCALE - dy - scaledH);
+      }
+
+      $('preview-wrap').style.display = 'block';
+    } catch (e) { showError('미리보기 생성 실패: ' + e.message); }
+    $('btn-preview').textContent = '미리보기 확인';
+  });
+
+  // Process
+  $('btn-process').addEventListener('click', async () => {
+    if (!currentFile) return;
+    $('btn-process').disabled = true;
+    $('result-wrap').style.display = 'none';
+    $('error-msg').style.display = 'none';
+    $('progress-wrap').style.display = 'block';
+    setProgress(5, 'PDF 읽는 중...');
+
+    try {
+      const ab = await currentFile.arrayBuffer();
+      const { PDFDocument, rgb } = PDFLib;
+      const orientation = $('orientation').value;
+      const ratio = parseInt($('memo-ratio').value) / 100;
+
+      // 원본 PDF 로드
+      const srcDoc = await PDFDocument.load(ab, { ignoreEncryption: true });
+      const totalPages = srcDoc.getPageCount();
+      console.log('[pdf-memo] 총 페이지:', totalPages);
+      const newDoc = await PDFDocument.create();
+
+      for (let i = 0; i < totalPages; i++) {
+        setProgress(5 + (i / totalPages) * 85, `처리 중... (${i + 1} / ${totalPages} 페이지)`);
+
+        // 이 페이지만 담은 단일 페이지 PDF 생성
+        const singleDoc = await PDFDocument.create();
+        const [singlePage] = await singleDoc.copyPages(srcDoc, [i]);
+        singleDoc.addPage(singlePage);
+        const singleBytes = await singleDoc.save();
+
+        // newDoc에 embed
+        const embeddedDoc = await PDFDocument.load(singleBytes, { ignoreEncryption: true });
+        const embedded = await newDoc.embedPdf(embeddedDoc, [0]);
+        console.log('[pdf-memo] 페이지', i+1, 'embedded 타입:', typeof embedded[0], 'width:', embedded[0]?.width);
+        const [embeddedPage] = embedded;
+
+        const { width: ow, height: oh } = embeddedPage;
+
+        const pad = 8;
+
+        // 상단 여백 1.5cm ≈ 42.5pt (철 여백)
+        const topMargin = 42.5;
+
+        const newW = orientation === 'landscape' ? Math.max(ow, oh) : Math.min(ow, oh);
+        const newH = orientation === 'landscape' ? Math.min(ow, oh) : Math.max(ow, oh);
+        const contentW = newW * (1 - ratio);
+        const scale = Math.min(contentW / ow, (newH - topMargin) / oh) * 0.97;
+        const scaledW = ow * scale;
+        const scaledH = oh * scale;
+
+        const page = newDoc.addPage([newW, newH]);
+
+        // 둥근 사각형 path
+        function roundedRectPath(x, y, w, h, r) {
+          r = Math.min(r, w/2, h/2);
+          return `M ${x+r} ${y} L ${x+w-r} ${y} C ${x+w} ${y} ${x+w} ${y} ${x+w} ${y+r} L ${x+w} ${y+h-r} C ${x+w} ${y+h} ${x+w} ${y+h} ${x+w-r} ${y+h} L ${x+r} ${y+h} C ${x} ${y+h} ${x} ${y+h} ${x} ${y+h-r} L ${x} ${y+r} C ${x} ${y} ${x} ${y} ${x+r} ${y} Z`;
+        }
+
+        const borderC = rgb(0.80, 0.80, 0.80);
+        const lineC   = rgb(0.72, 0.72, 0.72);
+        const titleC  = rgb(0.78, 0.78, 0.78);
+
+        // 오른쪽 메모 (점선 균등 배분)
+        function drawMemo(mx, my, mw, mh) {
+          if (mw < 20 || mh < 20) return;
+          const padX = 12, padY = 10;
+          page.drawSvgPath(roundedRectPath(mx, my, mw, mh, 6), { x:0, y:0, borderColor: borderC, borderWidth: 0.6 });
+          page.drawText('memo', { x: mx+padX, y: my+mh-padY-7, size: 8, color: titleC });
+          const areaTop = my+mh-padY-20, areaBot = my+padY;
+          const count = Math.floor((areaTop - areaBot) / 18);
+          const sp = count > 0 ? (areaTop - areaBot) / count : 18;
+          for (let k = 0; k <= count; k++) {
+            const ly = areaTop - k * sp;
+            for (let lx = mx+padX; lx+3 < mx+mw-padX; lx += 6)
+              page.drawLine({ start:{x:lx,y:ly}, end:{x:lx+3,y:ly}, thickness:0.35, color:lineC });
+          }
+        }
+
+        // 아래 체크란 (체크박스만, 점선 없음, 줄간격 넉넉하게)
+        function drawCheck(mx, my, mw, mh) {
+          if (mw < 20 || mh < 20) return;
+          const padX = 12, padY = 14, boxSize = 8, lineSpacing = 26;
+          page.drawSvgPath(roundedRectPath(mx, my, mw, mh, 6), { x:0, y:0, borderColor: borderC, borderWidth: 0.6 });
+          page.drawText('check!', { x: mx+padX, y: my+mh-padY-7, size: 8, color: titleC });
+          const areaTop = my+mh-padY-20, areaBot = my+padY;
+          const count = Math.floor((areaTop - areaBot) / lineSpacing);
+          const sp = count > 0 ? (areaTop - areaBot) / count : lineSpacing;
+          for (let k = 0; k <= count; k++) {
+            const cy = areaTop - k * sp;
+            page.drawRectangle({ x: mx+padX, y: cy-boxSize/2, width: boxSize, height: boxSize, borderColor: rgb(0.78,0.78,0.78), borderWidth: 0.5, color: rgb(1,1,1) });
+          }
+        }
+
+        if (orientation === 'landscape') {
+          const dx = (contentW - scaledW) / 2;
+          const dy = (newH - topMargin - scaledH) / 2;
+          page.drawPage(embeddedPage, { x: dx, y: dy, xScale: scale, yScale: scale });
+          drawMemo(contentW, 0, newW - contentW, newH);
+        } else {
+          const dx = 0;
+          const dy = newH - topMargin - scaledH;
+          page.drawPage(embeddedPage, { x: dx, y: dy, xScale: scale, yScale: scale });
+          drawMemo(scaledW, dy, newW - scaledW, scaledH);
+          if (dy > 30) drawCheck(0, 0, newW, dy);
+        }
+      }
+
+      setProgress(95, '파일 생성 중...');
+      const bytes = await newDoc.save();
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const outName = currentFile.name.replace(/\.pdf$/i, '') + '_메모.pdf';
+
+      // 자동 다운로드
+      const a = document.createElement('a');
+      a.href = url; a.download = outName;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+
+      $('result-link').href = url;
+      $('result-link').download = outName;
+      $('result-name').textContent = outName;
+
+      setProgress(100, '완료!');
+      setTimeout(() => {
+        $('progress-wrap').style.display = 'none';
+        $('result-wrap').style.display = 'block';
+      }, 500);
+    } catch (e) {
+      console.error('[pdf-memo] 오류:', e);
+      showError('변환 실패: ' + e.message);
+      $('progress-wrap').style.display = 'none';
+    }
+    $('btn-process').disabled = false;
+  });
+
+  function setProgress(pct, text) {
+    $('progress-fill').style.width = pct + '%';
+    $('progress-text').textContent = text;
+  }
+
+  function showError(msg) {
+    const el = $('error-msg');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+</script>
+</body>
+</html>
