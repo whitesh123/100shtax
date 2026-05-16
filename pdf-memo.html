@@ -326,10 +326,16 @@
     <div class="card-section" id="action-section" style="display:none">
       <div class="section-label">③ 변환</div>
 
-      <button class="btn-primary" id="btn-process" disabled>
-        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-        메모 공간 추가 후 다운로드
-      </button>
+      <div style="display:flex; gap:8px;">
+        <button class="btn-primary" id="btn-process" disabled style="flex:1;">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          다운로드
+        </button>
+        <button class="btn-primary" id="btn-print" disabled style="flex:1;">
+          <svg viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
+          바로 인쇄
+        </button>
+      </div>
 
       <div id="error-msg"></div>
 
@@ -362,6 +368,7 @@
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
   let currentFile = null;
+  let lastPdfBytes = null; // 변환된 bytes 보관
 
   const $ = id => document.getElementById(id);
 
@@ -389,6 +396,7 @@
     $('preview-section').style.display = '';
     $('action-section').style.display = '';
     $('btn-process').disabled = false;
+    $('btn-print').disabled = false;
     $('result-wrap').style.display = 'none';
     $('error-msg').style.display = 'none';
     $('preview-wrap').style.display = 'none';
@@ -401,13 +409,14 @@
   }
 
   $('file-clear').addEventListener('click', () => {
-    currentFile = null; fileInput.value = '';
+    currentFile = null; fileInput.value = ''; lastPdfBytes = null;
     dropZone.style.display = '';
     $('file-info').style.display = 'none';
     $('options-section').style.display = 'none';
     $('preview-section').style.display = 'none';
     $('action-section').style.display = 'none';
     $('btn-process').disabled = true;
+    $('btn-print').disabled = true;
   });
 
   $('memo-ratio').addEventListener('input', () => {
@@ -623,6 +632,7 @@
 
       setProgress(95, '파일 생성 중...');
       const bytes = await newDoc.save();
+      lastPdfBytes = bytes; // 인쇄용으로 보관
       const blob = new Blob([bytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const outName = currentFile.name.replace(/\.pdf$/i, '') + '_메모.pdf';
@@ -647,6 +657,63 @@
       $('progress-wrap').style.display = 'none';
     }
     $('btn-process').disabled = false;
+  });
+
+  // 인쇄 버튼
+  $('btn-print').addEventListener('click', async () => {
+    if (!currentFile) return;
+
+    // 변환된 결과 없으면 먼저 변환 후 대기
+    if (!lastPdfBytes) {
+      $('btn-process').click();
+      await new Promise(resolve => {
+        const check = setInterval(() => {
+          if (lastPdfBytes) { clearInterval(check); resolve(); }
+        }, 300);
+        setTimeout(() => { clearInterval(check); resolve(); }, 30000);
+      });
+    }
+    if (!lastPdfBytes) return;
+
+    const origHtml = $('btn-print').innerHTML;
+    $('btn-print').textContent = '인쇄 준비 중...';
+    $('btn-print').disabled = true;
+
+    try {
+      // pdf.js로 모든 페이지를 canvas → dataURL 변환
+      const pdf = await pdfjsLib.getDocument({ data: lastPdfBytes.slice(0) }).promise;
+      const pageCount = pdf.numPages;
+      let imagesHtml = '';
+
+      for (let p = 1; p <= pageCount; p++) {
+        const page = await pdf.getPage(p);
+        const vp = page.getViewport({ scale: 2.5 });
+        const canvas = document.createElement('canvas');
+        canvas.width = vp.width; canvas.height = vp.height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        await page.render({ canvasContext: ctx, viewport: vp }).promise;
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+        imagesHtml += `<div style="page-break-after:always;"><img src="${dataUrl}" style="width:100%;display:block;"></div>`;
+      }
+
+      const w = window.open('', '_blank');
+      if (!w) { showError('팝업이 차단되었습니다. 팝업 허용 후 다시 시도해주세요.'); return; }
+      w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{background:#fff;}
+        div{break-after:page;}
+        @media print{@page{margin:0;size:auto;}div{break-after:page;}}
+      </style></head><body>${imagesHtml}<script>
+        window.onload = function(){ setTimeout(function(){ window.print(); }, 500); };
+      <\/script></body></html>`);
+      w.document.close();
+    } catch(e) {
+      showError('인쇄 실패: ' + e.message);
+    }
+
+    $('btn-print').innerHTML = origHtml;
+    $('btn-print').disabled = false;
   });
 
   function setProgress(pct, text) {
