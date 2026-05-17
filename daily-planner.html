@@ -24,6 +24,9 @@
   --night: #5A4A8A;
   --night-bg: #F0ECF8;
   --night-border: #C8B8E8;
+  --defer: #7A5A2A;
+  --defer-bg: #FBF5E4;
+  --defer-border: #E8D48A;
   --accent: #C84B2A;
   --done-bg: #F0EDE8;
   --done-text: #A8A09A;
@@ -45,7 +48,6 @@ body {
 
 .page { max-width: 760px; margin: 0 auto; }
 
-/* ── Header ── */
 .page-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
 .page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
 .page-date { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-3); flex: 1; }
@@ -58,9 +60,8 @@ body {
   cursor: pointer; font-weight: 500; transition: background 0.15s, border-color 0.15s;
 }
 .hbtn:hover { background: var(--surface2); border-color: var(--border-strong); }
-.hbtn svg { flex-shrink: 0; }
 
-/* ── Pool ── */
+/* Pool */
 .pool-section {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.75rem;
@@ -68,14 +69,12 @@ body {
 .pool-section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
 .pool-section-title { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-2); }
 .pool-hint { font-size: 11px; color: var(--text-3); margin-left: auto; }
-
 .pool-chips {
   min-height: 56px; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start;
   padding: 10px; border: 1.5px dashed var(--border); border-radius: var(--radius-sm);
   transition: background 0.15s, border-color 0.15s;
 }
 .pool-empty { font-size: 12px; color: var(--text-3); align-self: center; pointer-events: none; }
-
 .add-row { display: flex; gap: 8px; margin-top: 0.75rem; }
 .add-input {
   flex: 1; padding: 8px 12px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif;
@@ -91,7 +90,16 @@ body {
 }
 .add-btn:hover { opacity: 0.82; }
 
-/* ── Chip ── */
+/* 미뤄진 항목 뱃지 */
+.carried-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+  background: var(--defer-bg); color: var(--defer); border: 1px solid var(--defer-border);
+  border-radius: 10px; padding: 1px 7px; margin-bottom: 0.5rem;
+  width: fit-content;
+}
+
+/* Chip */
 .chip {
   display: inline-flex; align-items: center; gap: 4px;
   padding: 5px 8px 5px 10px; border-radius: var(--chip-radius);
@@ -106,6 +114,9 @@ body {
 .chip.done { background: var(--done-bg) !important; color: var(--done-text) !important; border-color: var(--done-border) !important; }
 .chip.done .chip-label { text-decoration: line-through; opacity: 0.7; }
 .chip.done .check-btn { color: #5A9A5A !important; opacity: 1 !important; }
+/* 미뤄진 칩 (풀에서 carried over 표시) */
+.chip.carried { outline: 1.5px dashed var(--defer-border); outline-offset: 1px; }
+.chip.carried .chip-label::before { content: '↩ '; font-size: 10px; opacity: 0.7; }
 
 .check-btn {
   background: none; border: none; cursor: pointer; font-size: 12px;
@@ -121,12 +132,12 @@ body {
 .chip-x:hover { opacity: 1; }
 .chip-pool .check-btn { display: none; }
 
-/* ── Divider ── */
+/* Divider */
 .day-divider { display: flex; align-items: center; gap: 12px; margin: 1.5rem 0 1rem; }
 .day-divider-line { flex: 1; height: 1px; background: var(--border); }
 .day-divider-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); font-family: 'DM Mono', monospace; }
 
-/* ── Sections ── */
+/* Section */
 .section { margin-bottom: 1.25rem; }
 .section-head { display: flex; align-items: center; gap: 8px; margin-bottom: 0.6rem; }
 .section-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
@@ -144,6 +155,14 @@ body {
 .slots-grid.three { grid-template-columns: 1fr 1fr 1fr; }
 .slot-wrap { display: flex; flex-direction: column; gap: 4px; }
 .slot-label { font-size: 11px; color: var(--text-3); font-weight: 500; padding-left: 2px; }
+
+/* 내일로 미루기 슬롯 - 강조 스타일 */
+.slot-label.defer-label { color: var(--defer); font-weight: 700; }
+.slot.defer-slot {
+  border-color: var(--defer-border); background: var(--defer-bg);
+}
+.slot.defer-slot.drag-over { border-color: var(--defer); background: #F5EDD0; }
+
 .slot {
   min-height: 52px; border-radius: var(--radius-sm); border: 1px solid var(--border);
   background: var(--surface); padding: 8px; display: flex; flex-wrap: wrap; gap: 6px;
@@ -161,7 +180,6 @@ body {
 .sec-night .section-name { color: var(--night); }
 .sec-night .slot.drag-over { background: var(--night-bg); border-color: var(--night-border); }
 
-/* ── Chip colors ── */
 .cp-0 { background: #EBF3FA; color: #1E4A70; border-color: #B8D4EC; }
 .cp-1 { background: #EAF4EE; color: #2A5C3C; border-color: #A8D4B8; }
 .cp-2 { background: #FBF1E4; color: #7A4810; border-color: #E8C88A; }
@@ -171,7 +189,7 @@ body {
 .cp-6 { background: #F8F4E4; color: #5A4A18; border-color: #D8C888; }
 .cp-7 { background: #F4EEFC; color: #5A2878; border-color: #D0B0E8; }
 
-/* ── Stats ── */
+/* Stats */
 .stats-bar {
   display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.75rem;
   padding: 0.75rem 1rem; background: var(--surface); border: 1px solid var(--border);
@@ -180,20 +198,20 @@ body {
 .stat-item { display: flex; gap: 6px; align-items: center; }
 .stat-dot { width: 7px; height: 7px; border-radius: 50%; }
 
-/* ── Print / PDF ── */
+/* Print */
 @media print {
   body { background: #fff !important; padding: 1rem !important; }
   .header-btns, .add-row, .pool-section, .day-divider, .stats-bar { display: none !important; }
-  .hbtn { display: none !important; }
   .chip-x, .check-btn { display: none !important; }
   .page { max-width: 100% !important; }
   .section { break-inside: avoid; }
   .slot { border: 1px solid #ccc !important; background: #fff !important; }
-  .chip { border: 1px solid #ccc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .slot.defer-slot { background: #FFFBF0 !important; border-color: #E8D48A !important; }
+  .chip { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .chip.done .chip-label { text-decoration: line-through; }
-  .chip.done::before { content: "✓ "; color: #5A9A5A; }
   .goal-input { border-bottom: 1px dashed #ccc !important; color: #333 !important; }
   h1.print-title { display: block !important; font-size: 18px; font-weight: 700; margin-bottom: 1rem; }
+  .carried-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 h1.print-title { display: none; }
 </style>
@@ -218,12 +236,16 @@ h1.print-title { display: none; }
     </div>
   </div>
 
-  <!-- Pool -->
+  <!-- 오늘 할 일 풀 -->
   <div class="pool-section">
     <div class="pool-section-header">
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="color:var(--text-2)"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="12" x2="10" y2="12"/></svg>
       <span class="pool-section-title">오늘 할 일</span>
       <span class="pool-hint">드래그해서 시간대에 배치 (원본 유지)</span>
+    </div>
+    <!-- 어제에서 미뤄진 항목 뱃지 (있을 때만 표시) -->
+    <div id="carried-notice" style="display:none;">
+      <div class="carried-badge">↩ 어제에서 넘어온 항목</div>
     </div>
     <div class="pool-chips" id="pool">
       <span class="pool-empty" id="pool-empty">할 일을 추가하면 여기에 표시됩니다</span>
@@ -298,8 +320,8 @@ h1.print-title { display: none; }
         <div class="slot" id="slot-night" ondragover="onDragOver(event)" ondrop="onDrop(event,'slot-night')" ondragleave="onDragLeave(event)"></div>
       </div>
       <div class="slot-wrap">
-        <div class="slot-label">내일 준비</div>
-        <div class="slot" id="slot-tomorrow" ondragover="onDragOver(event)" ondrop="onDrop(event,'slot-tomorrow')" ondragleave="onDragLeave(event)"></div>
+        <div class="slot-label defer-label">📅 내일로 미루기</div>
+        <div class="slot defer-slot" id="slot-defer" ondragover="onDragOver(event)" ondrop="onDrop(event,'slot-defer')" ondragleave="onDragLeave(event)"></div>
       </div>
     </div>
   </div>
@@ -310,27 +332,33 @@ h1.print-title { display: none; }
     <div class="stat-item"><div class="stat-dot" style="background:var(--am)"></div><span id="stat-placed">배치됨 0개</span></div>
     <div class="stat-item"><div class="stat-dot" style="background:#5A9A5A"></div><span id="stat-done">완료 0개</span></div>
     <div class="stat-item"><div class="stat-dot" style="background:var(--accent)"></div><span id="stat-pool">미배치 0개</span></div>
+    <div class="stat-item"><div class="stat-dot" style="background:var(--defer)"></div><span id="stat-defer">내일로 미룸 0개</span></div>
   </div>
 
 </div>
 
 <script>
-// ── 상수 ──────────────────────────────────────────────
+// ── 상수 ──────────────────────────────────────────────────────
 const PALETTES = ['cp-0','cp-1','cp-2','cp-3','cp-4','cp-5','cp-6','cp-7'];
-const SLOTS = ['slot-before-breakfast','slot-after-breakfast','slot-after-lunch','slot-before-dinner','slot-evening','slot-night','slot-tomorrow'];
-const STORAGE_KEY = 'daily-planner-v1';
+const SLOTS = ['slot-before-breakfast','slot-after-breakfast','slot-after-lunch','slot-before-dinner','slot-evening','slot-night','slot-defer'];
+const STORAGE_KEY  = 'daily-planner-v2';   // 오늘 상태
+const DEFERRED_KEY = 'daily-planner-deferred'; // 내일로 미룬 항목
 
-// ── 상태 ──────────────────────────────────────────────
-let tasks = {};       // { taskId: { text, ci } }
-let placed = {};      // { placedId: { taskId, slotId, done } }
+// ── 상태 ──────────────────────────────────────────────────────
+let tasks = {};
 let counter = 0;
 let placedCounter = 0;
 let dragTaskId = null;
 let dragPlacedId = null;
 
-// ── 날짜 ──────────────────────────────────────────────
+// ── 날짜 헬퍼 ─────────────────────────────────────────────────
 function todayKey() {
   const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function yesterdayKey() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 function todayLabel() {
@@ -341,15 +369,13 @@ function todayLabel() {
 document.getElementById('today-date').textContent = todayLabel();
 document.getElementById('print-title').textContent = '하루 일과표  ' + todayLabel();
 
-// ── localStorage 저장/복원 ────────────────────────────
+// ── saveState ─────────────────────────────────────────────────
 function saveState() {
-  // 목표 텍스트 수집
   const goals = {
     am: document.getElementById('goal-am').value,
     pm: document.getElementById('goal-pm').value,
     night: document.getElementById('goal-night').value
   };
-  // placed 위치 수집 (DOM에서)
   const placedSnap = {};
   SLOTS.forEach(function(slotId) {
     const slot = document.getElementById(slotId);
@@ -362,6 +388,19 @@ function saveState() {
     });
   });
 
+  // 내일로 미룬 항목 따로 저장 (다음날을 위해)
+  const deferredTasks = [];
+  const deferSlot = document.getElementById('slot-defer');
+  deferSlot.querySelectorAll('[data-placed-id]').forEach(function(el) {
+    const tid = el.dataset.taskId;
+    if (tasks[tid]) {
+      deferredTasks.push({ text: tasks[tid].text, ci: tasks[tid].ci });
+    }
+  });
+  try {
+    localStorage.setItem(DEFERRED_KEY, JSON.stringify({ date: todayKey(), items: deferredTasks }));
+  } catch(e) {}
+
   const state = {
     date: todayKey(),
     tasks: tasks,
@@ -373,21 +412,54 @@ function saveState() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
 }
 
+// ── loadState ─────────────────────────────────────────────────
 function loadState() {
-  let raw;
-  try { raw = localStorage.getItem(STORAGE_KEY); } catch(e) { return; }
-  if (!raw) return;
-  let state;
-  try { state = JSON.parse(raw); } catch(e) { return; }
+  let carriedCount = 0;
 
-  // 오늘 날짜가 아니면 무시 (자정 초기화)
-  if (state.date !== todayKey()) {
-    try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
-    return;
+  // 1. 어제 미뤄진 항목 → 오늘 풀에 추가
+  try {
+    const raw = localStorage.getItem(DEFERRED_KEY);
+    if (raw) {
+      const def = JSON.parse(raw);
+      // 어제 저장된 것만 (오늘 저장된 건 무시)
+      if (def.date === yesterdayKey() && def.items && def.items.length > 0) {
+        const pool = document.getElementById('pool');
+        const empty = document.getElementById('pool-empty');
+        if (empty) empty.remove();
+        def.items.forEach(function(item) {
+          const id = 'task-' + (++counter);
+          tasks[id] = { text: item.text, ci: item.ci };
+          const chip = makePoolChip(id);
+          chip.classList.add('carried');
+          pool.appendChild(chip);
+          carriedCount++;
+        });
+        // 어제 데이터 소비 완료 → 삭제
+        localStorage.removeItem(DEFERRED_KEY);
+      }
+    }
+  } catch(e) {}
+
+  if (carriedCount > 0) {
+    document.getElementById('carried-notice').style.display = 'block';
   }
 
-  tasks = state.tasks || {};
-  counter = state.counter || 0;
+  // 2. 오늘 저장된 상태 복원
+  let raw;
+  try { raw = localStorage.getItem(STORAGE_KEY); } catch(e) { updateStats(); return; }
+  if (!raw) { updateStats(); return; }
+  let state;
+  try { state = JSON.parse(raw); } catch(e) { updateStats(); return; }
+
+  if (state.date !== todayKey()) {
+    try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+    updateStats(); return;
+  }
+
+  // tasks 병합 (미뤄온 항목 + 오늘 저장 항목)
+  const carried = Object.assign({}, tasks); // 미뤄온 것
+  tasks = Object.assign({}, state.tasks || {}, carried);
+  counter = Math.max(counter, state.counter || 0);
   placedCounter = state.placedCounter || 0;
 
   // 목표 복원
@@ -397,34 +469,41 @@ function loadState() {
     document.getElementById('goal-night').value = state.goals.night || '';
   }
 
-  // 풀 칩 복원
+  // 풀 칩 복원 (오늘 저장된 task들 — carried는 이미 추가됨)
   const pool = document.getElementById('pool');
   const empty = document.getElementById('pool-empty');
-  const taskIds = Object.keys(tasks);
-  if (taskIds.length > 0) {
-    if (empty) empty.remove();
-    taskIds.forEach(function(id) { pool.appendChild(makePoolChip(id)); });
+  Object.keys(state.tasks || {}).forEach(function(id) {
+    if (!tasks[id]) tasks[id] = state.tasks[id];
+    // carried 항목은 이미 풀에 있으므로 중복 방지
+    if (!document.getElementById('chip-pool-' + id)) {
+      if (empty) empty.remove();
+      pool.appendChild(makePoolChip(id));
+    }
+  });
+  if (!pool.querySelector('.chip')) {
+    if (!document.getElementById('pool-empty')) {
+      const span = document.createElement('span');
+      span.className = 'pool-empty'; span.id = 'pool-empty';
+      span.textContent = '할 일을 추가하면 여기에 표시됩니다';
+      pool.appendChild(span);
+    }
   }
 
-  // placed 칩 복원
-  placed = state.placed || {};
-  Object.keys(placed).forEach(function(pid) {
-    const p = placed[pid];
+  // placed 칩 복원 (slot-defer 포함)
+  Object.keys(state.placed || {}).forEach(function(pid) {
+    const p = state.placed[pid];
     if (!tasks[p.taskId]) return;
     const slot = document.getElementById(p.slotId);
     if (!slot) return;
     const chip = makePlacedChip(p.taskId, pid);
-    if (p.done) {
-      chip.dataset.done = 'true';
-      chip.classList.add('done');
-    }
+    if (p.done) { chip.dataset.done = 'true'; chip.classList.add('done'); }
     slot.appendChild(chip);
   });
 
   updateStats();
 }
 
-// ── 칩 생성 ──────────────────────────────────────────
+// ── 칩 생성 ──────────────────────────────────────────────────
 function makePoolChip(id) {
   const t = tasks[id];
   const chip = document.createElement('div');
@@ -463,15 +542,14 @@ function makePlacedChip(taskId, placedId) {
   return chip;
 }
 
-// ── 액션 ──────────────────────────────────────────────
+// ── 액션 ──────────────────────────────────────────────────────
 function toggleDone(placedId) {
   const chip = document.getElementById('chip-placed-' + placedId);
   if (!chip) return;
   const isDone = chip.dataset.done === 'true';
   chip.dataset.done = isDone ? 'false' : 'true';
   chip.classList.toggle('done', !isDone);
-  updateStats();
-  saveState();
+  updateStats(); saveState();
 }
 
 function addTask() {
@@ -485,8 +563,7 @@ function addTask() {
   if (empty) empty.remove();
   pool.appendChild(makePoolChip(id));
   inp.value = ''; inp.focus();
-  updateStats();
-  saveState();
+  updateStats(); saveState();
 }
 
 function removeTask(id) {
@@ -501,19 +578,16 @@ function removeTask(id) {
     span.textContent = '할 일을 추가하면 여기에 표시됩니다';
     pool.appendChild(span);
   }
-  updateStats();
-  saveState();
+  updateStats(); saveState();
 }
 
 function removePlaced(placedId) {
   const el = document.getElementById('chip-placed-' + placedId);
   if (el) el.remove();
-  delete placed[placedId];
-  updateStats();
-  saveState();
+  updateStats(); saveState();
 }
 
-// ── 드래그 ────────────────────────────────────────────
+// ── 드래그 ────────────────────────────────────────────────────
 function onDragOver(e) {
   e.preventDefault();
   e.dataTransfer.dropEffect = dragPlacedId ? 'move' : 'copy';
@@ -534,41 +608,45 @@ function onDrop(e, targetId) {
     const pid = 'placed-' + (++placedCounter);
     target.appendChild(makePlacedChip(dragTaskId, pid));
   }
-  updateStats();
-  saveState();
+  updateStats(); saveState();
 }
 
-// ── 통계 ──────────────────────────────────────────────
+// ── 통계 ──────────────────────────────────────────────────────
 function updateStats() {
   const total = Object.keys(tasks).length;
   const placedTaskIds = new Set();
   let doneCount = 0;
+  let deferCount = 0;
+  const deferSlot = document.getElementById('slot-defer');
+
   document.querySelectorAll('[data-task-id]').forEach(function(el) {
     placedTaskIds.add(el.dataset.taskId);
     if (el.dataset.done === 'true') doneCount++;
   });
+  deferSlot.querySelectorAll('[data-placed-id]').forEach(function() { deferCount++; });
+
   const unplaced = total - placedTaskIds.size;
   document.getElementById('stat-total').textContent = '전체 ' + total + '개';
   document.getElementById('stat-placed').textContent = '배치됨 ' + placedTaskIds.size + '개';
   document.getElementById('stat-done').textContent = '완료 ' + doneCount + '개';
   document.getElementById('stat-pool').textContent = '미배치 ' + unplaced + '개';
+  document.getElementById('stat-defer').textContent = '내일로 미룸 ' + deferCount + '개';
 }
 
-// ── PDF 저장 ──────────────────────────────────────────
+// ── PDF 저장 ──────────────────────────────────────────────────
 function savePDF() {
-  // 브라우저 인쇄 다이얼로그를 PDF로 안내
   const prev = document.title;
   document.title = '하루 일과표_' + todayKey();
   window.print();
   document.title = prev;
 }
 
-// ── 키 이벤트 ─────────────────────────────────────────
+// ── 키 이벤트 ─────────────────────────────────────────────────
 document.getElementById('new-task').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') addTask();
 });
 
-// ── 초기화 ────────────────────────────────────────────
+// ── 초기 로드 ─────────────────────────────────────────────────
 loadState();
 </script>
 </body>
